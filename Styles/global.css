@@ -1,22 +1,28 @@
-/* variables de estilo */
+/* ====================================================================
+   FERRETERÍA LOS MAESTROS - HOJA DE ESTILOS GLOBAL (CSS BÁSICO LIMPIO)
+   ==================================================================== */
+
+/* =========================================
+   1. VARIABLES GLOBALES Y SISTEMA DE DISEÑO
+   ========================================= */
 :root {
-  /* colores de marca */
-  --color-primary: #e65100;          
-  --color-primary-hover: #f57c00;    
-  --color-primary-light: #fff3e0;    
-  --color-secondary: #1e293b;        
+  /* Colores de marca */
+  --color-primary: #e65100;          /* Naranja industrial principal */
+  --color-primary-hover: #f57c00;    /* Tono más vibrante en interacción */
+  --color-primary-light: #fff3e0;    /* Fondo suave complementario */
+  --color-secondary: #1e293b;        /* Pizarra oscuro moderno (Navbar, Footer, Títulos) */
   --color-secondary-hover: #334155;
-  --color-accent: #f59e0b;           
+  --color-accent: #f59e0b;           /* Amarillo / Ámbar para avisos */
 
-  /* fondos y superficies */
-  --bg-body: #f8fafc;               
-  --bg-surface: #ffffff;             
-  --bg-surface-alt: #f1f5f9;         
+  /* Fondos y superficies */
+  --bg-body: #f8fafc;                /* Fondo general limpio y neutro */
+  --bg-surface: #ffffff;             /* Superficie blanca para tarjetas y contenedores */
+  --bg-surface-alt: #f1f5f9;         /* Superficie secundaria sutil */
 
-  /* textos y bordes */
-  --text-main: #334155;              
-  --text-muted: #64748b;             
-  --border-color: #e2e8f0;           
+  /* Textos y bordes */
+  --text-main: #334155;              /* Texto principal de alto contraste y legibilidad */
+  --text-muted: #64748b;             /* Texto secundario para fechas, códigos y subtítulos */
+  --border-color: #e2e8f0;           /* Bordes suaves de separación */
   --border-color-hover: #cbd5e1;
 
   /* Estados funcionales */
@@ -26,7 +32,7 @@
   --bg-success: #ecfdf5;
   --border-success: #a7f3d0;
 
-  /* bordes,sombras y transicion */
+  /* Estructura, Bordes y Sombras */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -36,7 +42,9 @@
   --transition: 0.2s ease-in-out;
 }
 
-/* Reset y tipografia */
+/* =========================================
+   2. RESET BÁSICO Y TIPOGRAFÍA
+   ========================================= */
 * {
   margin: 0;
   padding: 0;
@@ -47,7 +55,7 @@ html {
   min-height: 100%;
 }
 
-
+/* SOLUCIÓN STICKY FOOTER: Estructura vertical con Flexbox */
 body {
   min-height: 100vh;
   display: flex;
@@ -83,7 +91,9 @@ p {
   margin-bottom: 0.5rem;
 }
 
-
+/* =========================================
+   3. LAYOUT: NAVBAR Y FOOTER
+   ========================================= */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -169,8 +179,9 @@ p {
   margin: 0.35rem 0;
 }
 
-
-/* Vistas */
+/* =========================================
+   4. SECCIONES Y VISTAS (SPA)
+   ========================================= */
 section {
   padding: 2.75rem 5%;
   width: 100%;
@@ -194,7 +205,9 @@ section {
   margin-bottom: 1.25rem;
 }
 
-/* componentes */
+/* =========================================
+   5. COMPONENTES: BOTONES
+   ========================================= */
 .btn {
   font-family: inherit;
   font-size: 0.95rem;
@@ -261,7 +274,9 @@ section {
   font-size: 0.85rem;
 }
 
-
+/* =========================================
+   6. COMPONENTES: TARJETAS (CARDS)
+   ========================================= */
 .cards-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -302,7 +317,48 @@ section {
   padding-top: 0.5rem;
 }
 
+/* Imágenes y datos del catálogo: componentes reutilizados por las seis tarjetas */
+.product-image {
+  display: block;
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  background-color: var(--bg-surface-alt);
+  border-radius: var(--radius-sm);
+}
 
+.product-category {
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.product-description,
+.product-meta,
+.product-image-credits {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.product-meta {
+  font-size: 0.85rem;
+}
+
+.product-image-credits {
+  margin-bottom: 1.5rem;
+}
+
+.product-image-credits a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.product-image-credits a:hover {
+  color: var(--color-primary);
+}
+
+/* Grilla del equipo */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -310,7 +366,7 @@ section {
   margin-top: 1.5rem;
 }
 
-
+/* Tarjetas y detalle de blogs */
 .blog-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
@@ -353,7 +409,9 @@ section {
   white-space: pre-line;
 }
 
-/* Layout bento del home */
+/* =========================================
+   7. LAYOUT: BENTO GRID (HOME)
+   ========================================= */
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
@@ -425,7 +483,9 @@ section {
   grid-column: span 2;
 }
 
-/* formulario */
+/* =========================================
+   8. FORMULARIOS Y MENSAJES DE ESTADO
+   ========================================= */
 .form-container {
   max-width: 580px;
   margin: 0 auto;
@@ -502,7 +562,9 @@ section {
   display: none;
 }
 
-/* carrito */
+/* =========================================
+   9. CARRITO DE COMPRAS Y TABLA
+   ========================================= */
 .table-responsive {
   width: 100%;
   overflow-x: auto;
@@ -551,7 +613,9 @@ section {
   gap: 1.25rem;
 }
 
-/* mobile first */
+/* =========================================
+   10. RESPONSIVE
+   ========================================= */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
