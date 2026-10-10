@@ -1,0 +1,146 @@
+/* ====================================================================
+   BENTO GRID SYSTEM & TACTILE CARD CONTAINERS
+   ==================================================================== */
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .bento-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Clases de expansión de columnas en Bento */
+@media (min-width: 768px) {
+  .bento-col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bento-col-span-3 {
+    grid-column: span 3 / span 3;
+  }
+}
+
+@media (min-width: 1280px) {
+  .bento-col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+}
+
+.bento-row-span-2 {
+  grid-row: span 2 / span 2;
+}
+
+/* Tarjeta Bento Base */
+.bento-card {
+  background-color: var(--bg-surface);
+  border: var(--border-tactile);
+  box-shadow: var(--shadow-tactile);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: var(--transition-tactile);
+  overflow: hidden;
+}
+
+.bento-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-tactile-lg);
+}
+
+/* Variantes temáticas Bento */
+.bento-card-primary {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: var(--color-secondary);
+}
+
+.bento-card-dark {
+  background-color: var(--color-secondary);
+  color: var(--text-inverse);
+  border-color: #000000;
+}
+
+.bento-card-dark h1,
+.bento-card-dark h2,
+.bento-card-dark h3,
+.bento-card-dark h4,
+.bento-card-dark p {
+  color: var(--text-inverse);
+}
+
+.bento-card-accent {
+  background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+  border-color: var(--color-secondary);
+}
+
+.bento-card-contractor {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: var(--color-contractor);
+}
+
+/* Cabecera y cuerpo de tarjetas Bento */
+.bento-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.bento-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.bento-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.bento-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background-color: var(--bg-surface);
+  border: var(--border-tactile);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-sm);
+}
+
+.bento-content {
+  flex: 1;
+}
+
+.bento-footer {
+  margin-top: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-md);
+  border-top: var(--border-sm);
+}
