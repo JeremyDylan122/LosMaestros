@@ -5,7 +5,7 @@
 export const initialUsers = [
   {
     id: 1,
-    run: '11222333-4',
+    run: '11222333-9',
     nombre: 'Carlos',
     apellidos: 'Vega Osorio',
     email: 'admin@duoc.cl',
@@ -21,7 +21,7 @@ export const initialUsers = [
   },
   {
     id: 2,
-    run: '14555666-7',
+    run: '14555666-K',
     nombre: 'Ricardo',
     apellidos: 'Valdés Pizarro',
     email: 'vendedor@duoc.cl',
@@ -37,7 +37,7 @@ export const initialUsers = [
   },
   {
     id: 3,
-    run: '16888999-0',
+    run: '16888999-2',
     nombre: 'Patricio',
     apellidos: 'Gómez Alarcón',
     email: 'contratista@duoc.cl',
@@ -53,7 +53,7 @@ export const initialUsers = [
   },
   {
     id: 4,
-    run: '18333444-5',
+    run: '18333444-1',
     nombre: 'Andrea',
     apellidos: 'Soto Morales',
     email: 'cliente@gmail.com',
