@@ -1,0 +1,779 @@
+/* ====================================================================
+   ADMINISTRATION PANEL & LOGIN STYLES - FERRETERÍA LOS MAESTROS
+   Inspirado en el diseño brutalista táctil industrial y la maqueta oficial:
+   Sidebar azul marino (#142436), acentos terracota (#C84B29),
+   fondo lienzo crema (#F6F4EE) y tarjetas métricas arena (#EFECE6).
+   ==================================================================== */
+
+/* --- ESTRUCTURA GENERAL DEL PANEL DE ADMINISTRACIÓN --- */
+.admin-layout-root {
+  display: flex;
+  min-height: 100vh;
+  background-color: #F6F4EE;
+  color: #142436;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  position: relative;
+}
+
+/* --- SIDEBAR LATERAL IZQUIERDO --- */
+.admin-sidebar {
+  width: 270px;
+  background-color: #142436;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 2.5px solid #0a131e;
+  box-shadow: 4px 0 0 rgba(10, 19, 30, 0.15);
+  z-index: 100;
+  flex-shrink: 0;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Cabecera del Sidebar */
+.admin-sidebar-header {
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-sidebar-brand {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+
+.admin-sidebar-brand-badge {
+  background-color: #C84B29;
+  color: #ffffff;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-sidebar-subtitle {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Menú de Navegación del Sidebar */
+.admin-sidebar-nav {
+  padding: 1.25rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  width: 100%;
+  text-align: left;
+}
+
+.admin-nav-item-content {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.admin-nav-item-chevron {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #64748b;
+  transition: transform 0.12s ease;
+}
+
+.admin-nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.admin-nav-item:hover .admin-nav-item-chevron {
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+/* Estado Activo (Exacto al botón terracota de la imagen) */
+.admin-nav-item.active {
+  background-color: #C84B29;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.25);
+}
+
+.admin-nav-item.active .admin-nav-item-chevron {
+  color: #ffffff;
+  font-weight: 900;
+}
+
+/* Footer del Sidebar */
+.admin-sidebar-footer {
+  padding: 1rem 0.85rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: #0e1b29;
+}
+
+.admin-user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 4px;
+  background-color: #C84B29;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.9rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-user-meta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  line-height: 1.2;
+}
+
+.admin-user-name {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-user-role-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #f59e0b;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.admin-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-btn-back-store {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.75rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.12s ease;
+}
+
+.admin-btn-back-store:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.admin-btn-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.75rem;
+  background-color: #ef4444;
+  color: #ffffff;
+  border: 1px solid #b91c1c;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.admin-btn-logout:hover {
+  background-color: #dc2626;
+}
+
+/* --- ÁREA PRINCIPAL DE CONTENIDO (MAIN CANVAS) --- */
+.admin-main-canvas {
+  flex: 1;
+  min-width: 0;
+  padding: 2.25rem 3rem 4rem;
+  background-color: #F6F4EE;
+  overflow-y: auto;
+}
+
+/* Encabezado de la Vista */
+.admin-header-block {
+  margin-bottom: 2rem;
+}
+
+.admin-overline {
+  color: #C84B29;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.admin-title {
+  color: #142436;
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1.15;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.admin-subtitle {
+  color: #556575;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 500;
+  max-width: 780px;
+}
+
+/* --- TARJETAS MÉTRICAS KPI (GRID DE 3 COLUMNAS - EXACTO A LA IMAGEN) --- */
+.admin-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.75rem;
+}
+
+.admin-kpi-card {
+  background-color: #EFECE6;
+  border: 2px solid #142436;
+  border-radius: 4px;
+  box-shadow: 3.5px 3.5px 0px #142436;
+  padding: 1.5rem 1.65rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  min-height: 140px;
+}
+
+.admin-kpi-card:hover {
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: 5px 5px 0px #142436;
+}
+
+.admin-kpi-card-critical {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+  box-shadow: 3.5px 3.5px 0px #dc2626;
+}
+
+.admin-kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.admin-kpi-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 0.02em;
+}
+
+.admin-kpi-value {
+  font-size: 3.4rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #142436;
+  font-family: var(--font-mono, monospace);
+  margin: 0.25rem 0;
+}
+
+.admin-kpi-footer {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 0.35rem;
+}
+
+/* --- SECCIÓN: PRODUCTOS QUE NECESITAN ATENCIÓN --- */
+.admin-section-block {
+  margin-bottom: 3rem;
+}
+
+.admin-section-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #142436;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.01em;
+}
+
+.admin-section-desc {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 1.25rem;
+}
+
+/* Contenedor de Tabla Táctil */
+.admin-card-container {
+  background-color: #ffffff;
+  border: 2px solid #142436;
+  border-radius: 4px;
+  box-shadow: 4px 4px 0px #142436;
+  overflow: hidden;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th {
+  background-color: #142436;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.85rem 1rem;
+  border-bottom: 2px solid #142436;
+}
+
+.admin-table td {
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.92rem;
+  vertical-align: middle;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Badges de Estado */
+.badge-admin-critical {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1.5px solid #dc2626;
+  padding: 0.2rem 0.55rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.badge-admin-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: #d1fae5;
+  color: #059669;
+  border: 1.5px solid #059669;
+  padding: 0.2rem 0.55rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+/* Botones de Acción de Stock en Fila */
+.admin-stock-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.btn-stock-adjust {
+  background-color: #EFECE6;
+  color: #142436;
+  border: 1.5px solid #142436;
+  border-radius: 3px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-stock-adjust:hover {
+  background-color: #142436;
+  color: #ffffff;
+}
+
+.btn-stock-adjust-replenish {
+  background-color: #C84B29;
+  color: #ffffff;
+  border-color: #C84B29;
+}
+
+.btn-stock-adjust-replenish:hover {
+  background-color: #a33b1e;
+  border-color: #a33b1e;
+}
+
+/* Barra de Filtros y Búsqueda en Mantenedores */
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.admin-search-box {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.admin-search-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+  border: 2px solid #142436;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: #ffffff;
+  box-shadow: 2px 2px 0px #142436;
+  outline: none;
+}
+
+.admin-search-input:focus {
+  border-color: #C84B29;
+  box-shadow: 2px 2px 0px #C84B29;
+}
+
+.admin-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #64748b;
+  pointer-events: none;
+}
+
+/* Botón Nuevo Elemento en Toolbar */
+.btn-admin-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #C84B29;
+  color: #ffffff;
+  padding: 0.65rem 1.25rem;
+  border: 2px solid #142436;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  box-shadow: 3px 3px 0px #142436;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.12s ease;
+}
+
+.btn-admin-primary:hover {
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: 4.5px 4.5px 0px #142436;
+  background-color: #b54020;
+}
+
+.btn-admin-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #142436;
+}
+
+/* --- MODAL DE LOGIN ADMINISTRATIVO EN EL HEADER --- */
+.admin-login-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 2000;
+  animation: adminModalFadeIn 0.15s ease-out;
+}
+
+@keyframes adminModalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.admin-login-modal-card {
+  background-color: #ffffff;
+  border: 3.5px solid #142436;
+  border-radius: 6px;
+  box-shadow: 8px 8px 0px #142436;
+  max-width: 500px;
+  width: 100%;
+  padding: 2.25rem 2rem;
+  position: relative;
+  animation: adminModalScaleUp 0.15s ease-out;
+}
+
+@keyframes adminModalScaleUp {
+  from { transform: scale(0.95); }
+  to { transform: scale(1); }
+}
+
+.admin-login-modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: none;
+  border: none;
+  color: #142436;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
+}
+
+.admin-login-modal-close:hover {
+  background-color: #f1f5f9;
+}
+
+.admin-login-modal-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.admin-login-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: #142436;
+  color: #ffffff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+
+.admin-login-title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #142436;
+  margin: 0 0 0.4rem 0;
+}
+
+.admin-login-desc {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Botones Demo Rápidos en el Modal de Login */
+.admin-demo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 2px dashed #cbd5e1;
+}
+
+.btn-demo-quick {
+  background-color: #EFECE6;
+  border: 2px solid #142436;
+  border-radius: 4px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #142436;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #142436;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.2rem;
+  transition: all 0.12s ease;
+}
+
+.btn-demo-quick:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #142436;
+  background-color: #ffffff;
+}
+
+.btn-demo-quick:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #142436;
+}
+
+.btn-demo-quick-admin {
+  border-color: #C84B29;
+  background-color: #fff7ed;
+  color: #9a3412;
+  box-shadow: 2px 2px 0px #C84B29;
+}
+
+.btn-demo-quick-admin:hover {
+  background-color: #C84B29;
+  color: #ffffff;
+}
+
+/* Botón de Acceso Admin en el Header de la Tienda */
+.header-admin-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background-color: #142436;
+  color: #ffffff;
+  padding: 0.45rem 0.85rem;
+  border: 2px solid #142436;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+  transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-admin-pill:hover {
+  background-color: #C84B29;
+  border-color: #C84B29;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+.header-admin-pill:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}
+
+.header-admin-tag {
+  background-color: #C84B29;
+  color: #ffffff;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 2px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+/* --- BARRA SUPERIOR MÓVIL PARA ADMINISTRACIÓN --- */
+.admin-mobile-topbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background-color: #142436;
+  color: #ffffff;
+  border-bottom: 2px solid #0a131e;
+  position: sticky;
+  top: 0;
+  z-index: 150;
+}
+
+/* --- MEDIA QUERIES RESPONSIVAS --- */
+@media (max-width: 1024px) {
+  .admin-layout-root {
+    flex-direction: column;
+  }
+
+  .admin-mobile-topbar {
+    display: flex;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    transform: translateX(-100%);
+    box-shadow: 8px 0 16px rgba(0, 0, 0, 0.4);
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .admin-main-canvas {
+    padding: 1.5rem 1.25rem 3rem;
+  }
+
+  .admin-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .admin-title {
+    font-size: 1.85rem;
+  }
+}

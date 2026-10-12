@@ -483,5 +483,23 @@ export const initialProducts = [
     descripcion: 'Botín de cuero hidrofugado con puntera de acero templado y suela antideslizante resistente a hidrocarburos.',
     imagen: '/assets/img/productos/casco.jpg',
     especificaciones: 'Talla 42, plantilla antiperforación, certificación cesmec.'
+  },
+  {
+    id: 27,
+    codigo: 'SE005',
+    nombre: 'Guantes de seguridad cabritilla para faena',
+    categoria: 'Seguridad',
+    subcategoria: 'Protección Manos',
+    marca: '3M',
+    unidad: 'Par',
+    precio: 4990,
+    precioCompra: 2200,
+    stock: 3,
+    stockMinimo: 6, // STOCK CRÍTICO: stock (3) <= stockMinimo (6)
+    enOferta: false,
+    descuento: 0,
+    descripcion: 'Guantes de cuero cabritilla flexible de alta resistencia mecánica y abrasión para faena de obra.',
+    imagen: '/assets/img/productos/casco.jpg',
+    especificaciones: 'Talla estándar 9/L, costuras reforzadas con hilo poliéster.'
   }
 ];

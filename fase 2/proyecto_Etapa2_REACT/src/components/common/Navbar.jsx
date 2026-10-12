@@ -13,13 +13,23 @@ import {
   Tag, 
   Layers, 
   PhoneCall, 
-  FileText 
+  FileText,
+  Lock,
+  Mail,
+  Key,
+  AlertCircle,
+  CheckCircle2,
+  UserCheck
 } from 'lucide-react';
 
 export const Navbar = () => {
-  const { user, isAuthenticated, isVendor, isAdmin, isContractor, logout } = useAuth();
+  const { user, isAuthenticated, isVendor, isAdmin, isContractor, login, logout } = useAuth();
   const { totalCount, notification, clearNotification } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminLoginError, setAdminLoginError] = useState('');
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -32,11 +42,57 @@ export const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
+  const openAdminModal = () => {
+    setAdminLoginError('');
+    setAdminEmail('admin@duoc.cl');
+    setAdminPassword('admin123');
+    setAdminModalOpen(true);
+    setMobileMenuOpen(false);
+  };
+
+  const closeAdminModal = () => {
+    setAdminModalOpen(false);
+    setAdminLoginError('');
+  };
+
+  const handleAdminLoginSubmit = (e) => {
+    e.preventDefault();
+    setAdminLoginError('');
+
+    if (!adminEmail.trim() || !adminPassword.trim()) {
+      setAdminLoginError('Por favor ingresa correo y contraseña.');
+      return;
+    }
+
+    const res = login(adminEmail, adminPassword);
+    if (res.success) {
+      if (res.user.rol === 'ADMIN' || res.user.rol === 'VENDEDOR') {
+        setAdminModalOpen(false);
+        navigate('/admin');
+      } else {
+        setAdminLoginError('Esta cuenta no tiene permisos de Administrador o Vendedor.');
+      }
+    } else {
+      setAdminLoginError(res.error || 'Credenciales incorrectas.');
+    }
+  };
+
+  const handleQuickDemoLogin = (email, pass) => {
+    setAdminLoginError('');
+    const res = login(email, pass);
+    if (res.success) {
+      setAdminModalOpen(false);
+      navigate('/admin');
+    } else {
+      setAdminLoginError(res.error || 'Error al iniciar sesión.');
+    }
+  };
+
   return (
     <>
       <header className="navbar-tactile">
         <div className="navbar-container">
-          {/* LOGO BRUTALISTA */}
+          {/* LOGO CORPORATIVO BRUTALISTA */}
           <Link to="/" className="navbar-brand-tactile" onClick={closeMobileMenu}>
             <div style={{
               backgroundColor: 'var(--color-primary)',
@@ -85,7 +141,7 @@ export const Navbar = () => {
               Contacto
             </NavLink>
 
-            {/* Acceso a panel administrativo si es VENDEDOR o ADMIN */}
+            {/* Acceso a panel administrativo si es VENDEDOR o ADMIN (cumple Navbar.test.jsx) */}
             {(isVendor || isAdmin) && (
               <NavLink 
                 to="/admin" 
@@ -100,6 +156,21 @@ export const Navbar = () => {
 
           {/* ACCIONES Y CARRITO */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {/* BOTÓN APARTADO EN EL HEADER PARA ACCEDER A ADMINISTRACIÓN CON LOGIN */}
+            {!isAdmin && !isVendor && (
+              <button 
+                type="button"
+                onClick={openAdminModal}
+                className="header-admin-pill"
+                title="Acceso al Panel de Administración"
+                aria-label="Acceder a Administración"
+              >
+                <ShieldCheck size={16} />
+                <span>Administración</span>
+                <span className="header-admin-tag">LOGIN</span>
+              </button>
+            )}
+
             {/* Botón Carrito */}
             <Link 
               to="/carrito" 
@@ -185,7 +256,8 @@ export const Navbar = () => {
               Contacto y Cotizaciones
             </NavLink>
 
-            {(isVendor || isAdmin) && (
+            {/* Acceso a Panel Admin en Móvil */}
+            {(isVendor || isAdmin) ? (
               <NavLink 
                 to="/admin" 
                 onClick={closeMobileMenu} 
@@ -195,6 +267,16 @@ export const Navbar = () => {
                 <ShieldCheck size={18} />
                 Panel Administrativo ({user?.rol})
               </NavLink>
+            ) : (
+              <button 
+                type="button" 
+                onClick={openAdminModal} 
+                className="btn-tactile btn-tactile-secondary"
+                style={{ marginTop: '0.5rem', justifyContent: 'center' }}
+              >
+                <ShieldCheck size={18} />
+                Acceso Administración (Login)
+              </button>
             )}
 
             <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: 'var(--border-sm)' }}>
@@ -222,6 +304,116 @@ export const Navbar = () => {
           </div>
         )}
       </header>
+
+      {/* MODAL TÁCTIL DE ACCESO ADMINISTRATIVO CON LOGIN INTEGRADO */}
+      {adminModalOpen && (
+        <div className="admin-login-modal-overlay" onClick={closeAdminModal}>
+          <div className="admin-login-modal-card" onClick={(e) => e.stopPropagation()}>
+            <button 
+              type="button"
+              className="admin-login-modal-close" 
+              onClick={closeAdminModal}
+              aria-label="Cerrar modal"
+            >
+              <X size={22} />
+            </button>
+
+            <div className="admin-login-modal-header">
+              <span className="admin-login-badge">
+                <ShieldCheck size={14} /> Ferretería Los Maestros
+              </span>
+              <h2 className="admin-login-title">Acceso Administración</h2>
+              <p className="admin-login-desc">
+                Ingresa tus credenciales de operador para acceder al panel de control, inventario y órdenes.
+              </p>
+            </div>
+
+            {adminLoginError && (
+              <div className="alert-tactile alert-tactile-danger" style={{ marginBottom: '1rem', fontSize: '0.85rem' }}>
+                <AlertCircle size={16} />
+                <span>{adminLoginError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleAdminLoginSubmit}>
+              <div className="form-group" style={{ marginBottom: '0.85rem' }}>
+                <label className="label-tactile" style={{ fontSize: '0.85rem' }}>
+                  Correo Operativo
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="email"
+                    className="input-tactile"
+                    placeholder="admin@duoc.cl"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    style={{ paddingLeft: '2.4rem', fontSize: '0.9rem' }}
+                    required
+                  />
+                  <Mail 
+                    size={16} 
+                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} 
+                  />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <label className="label-tactile" style={{ fontSize: '0.85rem' }}>
+                  Contraseña de Seguridad
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="password"
+                    className="input-tactile"
+                    placeholder="••••••••"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    style={{ paddingLeft: '2.4rem', fontSize: '0.9rem' }}
+                    required
+                  />
+                  <Key 
+                    size={16} 
+                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} 
+                  />
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                className="btn-tactile btn-tactile-secondary btn-tactile-block"
+                style={{ padding: '0.75rem', fontWeight: 900 }}
+              >
+                <Lock size={16} /> Ingresar al Panel de Operaciones
+              </button>
+            </form>
+
+            {/* ACCESOS RÁPIDOS 1-CLIC PARA EVALUACIÓN DOCENTE */}
+            <div className="admin-demo-grid">
+              <button 
+                type="button" 
+                onClick={() => handleQuickDemoLogin('admin@duoc.cl', 'admin123')}
+                className="btn-demo-quick btn-demo-quick-admin"
+                title="Acceder como Administrador Don Carlos Vega"
+              >
+                <ShieldCheck size={18} />
+                <span>Don Carlos Vega</span>
+                <span style={{ fontSize: '0.7rem', opacity: 0.85 }}>Rol: Administrador</span>
+              </button>
+
+              <button 
+                type="button" 
+                onClick={() => handleQuickDemoLogin('vendedor@duoc.cl', 'vend123')}
+                className="btn-demo-quick"
+                title="Acceder como Vendedor Ricardo Valdés"
+              >
+                <UserCheck size={18} />
+                <span>Ricardo Valdés</span>
+                <span style={{ fontSize: '0.7rem', opacity: 0.85 }}>Rol: Vendedor Mesón</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* NOTIFICACIÓN TÁCTIL FLOTANTE */}
       {notification && (
