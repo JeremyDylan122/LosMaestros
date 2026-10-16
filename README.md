@@ -6,7 +6,7 @@ Proyecto de DSY1104 Desarrollo FullStack II, Duoc UC. La segunda versión implem
 
 El caso corresponde a una ferretería familiar de La Serena, Región de Coquimbo. La aplicación permite consultar productos, preparar una compra, registrar pedidos simulados y gestionar datos locales según el perfil. El negocio contempla más de 800 referencias; esta entrega utiliza una selección inicial de **27 productos en siete categorías**.
 
-## Alcance de la segunda versión
+## 🎯 Alcance de la segunda versión
 
 La tienda incluye catálogo con búsqueda, categorías, ofertas y orden por precio efectivo; fichas con imágenes referenciales; carrito persistente; registro e inicio de sesión; compra con retiro o despacho e historial personal. Búsqueda, categoría y ofertas se sincronizan con la URL y el historial del navegador.
 
@@ -16,7 +16,7 @@ Las operaciones se guardan en el mismo navegador mediante `localStorage`. Esta e
 
 El [ERS](<docs/ERS actualizado (v2)/ERS_actualizado_v2.md>) distingue las funciones implementadas, parciales y pendientes. Contiene 57 requisitos: 46 funcionales, ocho no funcionales y tres restricciones técnicas.
 
-## Organización del repositorio
+## 📁 Organización del repositorio
 
 ```text
 LosMaestros/
@@ -49,7 +49,7 @@ LosMaestros/
 
 La primera etapa se conserva como antecedente. El desarrollo y las pruebas de la entrega actual corresponden a la carpeta React.
 
-## Tecnologías y presentación
+## 🛠️ Tecnologías y presentación
 
 | Área | Herramientas de la versión documentada |
 | --- | --- |
@@ -66,12 +66,12 @@ Los estilos se organizan en `src/styles/`. `variables.css` concentra los colores
 
 Las imágenes del catálogo se sirven desde archivos del proyecto. Son referencias del tipo de artículo; la marca, medidas y características comerciales se describen en cada ficha. Los [créditos de imágenes](<fase 2/proyecto_Etapa2_REACT/public/assets/img/productos/CREDITOS.md>) identifican fuentes, autores, licencias y descripciones de las imágenes generadas.
 
-## Ejecución local
+## 🚀 Ejecución local
 
 Se recomienda **Node.js 24**, versión utilizada para la verificación, y npm. Node.js 18 no es compatible con las dependencias de esta entrega. La configuración instalada de Vitest admite Node `^22.12.0`, `^24.0.0` o `>=26.0.0`; se debe respetar también la compatibilidad del resto del archivo de bloqueo.
 
 ```powershell
-git clone https://github.com/MartinCaviedes/LosMaestros.git
+git clone https://github.com/JeremyDylan122/LosMaestros.git
 cd LosMaestros
 cd "fase 2/proyecto_Etapa2_REACT"
 npm ci
@@ -89,7 +89,7 @@ npm run preview
 
 Vite genera los archivos en `dist/`. La vista previa utiliza la dirección indicada en la terminal, normalmente `http://localhost:4173`. Un alojamiento estático debe servir `index.html` como alternativa para las rutas de React.
 
-## Perfiles y cuentas de demostración
+## 👥 Perfiles y cuentas de demostración
 
 La vista `/login` ofrece botones para completar estas credenciales ficticias. Son las cuentas iniciales; una edición o eliminación guardada en el navegador puede cambiar su acceso.
 
@@ -106,7 +106,7 @@ Los permisos y la titularidad se comprueban en la aplicación local. Las contras
 
 Se conservan los dominios admitidos `duoc.cl`, `profesor.duoc.cl` y `gmail.com`, y el rango de contraseña de 4 a 10 caracteres. Son restricciones del prototipo y no una política de seguridad de producción. El registro comprueba el RUN con Módulo 11; esto no acredita la identidad de una persona.
 
-## Reglas comerciales observables
+## 📋 Reglas comerciales observables
 
 | Operación | Comportamiento de la V2 |
 | --- | --- |
@@ -130,7 +130,7 @@ Las tarifas de despacho son de demostración y se reutilizan en la consulta de c
 
 El catálogo, las cuentas y los pedidos persisten en el origen del navegador. Otra dirección, puerto o dispositivo mantiene un almacenamiento distinto. Para una revisión con datos iniciales puede utilizarse un perfil de navegador aislado.
 
-## Pruebas y resultados documentados
+## 🧪 Pruebas y resultados documentados
 
 Desde la carpeta React:
 
@@ -155,7 +155,7 @@ Los servicios alcanzan 90,96 % de cobertura de líneas. La compilación de produ
 
 Las comprobaciones complementarias en navegador abarcan cinco perfiles en ocho anchos, 69 comprobaciones de vistas y la carga de las 27 imágenes del catálogo. Estas comprobaciones se documentan por separado y no incrementan la cobertura de Vitest. El [informe de pruebas](<docs/PRUEBAS UNITARIAS/PRUEBAS_UNITARIAS.md>) explica el procedimiento, la trazabilidad y las áreas pendientes.
 
-## Documentación de entrega
+## 📄 Documentación de entrega
 
 La carpeta [docs](docs/README.md) contiene una única versión vigente de cada documento, revisión 2.2:
 
