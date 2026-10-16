@@ -1,3 +1,4 @@
+import { MyOrders } from './pages/MyOrders';
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -48,6 +49,7 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Register />} />
 
+          <Route path="/mis-pedidos" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
           {/* Flujo de Compra y Carrito */}
           <Route path="/carrito" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />

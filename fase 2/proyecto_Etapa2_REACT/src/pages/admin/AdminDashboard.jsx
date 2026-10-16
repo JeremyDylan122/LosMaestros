@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Package, 
@@ -6,12 +6,8 @@ import {
   ShoppingBag, 
   Users, 
   Layers, 
-  ArrowRight, 
   Plus, 
   CheckCircle2, 
-  Clock, 
-  Truck, 
-  ShieldCheck, 
   Edit3, 
   Trash2, 
   Search, 
@@ -23,24 +19,16 @@ import {
   Home, 
   Menu, 
   ArrowLeft,
-  DollarSign,
   FileText,
-  CreditCard,
-  UserCheck,
-  ChevronRight,
-  TrendingUp,
-  Tag,
   Wrench,
-  Check
-} from 'lucide-react';
+  } from 'lucide-react';
 import { productService } from '../../services/productService';
 import { orderService } from '../../services/orderService';
 import { userService } from '../../services/userService';
 import { useAuth } from '../../context/AuthContext';
-import { chileLocations } from '../../data/chileLocations';
 
 export const AdminDashboard = () => {
-  const { user, isAdmin, isVendor, logout } = useAuth();
+  const { user, isAdmin, isVendor: _isVendor, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -53,14 +41,14 @@ export const AdminDashboard = () => {
     return 'resumen';
   };
 
-  const [activeTab, setActiveTab] = useState(getTabFromPath());
+  const activeTab = getTabFromPath();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Estados de datos sincronizados con persistencia
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [criticalProducts, setCriticalProducts] = useState([]);
+  const [products, setProducts] = useState(() => productService.getProducts());
+  const [orders, setOrders] = useState(() => orderService.getOrders());
+  const [users, setUsers] = useState(() => userService.getUsers());
+  const [criticalProducts, setCriticalProducts] = useState(() => productService.getCriticalStockProducts());
   const [feedback, setFeedback] = useState(null);
 
   // Estados de búsqueda y filtros
@@ -134,14 +122,7 @@ export const AdminDashboard = () => {
     setCriticalProducts(productService.getCriticalStockProducts());
   };
 
-  useEffect(() => {
-    reloadAllData();
-  }, []);
 
-  // Sincronizar activeTab cuando cambia la URL
-  useEffect(() => {
-    setActiveTab(getTabFromPath());
-  }, [location.pathname]);
 
   const showFeedback = (msg, type = 'success') => {
     setFeedback({ msg, type });
@@ -149,7 +130,6 @@ export const AdminDashboard = () => {
   };
 
   const handleTabChange = (tab) => {
-    setActiveTab(tab);
     setSidebarOpen(false);
     if (tab === 'resumen') navigate('/admin');
     else navigate(`/admin/${tab}`);
@@ -274,7 +254,7 @@ export const AdminDashboard = () => {
       nombre: u.nombre,
       apellidos: u.apellidos,
       email: u.email,
-      password: u.password,
+      password: '',
       rol: u.rol,
       region: u.region || 'Región de Coquimbo',
       comuna: u.comuna || 'La Serena',
@@ -314,19 +294,19 @@ export const AdminDashboard = () => {
     }
   };
 
-  const handleSaveUser = (e) => {
+  const handleSaveUser = async (e) => {
     e.preventDefault();
     const errs = {};
     if (!userFormData.run.trim()) errs.run = 'El RUN es obligatorio.';
-    else if (!userService.validateRun(userFormData.run)) errs.run = 'El RUN ingresado no es válido según algoritmo Módulo 11.';
+    else if (!userService.validateRun(userFormData.run).isValid) errs.run = 'El RUN ingresado no es válido según algoritmo Módulo 11.';
 
     if (!userFormData.nombre.trim()) errs.nombre = 'El nombre es obligatorio.';
     if (!userFormData.apellidos.trim()) errs.apellidos = 'Los apellidos son obligatorios.';
     if (!userFormData.email.trim()) errs.email = 'El correo es obligatorio.';
     else if (!userService.validateEmail(userFormData.email)) errs.email = 'El correo debe ser institucional (@duoc.cl, @profesor.duoc.cl o @gmail.com).';
 
-    if (!editingUser && (!userFormData.password || userFormData.password.length < 4)) {
-      errs.password = 'La contraseña debe tener al menos 4 caracteres.';
+    if ((!editingUser || userFormData.password) && (!userFormData.password || userFormData.password.length < 4 || userFormData.password.length > 10)) {
+      errs.password = 'La contraseña debe tener entre 4 y 10 caracteres.';
     }
 
     if (Object.keys(errs).length > 0) {
@@ -336,10 +316,11 @@ export const AdminDashboard = () => {
 
     try {
       if (editingUser) {
+        if (userFormData.password) await userService.changePassword(editingUser.id, userFormData.password);
         userService.updateUser(editingUser.id, userFormData);
         showFeedback(`Usuario "${userFormData.nombre}" actualizado con éxito.`);
       } else {
-        userService.createUser(userFormData);
+        await userService.createUser(userFormData);
         showFeedback(`Usuario "${userFormData.nombre}" registrado exitosamente.`);
       }
       setUserModalOpen(false);

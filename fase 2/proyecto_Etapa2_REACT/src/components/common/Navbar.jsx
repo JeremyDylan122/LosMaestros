@@ -8,22 +8,17 @@ import {
   X, 
   Wrench, 
   ShieldCheck, 
-  User, 
   LogOut, 
   Tag, 
-  Layers, 
-  PhoneCall, 
-  FileText,
   Lock,
   Mail,
   Key,
   AlertCircle,
-  CheckCircle2,
   UserCheck
 } from 'lucide-react';
 
 export const Navbar = () => {
-  const { user, isAuthenticated, isVendor, isAdmin, isContractor, login, logout } = useAuth();
+  const { user, isAuthenticated, isVendor, isAdmin, loading: authLoading, login, logout } = useAuth();
   const { totalCount, notification, clearNotification } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [adminModalOpen, setAdminModalOpen] = useState(false);
@@ -55,37 +50,25 @@ export const Navbar = () => {
     setAdminLoginError('');
   };
 
-  const handleAdminLoginSubmit = (e) => {
-    e.preventDefault();
+  // Validar el perfil operativo antes de reemplazar la sesión actual.
+  const handleQuickDemoLogin = async (email, password) => {
     setAdminLoginError('');
+    const result = await login(email, password, ['ADMIN', 'VENDEDOR']);
+    if (result.success) {
+      setAdminModalOpen(false);
+      navigate('/admin');
+    } else {
+      setAdminLoginError(result.error || 'Credenciales incorrectas.');
+    }
+  };
 
+  const handleAdminLoginSubmit = async (event) => {
+    event.preventDefault();
     if (!adminEmail.trim() || !adminPassword.trim()) {
       setAdminLoginError('Por favor ingresa correo y contraseña.');
       return;
     }
-
-    const res = login(adminEmail, adminPassword);
-    if (res.success) {
-      if (res.user.rol === 'ADMIN' || res.user.rol === 'VENDEDOR') {
-        setAdminModalOpen(false);
-        navigate('/admin');
-      } else {
-        setAdminLoginError('Esta cuenta no tiene permisos de Administrador o Vendedor.');
-      }
-    } else {
-      setAdminLoginError(res.error || 'Credenciales incorrectas.');
-    }
-  };
-
-  const handleQuickDemoLogin = (email, pass) => {
-    setAdminLoginError('');
-    const res = login(email, pass);
-    if (res.success) {
-      setAdminModalOpen(false);
-      navigate('/admin');
-    } else {
-      setAdminLoginError(res.error || 'Error al iniciar sesión.');
-    }
+    await handleQuickDemoLogin(adminEmail, adminPassword);
   };
 
   return (
@@ -94,23 +77,14 @@ export const Navbar = () => {
         <div className="navbar-container">
           {/* LOGO CORPORATIVO BRUTALISTA */}
           <Link to="/" className="navbar-brand-tactile" onClick={closeMobileMenu}>
-            <div style={{
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-secondary)',
-              border: '2px solid var(--border-color)',
-              padding: '6px',
-              borderRadius: 'var(--radius-sm)',
-              boxShadow: 'var(--shadow-sm)',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
+            <div className="navbar-brand-icon">
               <Wrench size={22} strokeWidth={2.5} />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 900, letterSpacing: '-0.02em' }}>
+            <div className="navbar-brand-copy">
+              <span className="navbar-brand-name">
                 LOS MAESTROS
               </span>
-              <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-accent)', letterSpacing: '0.08em' }}>
+              <span className="navbar-brand-location">
                 FERRETERÍA &bull; LA SERENA
               </span>
             </div>
@@ -128,7 +102,7 @@ export const Navbar = () => {
               Categorías
             </NavLink>
             <NavLink to="/ofertas" className={({ isActive }) => `nav-link-tactile ${isActive ? 'active' : ''}`}>
-              <Tag size={15} style={{ display: 'inline', marginRight: '4px' }} />
+              <Tag size={15} />
               Ofertas
             </NavLink>
             <NavLink to="/nosotros" className={({ isActive }) => `nav-link-tactile ${isActive ? 'active' : ''}`}>
@@ -141,27 +115,22 @@ export const Navbar = () => {
               Contacto
             </NavLink>
 
-            {/* Acceso a panel administrativo si es VENDEDOR o ADMIN (cumple Navbar.test.jsx) */}
-            {(isVendor || isAdmin) && (
-              <NavLink 
-                to="/admin" 
-                className={({ isActive }) => `btn-tactile btn-tactile-sm ${isActive ? 'btn-tactile-secondary' : 'btn-tactile-primary'}`}
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <ShieldCheck size={16} />
-                Panel Admin
-              </NavLink>
-            )}
           </nav>
 
           {/* ACCIONES Y CARRITO */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div className="navbar-actions">
+            {/* El acceso operativo acompaña a las acciones de la cuenta. */}
+            {(isVendor || isAdmin) && (
+              <NavLink to="/admin" className="btn-tactile btn-tactile-sm btn-tactile-primary navbar-admin-access">
+                <ShieldCheck size={16} /> Panel Admin
+              </NavLink>
+            )}
             {/* BOTÓN APARTADO EN EL HEADER PARA ACCEDER A ADMINISTRACIÓN CON LOGIN */}
             {!isAdmin && !isVendor && (
               <button 
                 type="button"
                 onClick={openAdminModal}
-                className="header-admin-pill"
+                className="header-admin-pill navbar-admin-access"
                 title="Acceso al Panel de Administración"
                 aria-label="Acceder a Administración"
               >
@@ -171,11 +140,12 @@ export const Navbar = () => {
               </button>
             )}
 
+            {isAuthenticated && <Link to="/mis-pedidos" className="btn-tactile btn-tactile-sm navbar-orders-link">Mis pedidos</Link>}
             {/* Botón Carrito */}
             <Link 
               to="/carrito" 
-              className="btn-tactile btn-tactile-sm" 
-              style={{ backgroundColor: 'var(--bg-surface)' }}
+              className="btn-tactile btn-tactile-sm navbar-cart-link"
+              aria-label={`Ver carrito de compras, ${totalCount} unidades`}
               title="Ver Carrito de Compras"
             >
               <ShoppingBag size={18} />
@@ -186,14 +156,9 @@ export const Navbar = () => {
 
             {/* Usuario autenticado o enlaces de login */}
             {isAuthenticated ? (
-              <div style={{ display: 'none', alignItems: 'center', gap: '0.5rem' }} className="user-desktop-box">
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  lineHeight: 1.1
-                }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 800 }}>
+              <div className="user-desktop-box">
+                <div className="navbar-user-meta">
+                  <span className="navbar-user-name" title={user.nombre}>
                     {user.nombre}
                   </span>
                   <span className={`badge-tactile badge-role-${user.rol.toLowerCase()}`} style={{ fontSize: '0.65rem' }}>
@@ -202,7 +167,7 @@ export const Navbar = () => {
                 </div>
                 <button 
                   onClick={handleLogout}
-                  className="btn-tactile btn-tactile-sm btn-tactile-danger"
+                  className="btn-tactile btn-tactile-sm btn-tactile-danger navbar-logout"
                   title="Cerrar sesión"
                   aria-label="Cerrar sesión"
                 >
@@ -210,7 +175,7 @@ export const Navbar = () => {
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'none', alignItems: 'center', gap: '0.5rem' }} className="user-desktop-box">
+              <div className="user-desktop-box">
                 <Link to="/login" className="btn-tactile btn-tactile-sm">
                   Iniciar Sesión
                 </Link>
@@ -224,7 +189,9 @@ export const Navbar = () => {
             <button 
               className="menu-toggle-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Abrir menú móvil"
+              aria-label={mobileMenuOpen ? 'Cerrar menú móvil' : 'Abrir menú móvil'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="store-mobile-menu"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -233,7 +200,7 @@ export const Navbar = () => {
 
         {/* DRAWER MÓVIL */}
         {mobileMenuOpen && (
-          <div className="mobile-menu-drawer">
+          <nav id="store-mobile-menu" className="mobile-menu-drawer" aria-label="Navegación móvil">
             <NavLink to="/" onClick={closeMobileMenu} className="nav-link-tactile">
               Inicio
             </NavLink>
@@ -256,6 +223,7 @@ export const Navbar = () => {
               Contacto y Cotizaciones
             </NavLink>
 
+            {isAuthenticated && <NavLink to="/mis-pedidos" onClick={closeMobileMenu} className="nav-link-tactile">Mis pedidos</NavLink>}
             {/* Acceso a Panel Admin en Móvil */}
             {(isVendor || isAdmin) ? (
               <NavLink 
@@ -301,14 +269,14 @@ export const Navbar = () => {
                 </div>
               )}
             </div>
-          </div>
+          </nav>
         )}
       </header>
 
       {/* MODAL TÁCTIL DE ACCESO ADMINISTRATIVO CON LOGIN INTEGRADO */}
       {adminModalOpen && (
         <div className="admin-login-modal-overlay" onClick={closeAdminModal}>
-          <div className="admin-login-modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-login-modal-card" role="dialog" aria-modal="true" aria-labelledby="admin-login-title" onClick={(e) => e.stopPropagation()}>
             <button 
               type="button"
               className="admin-login-modal-close" 
@@ -322,7 +290,7 @@ export const Navbar = () => {
               <span className="admin-login-badge">
                 <ShieldCheck size={14} /> Ferretería Los Maestros
               </span>
-              <h2 className="admin-login-title">Acceso Administración</h2>
+              <h2 id="admin-login-title" className="admin-login-title">Acceso Administración</h2>
               <p className="admin-login-desc">
                 Ingresa tus credenciales de operador para acceder al panel de control, inventario y órdenes.
               </p>
@@ -337,11 +305,12 @@ export const Navbar = () => {
 
             <form onSubmit={handleAdminLoginSubmit}>
               <div className="form-group" style={{ marginBottom: '0.85rem' }}>
-                <label className="label-tactile" style={{ fontSize: '0.85rem' }}>
+                <label htmlFor="admin-login-email" className="label-tactile" style={{ fontSize: '0.85rem' }}>
                   Correo Operativo
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input 
+                    id="admin-login-email"
                     type="email"
                     className="input-tactile"
                     placeholder="admin@duoc.cl"
@@ -358,11 +327,12 @@ export const Navbar = () => {
               </div>
 
               <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                <label className="label-tactile" style={{ fontSize: '0.85rem' }}>
+                <label htmlFor="admin-login-password" className="label-tactile" style={{ fontSize: '0.85rem' }}>
                   Contraseña de Seguridad
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input 
+                    id="admin-login-password"
                     type="password"
                     className="input-tactile"
                     placeholder="••••••••"
@@ -379,11 +349,12 @@ export const Navbar = () => {
               </div>
 
               <button 
-                type="submit" 
+                type="submit"
+                disabled={authLoading}
                 className="btn-tactile btn-tactile-secondary btn-tactile-block"
                 style={{ padding: '0.75rem', fontWeight: 900 }}
               >
-                <Lock size={16} /> Ingresar al Panel de Operaciones
+                <Lock size={16} /> {authLoading ? 'Verificando acceso...' : 'Ingresar al Panel de Operaciones'}
               </button>
             </form>
 
@@ -391,6 +362,7 @@ export const Navbar = () => {
             <div className="admin-demo-grid">
               <button 
                 type="button" 
+                disabled={authLoading}
                 onClick={() => handleQuickDemoLogin('admin@duoc.cl', 'admin123')}
                 className="btn-demo-quick btn-demo-quick-admin"
                 title="Acceder como Administrador Don Carlos Vega"
@@ -402,6 +374,7 @@ export const Navbar = () => {
 
               <button 
                 type="button" 
+                disabled={authLoading}
                 onClick={() => handleQuickDemoLogin('vendedor@duoc.cl', 'vend123')}
                 className="btn-demo-quick"
                 title="Acceder como Vendedor Ricardo Valdés"
@@ -436,14 +409,6 @@ export const Navbar = () => {
         </div>
       )}
 
-      {/* Media query complementaria para mostrar usuario en desktop */}
-      <style>{`
-        @media (min-width: 1024px) {
-          .user-desktop-box {
-            display: flex !important;
-          }
-        }
-      `}</style>
     </>
   );
 };

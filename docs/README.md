@@ -1,18 +1,37 @@
-# Documentación Formal — Evaluación 2 (30%)
-## Portal Web Ferretería Los Maestros
+# Documentación de Ferretería Los Maestros
 
-En este directorio se encuentra la documentación oficial de la Evaluación 2 para el ramo DSY1104 Full Stack II (Duoc UC), estructurada en formato Markdown y Microsoft Word (.docx):
+Documentación vigente de la segunda entrega de DSY1104 Desarrollo FullStack II, Duoc UC. Ambos informes corresponden a la **revisión 2.2 del 16 de octubre de 2026**.
 
-### 1. Especificación de Requisitos de Software (ERS v2)
-- **Directorio:** `docs/ERS actualizado (v2)/`
-- **Archivos:**
-  - `ERS_actualizado_v2.md`
-  - `ERS_Ferreteria_Los_Maestros_v2.docx`
-- **Contenido:** Especificación formal según estándar IEEE Std 830-1998, incluyendo Introducción, Descripción General, Actores RBAC, 15 Requisitos Funcionales (RF-01 al RF-15), 8 Requisitos No Funcionales (RNF-01 al RNF-08) y Matriz de Trazabilidad.
+Integrantes: Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
 
-### 2. Informe de Pruebas Unitarias y Cobertura de Código
-- **Directorio:** `docs/PRUEBAS UNITARIAS/`
-- **Archivos:**
-  - `PRUEBAS_UNITARIAS.md`
-  - `Informe_Pruebas_Unitarias_y_Cobertura.docx`
-- **Contenido:** Informe estructurado según la guía Duoc UC *2.3.4 MC_Informes de cobertura*, con matriz de los 49 casos de prueba ejecutados en Vitest (100% aprobados), tabla consolidada de cobertura v8 (Lines, Statements, Branch, Functions) y análisis técnico de código probado vs no probado.
+## Documentos de entrega
+
+| Documento | Word | Markdown | Contenido |
+| --- | --- | --- | --- |
+| Especificación de Requisitos de Software | [ERS](<ERS actualizado (v2)/ERS_Ferreteria_Los_Maestros_v2.docx>) | [ERS](<ERS actualizado (v2)/ERS_actualizado_v2.md>) | Reglas del negocio y 57 requisitos, con estado, criterio de aceptación y aplicación actual. |
+| Informe de pruebas unitarias y cobertura | [Informe](<PRUEBAS UNITARIAS/Informe_Pruebas_Unitarias_y_Cobertura.docx>) | [Informe](<PRUEBAS UNITARIAS/PRUEBAS_UNITARIAS.md>) | Procedimiento, 92 pruebas en 13 archivos, cobertura, trazabilidad y límites de la revisión. |
+
+Los Word son los documentos formales de entrega. Las versiones Markdown reproducen su cuerpo y añaden enlaces de navegación para consultarlos desde el repositorio. Cada documento se conserva una sola vez, en su carpeta correspondiente.
+
+## Alcance documentado
+
+La V2 utiliza React, Vite, CSS propio y almacenamiento en el navegador. El ERS distingue 38 requisitos implementados en este alcance local, 15 parciales y cuatro pendientes. Del total de 57 requisitos, 46 son funcionales, ocho no funcionales y tres restricciones técnicas.
+
+El crédito automático de contratistas, los montos precargados y las tarifas corresponden a la demostración. La integración con servidor, base de datos, pagos reales y verificación geográfica exacta pertenece a etapas posteriores. La [guía principal](../README.md) explica la ejecución, los perfiles y las reglas observables.
+
+## Resultados documentados
+
+La medición final registra 92 pruebas aprobadas, sin fallos ni casos omitidos. La cobertura es 59,83 % de sentencias, 53,34 % de ramas, 49,57 % de funciones y 60,85 % de líneas. La compilación se completó y Oxlint informó cero errores y seis advertencias.
+
+El informe de pruebas contiene las métricas finales, las comprobaciones en navegador y los comandos necesarios para reproducir la medición.
+
+```text
+docs/
+├── README.md
+├── ERS actualizado (v2)/
+│   ├── ERS_Ferreteria_Los_Maestros_v2.docx
+│   └── ERS_actualizado_v2.md
+└── PRUEBAS UNITARIAS/
+    ├── Informe_Pruebas_Unitarias_y_Cobertura.docx
+    └── PRUEBAS_UNITARIAS.md
+```

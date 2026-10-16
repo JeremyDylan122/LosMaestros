@@ -52,6 +52,6 @@ describe('Página de Contacto y Cotizaciones (Contact)', () => {
     fireEvent.click(submitBtn);
 
     expect(screen.getByTestId('contact-success-alert')).toBeInTheDocument();
-    expect(screen.getByText(/¡Mensaje enviado con éxito!/i)).toBeInTheDocument();
+    expect(screen.getByText(/¡Mensaje validado en modo demostración!/i)).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Package, RotateCcw } from 'lucide-react';
 import { productService } from '../services/productService';
@@ -7,31 +7,27 @@ import { ProductFilter } from '../components/products/ProductFilter';
 import { useAuth } from '../context/AuthContext';
 
 export const Products = () => {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categories] = useState(() => productService.getCategories());
   const [searchParams, setSearchParams] = useSearchParams();
   const { isVendor, isAdmin } = useAuth();
 
-  // Estados de filtros
-  const [activeCategory, setActiveCategory] = useState(searchParams.get('categoria') || 'ALL');
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('buscar') || '');
+  // La URL es la fuente de los filtros para respetar enlaces, atrás y adelante.
+  const activeCategory = searchParams.get('categoria') || 'ALL';
+  const searchTerm = searchParams.get('buscar') || '';
+  const onlyOffers = searchParams.get('ofertas') === 'true';
   const [sortBy, setSortBy] = useState('default');
-  const [onlyOffers, setOnlyOffers] = useState(searchParams.get('ofertas') === 'true');
   const [onlyCritical, setOnlyCritical] = useState(false);
-
-  useEffect(() => {
-    const list = productService.getProducts();
-    setProducts(list);
-    setCategories(productService.getCategories());
-  }, []);
-
-  // Sincronizar URL si cambian query params
-  useEffect(() => {
-    const cat = searchParams.get('categoria');
-    if (cat) setActiveCategory(cat);
-    const off = searchParams.get('ofertas');
-    if (off === 'true') setOnlyOffers(true);
-  }, [searchParams]);
+  const updateFilter = (key, value) => {
+    setSearchParams(previous => {
+      const next = new URLSearchParams(previous);
+      if (value) next.set(key, value);
+      else next.delete(key);
+      return next;
+    }, { replace: true });
+  };
+  const setActiveCategory = value => updateFilter('categoria', value === 'ALL' ? '' : value);
+  const setSearchTerm = value => updateFilter('buscar', value);
+  const setOnlyOffers = value => updateFilter('ofertas', value ? 'true' : '');
 
   // Filtrado y ordenamiento reactivo
   const filteredProducts = useMemo(() => {
@@ -43,21 +39,18 @@ export const Products = () => {
     });
 
     if (sortBy === 'price-asc') {
-      result.sort((a, b) => a.precio - b.precio);
+      result.sort((a, b) => productService.getUnitPrice(a) - productService.getUnitPrice(b));
     } else if (sortBy === 'price-desc') {
-      result.sort((a, b) => b.precio - a.precio);
+      result.sort((a, b) => productService.getUnitPrice(b) - productService.getUnitPrice(a));
     } else if (sortBy === 'name-asc') {
       result.sort((a, b) => a.nombre.localeCompare(b.nombre));
     }
 
     return result;
-  }, [products, activeCategory, searchTerm, sortBy, onlyOffers, onlyCritical]);
+  }, [activeCategory, searchTerm, sortBy, onlyOffers, onlyCritical]);
 
   const handleResetFilters = () => {
-    setActiveCategory('ALL');
-    setSearchTerm('');
     setSortBy('default');
-    setOnlyOffers(false);
     setOnlyCritical(false);
     setSearchParams({});
   };
@@ -74,6 +67,7 @@ export const Products = () => {
         </h1>
         <p className="section-subtitle">
           Consulta existencias reales en mesón, precios de venta en CLP y ficha técnica por producto.
+          Las imágenes son referenciales; consulta la marca y las especificaciones en cada ficha.
         </p>
       </div>
 

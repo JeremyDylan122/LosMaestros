@@ -1,115 +1,165 @@
-# Ferretería Los Maestros — Portal Web E-Commerce y Gestión Operativa
-## Evaluación Parcial 2 (30%) — DSY1104 Desarrollo Full Stack II (Foco Frontend)
-**Duoc UC — Escuela de Informática y Telecomunicaciones**
+# Ferretería Los Maestros
 
----
+Proyecto de DSY1104 Desarrollo FullStack II, Duoc UC. La segunda versión implementa una tienda y un panel de gestión con React, Vite, CSS propio y almacenamiento en el navegador.
 
-## 🏗️ Descripción del Proyecto
-Este repositorio contiene la evolución tecnológica integral del portal web de **Ferretería Los Maestros** (La Serena / Coquimbo). El proyecto ha sido migrado desde un sitio web estático desarrollado en la Fase 1 (HTML, CSS y JS nativo) a una moderna **Single Page Application (SPA)** de alto rendimiento en la Fase 2, utilizando **Vite + React**, pruebas unitarias automatizadas con **Vitest**, persistencia reactiva en LocalStorage y un sistema de diseño propio basado en **Bento Grid + Brutalismo Táctil** (sin dependencias de Bootstrap ni Tailwind).
+**Integrantes:** Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
 
----
+El caso corresponde a una ferretería familiar de La Serena, Región de Coquimbo. La aplicación permite consultar productos, preparar una compra, registrar pedidos simulados y gestionar datos locales según el perfil. El negocio contempla más de 800 referencias; esta entrega utiliza una selección inicial de **27 productos en siete categorías**.
 
-## 📁 Estructura del Repositorio
+## Alcance de la segunda versión
 
-El proyecto se encuentra estructurado de acuerdo a las directrices de entrega:
+La tienda incluye catálogo con búsqueda, categorías, ofertas y orden por precio efectivo; fichas con imágenes referenciales; carrito persistente; registro e inicio de sesión; compra con retiro o despacho e historial personal. Búsqueda, categoría y ofertas se sincronizan con la URL y el historial del navegador.
+
+El administrador y el vendedor gestionan productos, existencias y pedidos. La gestión de usuarios se reserva al administrador. El contratista puede consultar su saldo y utilizar crédito de demostración cuando dispone de cupo suficiente.
+
+Las operaciones se guardan en el mismo navegador mediante `localStorage`. Esta etapa no integra backend, base de datos compartida, cobros, correo saliente ni servicios reales de despacho. El esquema de cobertura es un SVG local que representa localidades y zonas; no valida direcciones ni calcula distancias.
+
+El [ERS](<docs/ERS actualizado (v2)/ERS_actualizado_v2.md>) distingue las funciones implementadas, parciales y pendientes. Contiene 57 requisitos: 46 funcionales, ocho no funcionales y tres restricciones técnicas.
+
+## Organización del repositorio
 
 ```text
 LosMaestros/
 ├── fase1/
-│   └── proyecto_etapa1_html/          # Entrega Evaluación 1 (Sitio estático HTML5/CSS3/JS)
-│       ├── css/
-│       ├── js/
-│       ├── images/
-│       └── *.html
+│   └── proyecto_etapa1_html/            # Primera versión con HTML, CSS y JavaScript
+│       ├── assets/
+│       ├── Styles/global.css
+│       ├── index.html
+│       └── main.js
 ├── fase 2/
-│   └── proyecto_Etapa2_REACT/         # Entrega Evaluación 2 (SPA Vite + React + Vitest)
-│       ├── public/assets/img/         # Catálogo de imágenes de productos
+│   └── proyecto_Etapa2_REACT/           # Aplicación de la segunda entrega
+│       ├── public/assets/img/productos/ # Imágenes locales y créditos
 │       ├── src/
-│       │   ├── components/            # Navbar, Footer, ProductCard, Filter, Map, etc.
-│       │   ├── context/               # AuthContext (RBAC) y CartContext (Stock en vivo)
-│       │   ├── data/                  # Semillas iniciales (26 productos Excel, usuarios)
-│       │   ├── pages/                 # Home, Products, Detail, Cart, Checkout, Auth, Admin
-│       │   ├── services/              # productService, userService, orderService, storage
-│       │   ├── styles/                # Framework CSS propio Bento Grid + Brutalismo Táctil
-│       │   └── test/                  # Suite de 49 pruebas unitarias con Vitest
+│       │   ├── assets/
+│       │   ├── components/             # Componentes compartidos y de productos
+│       │   ├── context/                # Sesión y carrito
+│       │   ├── data/                   # Catálogo, cuentas y datos iniciales
+│       │   ├── pages/                  # Tienda, formularios y panel
+│       │   ├── services/               # Productos, usuarios, pedidos y persistencia
+│       │   ├── styles/                 # Variables y estilos propios
+│       │   └── test/                   # 92 pruebas en 13 archivos
 │       ├── package.json
+│       ├── package-lock.json
 │       └── vite.config.js
-└── docs/                              # Documentación formal de la Evaluación 2
-    ├── ERS actualizado (v2)/
-    │   ├── ERS_actualizado_v2.md      # Especificación de Requisitos IEEE 830 v2
-    │   └── ERS_Ferreteria_Los_Maestros_v2.docx
-    ├── PRUEBAS UNITARIAS/
-    │   ├── PRUEBAS_UNITARIAS.md       # Informe de pruebas y cobertura según guía 2.3.4
-    │   └── Informe_Pruebas_Unitarias_y_Cobertura.docx
-    ├── ERS_actualizado_v2.md
-    ├── ERS_actualizado_v2.docx
-    ├── PRUEBAS_UNITARIAS.md
-    └── PRUEBAS_UNITARIAS.docx
+└── docs/
+    ├── README.md
+    ├── ERS actualizado (v2)/            # ERS vigente en Word y Markdown
+    └── PRUEBAS UNITARIAS/               # Informe vigente en Word y Markdown
 ```
 
----
+La primera etapa se conserva como antecedente. El desarrollo y las pruebas de la entrega actual corresponden a la carpeta React.
 
-## 🎨 Sistema de Estilo Propio: Bento Grid + Brutalismo Táctil
-El proyecto prescinde intencionalmente de frameworks CSS pesados externos como Tailwind CSS o Bootstrap. Implementa una arquitectura modular propia en CSS Moderno:
-- **Variables CSS (`variables.css`):** Paleta industrial de alta seguridad (Amarillo `#F59E0B`, Naranja `#EA580C`, Azul Contratista `#2563EB`, Pizarra `#0F172A`).
-- **Bento Grid (`bento.css`):** Rejilla responsiva asimétrica de 1 a 4 columnas con tarjetas de diferente envergadura (`span-2`, `featured-wide`).
-- **Brutalismo Táctil (`components.css`):** Bordes duros de 2.5px a 3.5px, sombras proyectadas sólidas sin difuminado (`4px 4px 0 #0F172A`), insignias pulsantes para stock crítico y respuesta de pulsación física mecánica en botones `:active` (`transform: translate(2px, 2px)`).
+## Tecnologías y presentación
 
----
+| Área | Herramientas de la versión documentada |
+| --- | --- |
+| Interfaz | React 19.3.0, React DOM y JavaScript |
+| Desarrollo y compilación | Vite 8.3.4 |
+| Navegación | React Router 7.18.4 |
+| Iconos | Lucide React |
+| Presentación | CSS propio con variables, rejillas y componentes reutilizables |
+| Persistencia | `localStorage`; comprobante de invitado asociado a la pestaña mediante `sessionStorage` |
+| Pruebas | Vitest 5.0.3, cobertura V8, jsdom y Testing Library |
+| Análisis estático | Oxlint |
 
-## 🧪 Pruebas Unitarias y Cobertura (Vitest + V8)
-La suite cuenta con **49 pruebas unitarias automatizadas** con **100% de aprobación (49/49 PASS)**:
-- **Validación matemática de RUN chileno (Módulo 11):** Verificación de RUTs reales con dígito numérico o K, y rechazo de RUTs inválidos.
-- **Lógica comercial y stock:** Búsqueda por SKU/nombre, cálculo de ofertas, detección de stock crítico (`stock <= stockMinimo`), bloqueo por sobregiro de inventario.
-- **Flujo de pedidos:** Generación de código correlativo `LM-2026-XXXX`, descuento automático de bodega y validación de línea de crédito contratista ($3.500.000).
-- **Componentes y páginas:** Renderizado condicional en `ProductCard`, navegación en `Navbar`, recálculo dinámico en `Cart`, formulario con feedback en `Contact` e inicio de sesión en `Login`.
+Los estilos se organizan en `src/styles/`. `variables.css` concentra los colores y valores comunes; `bento.css` define la distribución de tarjetas; `components.css` reúne controles y componentes. La identidad visual utiliza amarillo, naranja, azul y pizarra, con bordes y sombras sólidas. La adaptación a distintos anchos se implementa mediante CSS del proyecto, sin Bootstrap ni Tailwind.
 
-### Ejecución de Pruebas:
-```bash
-# Navegar al directorio de React
-cd "fase 2/proyecto_Etapa2_REACT"
+Las imágenes del catálogo se sirven desde archivos del proyecto. Son referencias del tipo de artículo; la marca, medidas y características comerciales se describen en cada ficha. Los [créditos de imágenes](<fase 2/proyecto_Etapa2_REACT/public/assets/img/productos/CREDITOS.md>) identifican fuentes, autores, licencias y descripciones de las imágenes generadas.
 
-# Ejecutar la suite completa de pruebas
-npm run test:run
+## Ejecución local
 
-# Generar reporte de cobertura de código
-npm run test:coverage
-```
+Se recomienda **Node.js 24**, versión utilizada para la verificación, y npm. Node.js 18 no es compatible con las dependencias de esta entrega. La configuración instalada de Vitest admite Node `^22.12.0`, `^24.0.0` o `>=26.0.0`; se debe respetar también la compatibilidad del resto del archivo de bloqueo.
 
----
-
-## 🚀 Puesta en Marcha (Desarrollo Local)
-
-### Requisitos Previos:
-- Node.js v18+ o v24+
-- npm v9+
-
-### Pasos:
-```bash
-# 1. Clonar el repositorio
-git clone git@github.com:Sebastianidm/LosMaestros.git
+```powershell
+git clone https://github.com/MartinCaviedes/LosMaestros.git
 cd LosMaestros
-
-# 2. Entrar al proyecto de React
 cd "fase 2/proyecto_Etapa2_REACT"
-
-# 3. Instalar dependencias
-npm install
-
-# 4. Iniciar servidor de desarrollo con Hot Module Replacement (HMR)
+npm ci
 npm run dev
-
-# 5. Abrir en el navegador: http://localhost:5173
 ```
 
----
+Si el repositorio ya está clonado, se comienza desde su carpeta React. La terminal indica la dirección del servidor; por defecto es `http://localhost:5173`. Debe abrirse mediante el servidor de Vite, no directamente como un archivo HTML. Web Crypto requiere `localhost` o un contexto seguro HTTPS.
 
-## 👥 Cuentas de Acceso Rápido (Demo RBAC)
-La vista de Login (`/login`) cuenta con botones de autocompletado para probar los distintos perfiles:
+Para comprobar la compilación de producción:
 
-| Perfil / Rol | Correo Electrónico | Contraseña | Privilegios / Características |
-|---|---|---|---|
-| **Administrador** | `admin@ferreterialosmaestros.cl` | `Admin2026!` | Acceso completo a Backoffice (Productos, Usuarios, Pedidos). |
-| **Vendedor** | `vendedor@ferreterialosmaestros.cl` | `Venta2026!` | Consulta de inventario, stock crítico y mantenedor de productos. |
-| **Contratista** | `contratista@constructora.cl` | `Obra2026!` | Línea de crédito aprobada ($3.5M) con pago diferido a 30 días. |
-| **Cliente Regular** | `cliente@duoc.cl` | `Cliente2026!` | Compra con Webpay, autocompletado de checkout e historial. |
+```powershell
+npm run build
+npm run preview
+```
+
+Vite genera los archivos en `dist/`. La vista previa utiliza la dirección indicada en la terminal, normalmente `http://localhost:4173`. Un alojamiento estático debe servir `index.html` como alternativa para las rutas de React.
+
+## Perfiles y cuentas de demostración
+
+La vista `/login` ofrece botones para completar estas credenciales ficticias. Son las cuentas iniciales; una edición o eliminación guardada en el navegador puede cambiar su acceso.
+
+| Perfil | Correo | Contraseña | Funciones principales |
+| --- | --- | --- | --- |
+| Administrador | `admin@duoc.cl` | `admin123` | Gestiona usuarios, productos, inventario y pedidos. |
+| Vendedor | `vendedor@duoc.cl` | `vend123` | Gestiona productos, inventario y pedidos; no administra usuarios. |
+| Contratista | `contratista@duoc.cl` | `contra123` | Compra con crédito de demostración y consulta sus pedidos y saldo. |
+| Cliente | `cliente@gmail.com` | `clie123` | Compra y consulta sus pedidos. |
+
+Un visitante puede consultar la tienda y realizar una compra simulada. El registro permite crear cuentas locales de cliente o contratista. Un nuevo contratista recibe automáticamente $2.500.000 de cupo de demostración; la cuenta precargada tiene un cupo de $3.500.000 y un saldo inicial de $450.000. Estos montos y la habilitación automática son decisiones de la demo.
+
+Los permisos y la titularidad se comprueban en la aplicación local. Las contraseñas se derivan con PBKDF2 SHA-256, sal y 100.000 iteraciones, pero el propietario del navegador sigue controlando sus datos y roles. La autorización mediante servidor corresponde a una etapa posterior.
+
+Se conservan los dominios admitidos `duoc.cl`, `profesor.duoc.cl` y `gmail.com`, y el rango de contraseña de 4 a 10 caracteres. Son restricciones del prototipo y no una política de seguridad de producción. El registro comprueba el RUN con Módulo 11; esto no acredita la identidad de una persona.
+
+## Reglas comerciales observables
+
+| Operación | Comportamiento de la V2 |
+| --- | --- |
+| Disponibilidad | No se agregan productos sin existencias ni cantidades superiores al stock. La confirmación vuelve a validar la disponibilidad. |
+| Precio y total | Se utiliza el precio vigente con descuento. El pedido conserva subtotal, despacho y total en pesos chilenos. |
+| Compra confirmada | Guarda el pedido, descuenta existencias y vacía el carrito, manteniendo visible la confirmación. |
+| Compra fallida | Conserva el carrito y no registra el pedido ni descuenta stock o crédito. |
+| Crédito | Exige contratista habilitado y cupo suficiente; carga el total, incluido el despacho. |
+| Anulación | Restituye existencias y saldo una sola vez. Los pedidos cerrados no se reabren. |
+| Historial | La interfaz muestra al cliente sus pedidos; el invitado consulta su último comprobante en la pestaña de compra. |
+| Reposición | La interfaz destaca stock menor o igual al mínimo; no envía avisos externos. |
+
+Las tarifas de despacho son de demostración y se reutilizan en la consulta de cobertura y en la compra:
+
+| Destino o modalidad | Tarifa |
+| --- | --- |
+| Retiro en tienda | Gratuito |
+| La Serena y Coquimbo, Región de Coquimbo | $4.990 bajo $100.000 de subtotal; gratuito desde $100.000 |
+| Vicuña, Región de Coquimbo | $14.990 |
+| Otras ubicaciones | Requieren cotización; se ofrece retiro en tienda |
+
+El catálogo, las cuentas y los pedidos persisten en el origen del navegador. Otra dirección, puerto o dispositivo mantiene un almacenamiento distinto. Para una revisión con datos iniciales puede utilizarse un perfil de navegador aislado.
+
+## Pruebas y resultados documentados
+
+Desde la carpeta React:
+
+```powershell
+npm run test:run
+npm run test:coverage
+npm run lint
+```
+
+`npm test` inicia Vitest en modo interactivo. `npm run test:run` ejecuta la suite una vez y `npm run test:coverage` genera la cobertura. El informe navegable se encuentra en `coverage/index.html` y los contadores en `coverage/coverage-final.json`.
+
+La revisión documental **2.2 del 16 de octubre de 2026** registra **92 pruebas aprobadas en 13 archivos**, sin fallos ni casos omitidos. Incluye servicios, componentes y flujos integrados de compra, acceso y navegación.
+
+| Métrica global | Cubierto / total | Porcentaje |
+| --- | --- | --- |
+| Sentencias | 785 / 1312 | 59,83 % |
+| Ramas | 598 / 1121 | 53,34 % |
+| Funciones | 177 / 357 | 49,57 % |
+| Líneas | 701 / 1152 | 60,85 % |
+
+Los servicios alcanzan 90,96 % de cobertura de líneas. La compilación de producción se completó y Oxlint registró cero errores y seis advertencias. El porcentaje de aprobación de pruebas no equivale al porcentaje de cobertura.
+
+Las comprobaciones complementarias en navegador abarcan cinco perfiles en ocho anchos, 69 comprobaciones de vistas y la carga de las 27 imágenes del catálogo. Estas comprobaciones se documentan por separado y no incrementan la cobertura de Vitest. El [informe de pruebas](<docs/PRUEBAS UNITARIAS/PRUEBAS_UNITARIAS.md>) explica el procedimiento, la trazabilidad y las áreas pendientes.
+
+## Documentación de entrega
+
+La carpeta [docs](docs/README.md) contiene una única versión vigente de cada documento, revisión 2.2:
+
+- [ERS en Word](<docs/ERS actualizado (v2)/ERS_Ferreteria_Los_Maestros_v2.docx>) y [versión Markdown](<docs/ERS actualizado (v2)/ERS_actualizado_v2.md>).
+- [Informe de pruebas y cobertura en Word](<docs/PRUEBAS UNITARIAS/Informe_Pruebas_Unitarias_y_Cobertura.docx>) y [versión Markdown](<docs/PRUEBAS UNITARIAS/PRUEBAS_UNITARIAS.md>).
+
+El ERS conserva las reglas del caso y delimita el alcance actual frente al resultado final esperado. La integración con servicios centrales, base de datos, pagos reales, reportes comerciales completos y verificación geográfica precisa permanece identificada como desarrollo posterior.

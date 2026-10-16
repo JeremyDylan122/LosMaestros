@@ -37,7 +37,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Cemento blanco arquitectónico para terminaciones a la vista y estucos decorativos.',
-    imagen: '/assets/img/productos/cemento.jpg',
+    imagen: '/assets/img/productos/cemento-blanco.webp',
     especificaciones: 'Gran blancura y finura, saco de 25 kg.'
   },
   {
@@ -55,7 +55,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Adhesivo cementicio de alto agarre para revestimientos cerámicos y porcelanatos en interiores.',
-    imagen: '/assets/img/productos/cemento.jpg',
+    imagen: '/assets/img/productos/mortero-adhesivo.webp',
     especificaciones: 'Rendimiento aprox 4 m² por saco de 25 kg.'
   },
   {
@@ -73,7 +73,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Mortero autonivelante para regularización de radieres previa instalación de pisos.',
-    imagen: '/assets/img/productos/cemento.jpg',
+    imagen: '/assets/img/productos/mortero-nivelador.webp',
     especificaciones: 'Espesor de 3 a 20 mm, secado rápido 24 hrs.'
   },
   {
@@ -91,7 +91,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Arena de río harneada y lavada, libre de arcillas y sales para estucos y revoques.',
-    imagen: '/assets/img/productos/cemento.jpg',
+    imagen: '/assets/img/productos/arena-fina.webp',
     especificaciones: 'Granulometría fina uniforme en saco de 25 kg.'
   },
   {
@@ -109,7 +109,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Ladrillo de arcilla cocida artesanal de alta solidez estructural para albañilería confinada.',
-    imagen: '/assets/img/productos/cemento.jpg',
+    imagen: '/assets/img/productos/ladrillo-fiscal.webp',
     especificaciones: 'Dimensiones aproximadas 28 x 14 x 5 cm.'
   },
 
@@ -129,7 +129,7 @@ export const initialProducts = [
     enOferta: true,
     descuento: 15,
     descripcion: 'Pintura látex base agua con alta lavabilidad y excelente poder cubridor para muros interiores.',
-    imagen: '/assets/img/productos/pintura.jpg',
+    imagen: '/assets/img/productos/pintura-blanca.webp',
     especificaciones: 'Acabado mate, secado al tacto 1 hr, galón 3.785 L.'
   },
   {
@@ -147,7 +147,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Esmalte hidrorepelente formulado contra hongos y humedad para baños, cocinas y fachadas.',
-    imagen: '/assets/img/productos/pintura.jpg',
+    imagen: '/assets/img/productos/pintura-blanca.webp',
     especificaciones: 'Terminación satinada lavable, galón 3.785 L.'
   },
   {
@@ -165,7 +165,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Barniz poliuretano de alta protección UV y resistencia a la salinidad costera de La Serena.',
-    imagen: '/assets/img/productos/pintura.jpg',
+    imagen: '/assets/img/productos/barniz-marino.webp',
     especificaciones: 'Protección para maderas expuestas al sol y brisa marina.'
   },
   {
@@ -183,7 +183,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Brocha profesional con cerdas naturales compactas y mango ergonómico de madera para pintura pareja.',
-    imagen: '/assets/img/productos/pintura.jpg',
+    imagen: '/assets/img/productos/brocha.webp',
     especificaciones: 'Ancho 3 pulgadas (76 mm), virola de acero inoxidable.'
   },
 
@@ -221,7 +221,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Alicate universal cromado con filo templado para corte de alambre duro y prensado firme.',
-    imagen: '/assets/img/productos/martillo.jpg',
+    imagen: '/assets/img/productos/alicate-universal.jpg',
     especificaciones: 'Largo 200 mm, aislación 1000V en mangos bi-materia.'
   },
   {
@@ -239,7 +239,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Arco de sierra resistente con ajuste de tensión rápido y hoja bimetálica para corte de metales.',
-    imagen: '/assets/img/productos/martillo.jpg',
+    imagen: '/assets/img/productos/sierra-manual.jpg',
     especificaciones: 'Hoja de 300 mm (12 pulg), 24 dientes por pulgada.'
   },
   {
@@ -257,7 +257,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Nivel magnético compacto con 3 burbujas (0°, 45° y 90°) ideal para cañerías y estructuras.',
-    imagen: '/assets/img/productos/martillo.jpg',
+    imagen: '/assets/img/productos/nivel-torpedo.jpg',
     especificaciones: 'Cuerpo de aluminio inyectado con base imantada.'
   },
 
@@ -277,7 +277,7 @@ export const initialProducts = [
     enOferta: true,
     descuento: 20,
     descripcion: 'Taladro percutor industrial reversible con velocidad variable y mandril metálico de 13 mm.',
-    imagen: '/assets/img/productos/taladro.jpg',
+    imagen: '/assets/img/productos/taladro-percutor.webp',
     especificaciones: 'Potencia 650 Watts, 0-2800 RPM, peso 1.9 kg, incluye empuñadura lateral.'
   },
   {
@@ -295,7 +295,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Amoladora angular para corte y desbaste en metal y albañilería con protección contra re-arranque.',
-    imagen: '/assets/img/productos/taladro.jpg',
+    imagen: '/assets/img/productos/esmeril-angular.webp',
     especificaciones: 'Disco 115 mm, 11000 RPM, cable reforzado de 2.5 metros.'
   },
   {
@@ -313,7 +313,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Sierra circular de alta precisión con base de aluminio y capacidad de corte en bisel hasta 45°.',
-    imagen: '/assets/img/productos/taladro.jpg',
+    imagen: '/assets/img/productos/sierra-circular.jpg',
     especificaciones: 'Potencia 1400W, disco de 24 dientes carburo de tungsteno incluido.'
   },
   {
@@ -331,7 +331,7 @@ export const initialProducts = [
     enOferta: true,
     descuento: 10,
     descripcion: 'Taladro atornillador compacto con 18 posiciones de torque y luz LED para trabajo en lugares estrechos.',
-    imagen: '/assets/img/productos/taladro.jpg',
+    imagen: '/assets/img/productos/atornillador-inalambrico.webp',
     especificaciones: 'Batería Litio-Ion 12V 1.5Ah, maletín de transporte y cargador rápido.'
   },
 
@@ -351,7 +351,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Tubería de PVC hidráulica clase 10 para conducción de agua potable a presión.',
-    imagen: '/assets/img/productos/tuberia-pvc.jpg',
+    imagen: '/assets/img/productos/tuberia-pvc-presion.webp',
     especificaciones: 'Diámetro nominal 1/2 pulgada, largo 6 metros con campana para pegar.'
   },
   {
@@ -369,7 +369,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Tubería de cobre rígida sin costura para instalaciones de agua fría, caliente y gas.',
-    imagen: '/assets/img/productos/tuberia-pvc.jpg',
+    imagen: '/assets/img/productos/tuberia-cobre.webp',
     especificaciones: 'Espesor reforzado tipo L según norma chilena.'
   },
   {
@@ -387,7 +387,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Válvula de corte esférica en bronce niquelado con palanca ergonómica de acero inoxidable.',
-    imagen: '/assets/img/productos/tuberia-pvc.jpg',
+    imagen: '/assets/img/productos/llave-paso.webp',
     especificaciones: 'Paso total, presión máxima 400 PSI, rosca HI-HI 1/2 pulgada.'
   },
   {
@@ -405,7 +405,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Cinta selladora de PTFE de alta densidad para sellado hermético de uniones roscadas.',
-    imagen: '/assets/img/productos/tuberia-pvc.jpg',
+    imagen: '/assets/img/productos/cinta-teflon.jpg',
     especificaciones: 'Ancho 19 mm, espesor 0.1 mm, largo 10 metros.'
   },
 
@@ -425,7 +425,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Conductor de cobre electrolítico libre de halógenos no propagador de incendios para circuitos residenciales.',
-    imagen: '/assets/img/productos/taladro.jpg',
+    imagen: '/assets/img/productos/cable-blanco.webp',
     especificaciones: 'Sección 1.5 mm², rollo de 100 metros, certificado SEC.'
   },
   {
@@ -443,7 +443,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Automático bipolar para riel DIN, protección contra sobrecargas y cortocircuitos.',
-    imagen: '/assets/img/productos/taladro.jpg',
+    imagen: '/assets/img/productos/disyuntor-bipolar.webp',
     especificaciones: 'Curva C, capacidad de ruptura 6 kA, 2 polos 16 Amperes.'
   },
 
@@ -481,7 +481,7 @@ export const initialProducts = [
     enOferta: true,
     descuento: 15,
     descripcion: 'Botín de cuero hidrofugado con puntera de acero templado y suela antideslizante resistente a hidrocarburos.',
-    imagen: '/assets/img/productos/casco.jpg',
+    imagen: '/assets/img/productos/zapatos-seguridad.webp',
     especificaciones: 'Talla 42, plantilla antiperforación, certificación cesmec.'
   },
   {
@@ -499,7 +499,7 @@ export const initialProducts = [
     enOferta: false,
     descuento: 0,
     descripcion: 'Guantes de cuero cabritilla flexible de alta resistencia mecánica y abrasión para faena de obra.',
-    imagen: '/assets/img/productos/casco.jpg',
+    imagen: '/assets/img/productos/guantes-cabritilla.webp',
     especificaciones: 'Talla estándar 9/L, costuras reforzadas con hilo poliéster.'
   }
 ];

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { XCircle, RotateCcw, ShoppingBag, PhoneCall, ArrowLeft } from 'lucide-react';
+import { XCircle, RotateCcw, ShoppingBag, PhoneCall } from 'lucide-react';
 
 export const CheckoutFailure = () => {
   const location = useLocation();

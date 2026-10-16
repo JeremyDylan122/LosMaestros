@@ -8,7 +8,6 @@ import {
   ArrowRight, 
   ShieldCheck, 
   Tag, 
-  CheckCircle2, 
   Package 
 } from 'lucide-react';
 import { productService } from '../services/productService';

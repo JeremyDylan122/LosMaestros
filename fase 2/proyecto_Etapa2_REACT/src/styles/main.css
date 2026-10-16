@@ -3,3 +3,11 @@
 @import './bento.css';
 @import './components.css';
 @import './admin.css';
+
+/* Ajustes de distribución para pantallas pequeñas */
+@media (max-width: 600px) {
+  .checkout-layout, .checkout-layout > div > .bento-card > div { min-width: 0; }
+  .checkout-layout { grid-template-columns: minmax(0, 1fr) !important; }
+  .checkout-layout .bento-card { padding: 1rem !important; }
+  .checkout-layout .bento-card > div[style*="grid"] { grid-template-columns: minmax(0, 1fr) !important; }
+}

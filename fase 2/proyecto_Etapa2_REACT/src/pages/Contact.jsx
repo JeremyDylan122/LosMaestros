@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, CheckCircle2, Phone, Mail, MapPin, AlertCircle } from 'lucide-react';
+import { Send, CheckCircle2, Mail, AlertCircle } from 'lucide-react';
 import { userService } from '../services/userService';
 
 export const Contact = () => {
@@ -90,7 +90,7 @@ export const Contact = () => {
             <div className="alert-tactile alert-tactile-success" data-testid="contact-success-alert">
               <CheckCircle2 size={20} />
               <div>
-                <strong>¡Mensaje enviado con éxito!</strong> Nuestro equipo comercial se comunicará contigo a la brevedad.
+                <strong>¡Mensaje validado en modo demostración!</strong> No se ha enviado un correo. Esta versión permite revisar el formulario y sus validaciones.
               </div>
             </div>
           )}

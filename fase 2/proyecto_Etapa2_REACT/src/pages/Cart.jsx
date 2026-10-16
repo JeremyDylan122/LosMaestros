@@ -6,8 +6,6 @@ import {
   ArrowRight, 
   ArrowLeft, 
   Package, 
-  Truck, 
-  CheckCircle2, 
   CreditCard 
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -15,7 +13,7 @@ import { useAuth } from '../context/AuthContext';
 
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, totalPrice, totalCount, isEmpty } = useCart();
-  const { isAuthenticated, isContractor, user } = useAuth();
+  const { isAuthenticated, isContractor, user: _user } = useAuth();
   const navigate = useNavigate();
 
   if (isEmpty) {
@@ -95,7 +93,7 @@ export const Cart = () => {
                           <img 
                             src={item.imagen || '/assets/img/productos/cemento.jpg'} 
                             alt={item.nombre}
-                            style={{ width: '48px', height: '48px', objectFit: 'cover', border: '1.5px solid #000', borderRadius: '4px' }}
+                            style={{ width: '48px', height: '48px', objectFit: 'contain', backgroundColor: 'var(--bg-surface)', border: '1.5px solid #000', borderRadius: '4px' }}
                           />
                           <div>
                             <strong style={{ display: 'block', fontSize: '0.95rem' }}>{item.nombre}</strong>
@@ -162,7 +160,7 @@ export const Cart = () => {
 
             <button
               type="button"
-              onClick={clearCart}
+              onClick={() => { if (window.confirm("¿Vaciar todos los productos del carrito?")) clearCart(); }}
               className="btn-tactile btn-tactile-sm btn-tactile-danger"
             >
               <Trash2 size={15} /> Vaciar Todo el Carrito
