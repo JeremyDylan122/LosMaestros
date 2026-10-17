@@ -8,9 +8,7 @@ import {
   ShieldCheck, 
   Truck, 
   Tag, 
-  Package, 
-  Wrench 
-} from 'lucide-react';
+  } from 'lucide-react';
 import { productService } from '../services/productService';
 import { useCart } from '../context/CartContext';
 
@@ -92,11 +90,11 @@ export const ProductDetail = () => {
       <div className="grid-2" style={{ gap: '2rem', alignItems: 'start' }}>
         {/* COLUMNA 1: IMAGEN TÁCTIL */}
         <div className="bento-card" style={{ padding: '0', overflow: 'hidden' }}>
-          <div style={{ position: 'relative', width: '100%', height: '420px', backgroundColor: '#f1f5f9' }}>
+          <div style={{ position: 'relative', width: '100%', height: '420px', backgroundColor: 'var(--bg-surface)' }}>
             <img 
               src={product.imagen || '/assets/img/productos/cemento.jpg'} 
               alt={product.nombre}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              className="product-img"
             />
 
             {product.enOferta && (
@@ -115,6 +113,10 @@ export const ProductDetail = () => {
               </div>
             )}
           </div>
+
+          <p style={{ padding: '0.5rem 1rem', margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+            Imagen referencial del tipo de producto.
+          </p>
 
           <div style={{ padding: '1.25rem', backgroundColor: 'var(--bg-surface-alt)', borderTop: 'var(--border-tactile)' }}>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'space-around', fontSize: '0.85rem' }}>

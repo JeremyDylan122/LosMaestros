@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { shippingService } from '../services/shippingService';
+import { productService } from '../services/productService';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   CreditCard, 
   Truck, 
-  MapPin, 
-  CheckCircle2, 
   AlertCircle, 
   Building2, 
-  ShieldCheck, 
-  ShoppingBag, 
-  ArrowLeft 
-} from 'lucide-react';
+  } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderService } from '../services/orderService';
@@ -18,13 +15,14 @@ import { userService } from '../services/userService';
 import { chileLocations } from '../data/chileLocations';
 
 export const Checkout = () => {
-  const { cartItems, totalPrice, totalCount, clearCart, isEmpty } = useCart();
+  const { cartItems, totalPrice, totalCount: _totalCount, clearCart, isEmpty } = useCart();
   const { user, isAuthenticated, isContractor, refreshUser } = useAuth();
   const navigate = useNavigate();
+  const completed = useRef(false);
 
   // Redirigir al carrito si está vacío
   useEffect(() => {
-    if (isEmpty) {
+    if (isEmpty && !completed.current) {
       navigate('/carrito');
     }
   }, [isEmpty, navigate]);
@@ -60,9 +58,8 @@ export const Checkout = () => {
   }, [user]);
 
   // Costo de despacho
-  const shippingFee = deliveryType === 'RETIRO_TIENDA' 
-    ? 0 
-    : (totalPrice >= 100000 ? 0 : 4990);
+  const shipping = shippingService.quote({ deliveryType, region, commune, subtotal: totalPrice });
+  const shippingFee = shipping.fee;
 
   const grandTotal = totalPrice + shippingFee;
 
@@ -86,6 +83,8 @@ export const Checkout = () => {
       return;
     }
 
+    if (!shipping.available) { setErrorMsg(shipping.message); return; }
+
     // Si el usuario marcó simular fallo de pago (requerimiento EV2 para probar compra fallida)
     if (simulateError) {
       navigate('/compra-fallida', {
@@ -108,12 +107,16 @@ export const Checkout = () => {
         items: cartItems,
         deliveryType,
         address,
+        region,
+        phone,
+        empresa,
         commune,
         paymentMethod,
         notes
       });
 
       // Limpiar carrito y refrescar usuario
+      completed.current = true;
       clearCart();
       refreshUser();
 
@@ -152,8 +155,9 @@ export const Checkout = () => {
         </div>
       )}
 
+      <p role="status">{shipping.message}</p>
       <form onSubmit={handleSubmit} data-testid="checkout-form">
-        <div className="grid-2" style={{ gridTemplateColumns: '2fr 1fr', gap: '2rem', alignItems: 'start' }}>
+        <div className="grid-2 checkout-layout" style={{ gridTemplateColumns: '2fr 1fr', gap: '2rem', alignItems: 'start' }}>
           {/* COLUMNA IZQUIERDA: FORMULARIOS */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* 1. DATOS DEL CLIENTE / CONTRATISTA */}
@@ -474,7 +478,7 @@ export const Checkout = () => {
                     <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{item.unidad} &bull; Cód: {item.codigo}</div>
                   </div>
                   <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, whiteSpace: 'nowrap' }}>
-                    ${(item.precio * item.cantidad).toLocaleString('es-CL')}
+                    ${(productService.getUnitPrice(item) * item.cantidad).toLocaleString('es-CL')}
                   </span>
                 </div>
               ))}
@@ -488,7 +492,7 @@ export const Checkout = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-muted)' }}>Flete / Despacho:</span>
                 <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: shippingFee === 0 ? '#059669' : 'inherit' }}>
-                  {shippingFee === 0 ? 'GRATIS' : `$${shippingFee.toLocaleString('es-CL')}`}
+                  {!shipping.available ? 'Por cotizar' : shippingFee === 0 ? 'GRATIS' : `$${shippingFee.toLocaleString('es-CL')}`}
                 </span>
               </div>
             </div>
@@ -511,7 +515,7 @@ export const Checkout = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !shipping.available}
               className="btn-tactile btn-tactile-primary btn-tactile-block"
               style={{ padding: '0.9rem', fontSize: '1.05rem' }}
               data-testid="confirm-order-btn"

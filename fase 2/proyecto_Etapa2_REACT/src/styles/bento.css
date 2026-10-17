@@ -121,11 +121,13 @@
 }
 
 .bento-icon-badge {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
+  color: var(--text-main);
   background-color: var(--bg-surface);
   border: var(--border-tactile);
   box-shadow: var(--shadow-sm);

@@ -1,380 +1,675 @@
-# ESPECIFICACIÓN DE REQUISITOS DE SOFTWARE (ERS)
-## VERSIÓN 2.0 — EVALUACIÓN PARCIAL 2 (DSY1104 FULL STACK II)
+# Especificación de Requisitos de Software
 
----
+Ferretería Los Maestros revisión 2.2 del 16 de octubre de 2026
 
-### DATOS DEL PROYECTO
-- **Nombre del Proyecto:** Portal Web Ferretería Los Maestros (Plataforma E-Commerce y Gestión Operativa)
-- **Organización / Cliente:** Ferretería Los Maestros Ltda. (La Serena / Coquimbo)
-- **Institución:** Duoc UC — Escuela de Informática y Telecomunicaciones
-- **Asignatura:** DSY1104 - Desarrollo Full Stack II (Foco Frontend)
-- **Docente:** Profesor Evaluador
-- **Estudiante / Desarrollador:** Sebastián Miranda (y equipo de desarrollo)
-- **Fecha:** Octubre 2026
-- **Versión del Documento:** 2.0 (Migración React + Vite + Vitest)
-- **Estándar de Referencia:** IEEE Std 830-1998 (*IEEE Recommended Practice for Software Requirements Specifications*)
+[Documento Word](ERS_Ferreteria_Los_Maestros_v2.docx) · [Índice de documentación](../README.md)
 
----
+**Contenido**
 
-## ÍNDICE GENERAL
+- [1. Introducción](#1-introducción)
+- [2. Descripción general](#2-descripción-general)
+- [3. Requisitos específicos](#3-requisitos-específicos)
+- [Funciones observables de la V2](#343-funciones-observables-de-la-segunda-versión)
 
-1. [INTRODUCCIÓN](#1-introducción)
-   - 1.1. Propósito
-   - 1.2. Ámbito del Sistema
-   - 1.3. Definiciones, Acrónimos y Abreviaturas
-   - 1.4. Referencias
-   - 1.5. Visión General del Documento
-2. [DESCRIPCIÓN GENERAL](#2-descripción-general)
-   - 2.1. Perspectiva del Producto
-   - 2.2. Funciones del Producto
-   - 2.3. Características de los Usuarios y Roles (RBAC)
-   - 2.4. Restricciones de Diseño e Implementación
-   - 2.5. Suposiciones y Dependencias
-   - 2.6. Requisitos Futuros
-3. [REQUISITOS ESPECÍFICOS](#3-requisitos-específicos)
-   - 3.1. Requisitos Comunes de las Interfaces
-     - 3.1.1. Interfaces de Usuario (Framework CSS Propio: Bento Grid + Brutalismo Táctil)
-     - 3.1.2. Interfaces de Hardware
-     - 3.1.3. Interfaces de Software
-     - 3.1.4. Interfaces de Comunicación
-   - 3.2. Requisitos Funcionales (RF-01 al RF-15)
-   - 3.3. Requisitos No Funcionales (RNF-01 al RNF-08)
-   - 3.4. Matriz de Trazabilidad de Requisitos
+## Ficha del documento
 
----
+| Dato | Descripción |
+| --- | --- |
+| Proyecto | Ferretería Los Maestros |
+| Documento | Especificación de Requisitos de Software revisión 2.2 |
+| Asignatura y entrega | DSY1104 Desarrollo FullStack II Evaluación Parcial 2 |
+| Fecha | 16 de octubre de 2026 |
+| Integrantes | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes |
+| Estado | Versión final para la segunda entrega |
+| Código documentado | Aplicación React V2 revisada para la entrega del 16 de octubre de 2026. |
 
-## 1. INTRODUCCIÓN
+| Fecha | Versión | Responsables | Cambio |
+| --- | --- | --- | --- |
+| 11/09/2026 | 1.0 | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes | Especificación de la primera versión con HTML, CSS y JavaScript. |
+| 13/10/2026 | 2.0 | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes | Evolución a React, persistencia local y gestión comercial de demostración. |
+| 14/10/2026 | 2.1 | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes | Revisión de reglas, requisitos y consistencia de las operaciones locales. |
+| 16/10/2026 | 2.2 | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes | Consolidación final de navegación, perfiles, cobertura referencial, imágenes y trazabilidad de pruebas. |
+
+V2 identifica la segunda versión de la aplicación, desarrollada con React. La revisión 2.2 corresponde a la versión final de esta especificación para la segunda entrega.
+
+## 1. Introducción
+
+Ferretería Los Maestros necesita facilitar la consulta de productos y mejorar la gestión de ventas, inventario y cuentas corrientes. Este documento describe las necesidades del negocio y los requisitos de la solución, indicando cuáles pueden observarse en la aplicación actual y cuáles requieren desarrollo posterior.
 
 ### 1.1. Propósito
-El presente documento constituye la **Especificación de Requisitos de Software (ERS) Versión 2.0** para el sistema web de **Ferretería Los Maestros**, desarrollado en el marco de la **Evaluación Parcial 2 (30%)** de la asignatura **DSY1104 Desarrollo Full Stack II** en Duoc UC.
 
-El propósito fundamental de esta versión es documentar de manera formal, no ambigua y verificable los requisitos derivados de la migración tecnológica integral desde la Fase 1 (sitio web estático basado en HTML5, CSS3 y JavaScript nativo) hacia la **Fase 2**: una aplicación de página única (**SPA - Single Page Application**) de alto rendimiento construida con **Vite + React**, gobernada por un sistema de diseño propio basado en **Bento Grid y Brutalismo Táctil**, persistencia reactiva del lado del cliente vía **Web Storage API**, control de roles (**RBAC**), gestión de crédito para contratistas de la construcción y una batería automatizada de pruebas unitarias con **Vitest**.
+Definir las funciones, reglas y restricciones de Ferretería Los Maestros y establecer criterios observables para su aceptación. La especificación está dirigida a quienes evalúan, utilizan y mantienen el sistema; describe el comportamiento esperado sin exigir conocimientos de programación.
 
 ### 1.2. Ámbito del Sistema
-El sistema denominado **"Portal Web Ferretería Los Maestros v2"** abarca la digitalización de la experiencia comercial, logística y administrativa de la ferretería líder de la Cuarta Región de Coquimbo.
 
-El sistema comprende:
-1. **Catálogo Unificado de Productos:** Más de 26 artículos industriales y hogareños clasificados en 7 familias (Cementos y Hormigones, Pinturas y Adhesivos, Herramientas Manuales, Herramientas Eléctricas Makita/Bosch, Gasfitería Tigre/Madeco, Electricidad y Seguridad Industrial Norseg/3M), con control de existencias, cálculo de descuentos y alerta visual de stock crítico.
-2. **Sistema de Carrito de Compras Dinámico:** Gestión en tiempo real de ítems seleccionados, validación automática contra inventario disponible y persistencia continua en el navegador.
-3. **Flujo Integral de Checkout:** Despacho regional por zonas (La Serena, Coquimbo, Ovalle, Vicuña), selección de medios de pago con simulación de pasarela Webpay y modalidad exclusiva de **Cuenta Corriente / Línea de Crédito a 30 días para Contratistas Calificados** (cupo asignado de $3.500.000).
-4. **Módulo de Autenticación y Registro:** Autenticación con credenciales seguras, asignación de roles (Administrador, Vendedor, Contratista, Cliente) y validación matemática estricta del **RUN / RUT chileno mediante el algoritmo Módulo 11**, además de restricción de dominios de correo institucionales (`@duoc.cl`, `@profesor.duoc.cl`, `@gmail.com`).
-5. **Panel de Administración (Backoffice):** Módulos de mantención (CRUD) para catálogo de productos, gestión de usuarios/roles y monitoreo de estados de pedidos.
-6. **Centro de Información y Servicios:** Mapa interactivo vectorial SVG de zonas de reparto, visor de artículos y guías técnicas de construcción (curado de hormigón, mantención de taladros, tuberías PPR/PVC) y formulario de contacto/cotizaciones.
+La segunda versión entrega una tienda React con 27 productos iniciales en siete categorías, imágenes referenciales por tipo de artículo, fichas, ofertas, carrito, registro e inicio de sesión, compra simulada e historial personal. Incluye un panel para gestionar usuarios, catálogo, inventario y pedidos según los permisos de cada perfil. Las operaciones se conservan en el navegador.
+
+La compra registra el pedido, descuenta existencias y carga el total a la cuenta corriente cuando se utiliza crédito. El pago, el despacho y el contacto son demostraciones: esta versión no realiza cobros ni envía correos. La solución final contempla servicios centrales, base de datos e inventario compartido, identificados como desarrollo posterior.
 
 ### 1.3. Definiciones, Acrónimos y Abreviaturas
-- **SPA (Single Page Application):** Aplicación web que carga una sola página HTML y actualiza dinámicamente el contenido mediante JavaScript según la interacción del usuario.
-- **Vite:** Herramienta de compilación frontend de última generación basada en ES Modules nativos y Rollup.
-- **React:** Biblioteca declarativa de componentes para interfaces de usuario reactivas.
-- **Vitest:** Framework de pruebas unitarias ultrarrápido con soporte nativo para Vite y emulación de navegador mediante JSDOM.
-- **RBAC (Role-Based Access Control):** Mecanismo de control de acceso fundamentado en roles asignados a los usuarios.
-- **Bento Grid:** Paradigma de diseño contemporáneo que organiza módulos de contenido e información en bloques asimétricos ordenados inspirados en las tradicionales cajas bento japonesas.
-- **Brutalismo Táctil (Tactile Brutalism):** Estilo visual caracterizado por bordes sólidos de alto contraste (2.5px a 3.5px), sombras proyectadas rígidas sin desenfoque (`offset-x: 4px`, `offset-y: 4px`, `blur: 0`), paleta industrial de alta seguridad y microinteracciones que emulan la pulsación física de interruptores o botones mecánicos (`translate(2px, 2px)`).
-- **RUN / RUT:** Rol Único Nacional / Rol Único Tributario chileno, compuesto por cuerpo numérico y dígito verificador calculado por Módulo 11.
-- **DTE:** Documento Tributario Electrónico.
-- **LocalStorage:** Almacenamiento local persistente por origen del navegador web (HTML5 Web Storage API).
+
+| Término | Significado |
+| --- | --- |
+| ERS | Especificación de Requisitos de Software. |
+| RF / RNF / RT | Requisito funcional, requisito no funcional y restricción técnica, respectivamente. |
+| Regla de negocio | Condición que determina cómo debe operar el negocio o quién puede realizar una acción. |
+| Stock | Cantidad disponible de un producto. El stock mínimo es el umbral utilizado para advertir la necesidad de reposición. |
+| Cuenta corriente | Registro de compras de un cliente habilitado cuyo pago queda pendiente a fin de mes. |
+| Simulación | Demostración de una interacción que todavía no realiza la operación comercial completa. |
+| Almacenamiento local | Datos conservados por el navegador para carrito, usuarios, productos y pedidos. No constituyen un inventario compartido entre dispositivos. |
+| Frontend / backend | Interfaz que utiliza el usuario / servicios que procesan y guardan las operaciones. |
+| API REST y JSON | Forma de comunicación entre la interfaz y los servicios, y formato de intercambio de los datos. |
 
 ### 1.4. Referencias
-- *IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications.*
-- Guía de Asignatura Duoc UC: *DSY1104 Desarrollo Full Stack II — Guía de Evaluación Parcial 2 (30%).*
-- Material de Cátedra Duoc UC: *2.3.4 MC_Informes de cobertura de código (Lines, Statements, Branches, Functions).*
-- Documento de Especificación Fase 1: *DSY1104 - Forma E - Ferretería Los Maestros.*
-- Catálogo de Productos Oficial: *DSY1104 - Forma E - Catálogo Ferretería Los Maestros.xlsx.*
+
+| Referencia | Descripción |
+| --- | --- |
+| ERS_Los_Maestros_V1.pdf | Especificación entregada para la primera versión; base de reglas e identificadores. |
+| DSY1104 - Forma E - Ferreteria Los Maestros.docx | Contexto del negocio y características de la solución final. |
+| DSY1104 - Forma E - Catalogo Ferreteria Los Maestros.xlsx | Productos, categorías y datos comerciales de referencia. |
+| DSY1104 Evaluación Parcial 2_EE_EP_Estudiante.pdf | Criterios y entregables de la segunda evaluación. |
+| DSY1104 Evaluación Parcial 2 - Anexo 1 Instrucciones.pdf | Orientación funcional y técnica de la etapa React. |
+| 2.3.4 MC_Informes de cobertura.docx | Guía para interpretar y documentar la cobertura de pruebas. |
+| Repositorio LosMaestros e indicaciones docentes | Implementación de la V2 y uso de Vitest para sus pruebas unitarias. |
 
 ### 1.5. Visión General del Documento
-El documento se estructura en tres secciones cardinales: la Sección 1 contextualiza los objetivos y ámbito; la Sección 2 expone las características operacionales, usuarios, restricciones de estilo y dependencias; y la Sección 3 detalla exhaustivamente cada requisito funcional (RF-01 a RF-15), no funcional (RNF-01 a RNF-08) y la matriz de trazabilidad con la suite de pruebas.
 
----
+El capítulo 1 presenta objetivo, alcance y referencias. El capítulo 2 explica el negocio, sus usuarios y reglas. El capítulo 3 identifica requisitos, criterios de aceptación y aplicación concreta. Las restricciones técnicas describen también la evolución prevista.
 
-## 2. DESCRIPCIÓN GENERAL
+El campo Aplicación actual de cada requisito relaciona la función con la segunda versión entregada. El apartado 3.4.3 presenta ejemplos observables de esa relación. El informe de pruebas y cobertura documenta los resultados ejecutados y distingue las pruebas automatizadas de las comprobaciones en navegador.
+
+## 2. Descripción General
 
 ### 2.1. Perspectiva del Producto
-El sistema constituye la plataforma central de atención al cliente y gestión operativa de Ferretería Los Maestros. En la Fase 2, la aplicación opera como una SPA autónoma desacoplada en el cliente, estructurada en una arquitectura de cuatro capas:
-```
-┌────────────────────────────────────────────────────────┐
-│             CAPA 1: INTERFAZ Y PRESENTACIÓN            │
-│  (Vistas, Componentes React, Bento Grid & Brutalismo)   │
-└───────────────────────────┬────────────────────────────┘
-                            │
-┌───────────────────────────▼────────────────────────────┐
-│         CAPA 2: ESTADO GLOBAL (REACT CONTEXT)          │
-│  (AuthContext [Sesión/RBAC], CartContext [Carro/Stock])│
-└───────────────────────────┬────────────────────────────┘
-                            │
-┌───────────────────────────▼────────────────────────────┐
-│      CAPA 3: SERVICIOS Y LÓGICA DE NEGOCIO PURA        │
-│  (productService, userService [Módulo 11], orderService)│
-└───────────────────────────┬────────────────────────────┘
-                            │
-┌───────────────────────────▼────────────────────────────┐
-│       CAPA 4: PERSISTENCIA Y ALMACENAMIENTO            │
-│     (storageService -> LocalStorage JSON Normalizado)  │
-└────────────────────────────────────────────────────────┘
-```
+
+Los Maestros es una ferretería familiar ubicada en La Serena, Región de Coquimbo, con 22 años de trayectoria. El dueño, su hijo y dos empleados atienden a particulares y contratistas. Su oferta incluye materiales de construcción, herramientas y artículos de ferretería, con más de 800 referencias en el negocio.
+
+Actualmente, las consultas de disponibilidad se atienden por teléfono y requieren revisar la bodega o un archivo Excel. Las ventas se anotan en una libreta y el inventario se actualiza al final del día. Esto puede producir diferencias entre las existencias informadas y las reales. Las compras a cuenta corriente se registran por separado y se suman manualmente para su cobro mensual.
+
+La aplicación representa esas operaciones mediante servicios JavaScript y almacenamiento local. El catálogo contiene una selección inicial de 27 productos. Los cambios de existencias, pedidos y crédito se conservan en el mismo navegador; la conexión con los registros físicos y la sincronización entre dispositivos corresponden a la solución final.
 
 ### 2.2. Funciones del Producto
-Las capacidades operacionales del sistema se sintetizan en:
-- Navegación instantánea y enrutamiento declarativo sin recarga de página (`react-router-dom`).
-- Búsqueda en tiempo real por nombre, código SKU y filtrado por familias de productos ferreteros.
-- Semáforo y radar de **Stock Crítico** para advertir oportunamente sobre quiebres de inventario.
-- Carro de compras persistente con validación instantánea de límites de existencias.
-- Proceso de compra con selector de método de despacho (Retiro en tienda La Serena / Despacho a obra) y opciones de pago (Webpay Crédito/Débito simulado o Cargo a Cuenta Corriente de Contratista).
-- Generación de comprobante con código único de pedido (`LM-2026-XXXX`).
-- Autenticación con perfiles diferenciados y control de sesión persistente.
-- Registro con validación matemática de RUN chileno (Módulo 11) y selectores jerárquicos de Región y Comuna.
-- Módulos CRUD protegidos para administradores y vendedores (creación, edición y eliminación de productos, usuarios y actualización de estados de pedidos).
-- Mapa vectorial interactivo SVG de cobertura regional de despachos.
-- Portal de capacitación y divulgación técnica con artículos de construcción.
-- Formulario de contacto con cálculo estimado de cotizaciones en tiempo real.
 
-### 2.3. Características de los Usuarios y Roles (RBAC)
+El visitante consulta productos, categorías, ofertas y contenido informativo, prepara el carrito y realiza una compra simulada. El registro permite crear una cuenta local de cliente o contratista. Con sesión iniciada, el formulario de compra propone los datos disponibles del usuario y permite consultar los pedidos propios. El contratista dispone además de saldo y crédito de demostración.
 
-| Rol | Identificador | Descripción de Perfil y Privilegios |
-|---|---|---|
-| **Público / Invitado** | `guest` | Usuario anónimo. Puede explorar catálogo, buscar productos, leer fichas técnicas y blogs, usar el mapa de cobertura, agregar ítems al carro y contactar a la tienda. |
-| **Cliente Regular** | `cliente` | Usuario particular registrado. Cuenta con credenciales, historial de compras, autocompletado en checkout y acceso a promociones del mes. |
-| **Contratista Certificado** | `contratista` | Constructor o maestro profesional con línea de crédito aprobada ($3.500.000). Acceso exclusivo a pago diferido a 30 días sin cargo inmediato. |
-| **Vendedor de Mesón** | `vendedor` | Personal de ventas de sucursal. Posee permisos para consultar stock crítico en tiempo real, visualizar inventario y operar el mantenedor de productos. |
-| **Administrador General** | `admin` | Jefatura de operaciones y sistemas. Acceso irrestricto al Backoffice: creación/edición de catálogo, gestión de usuarios, asignación de roles y control logístico de despachos. |
+Administrador y vendedor gestionan catálogo, existencias y pedidos. La administración de usuarios se reserva al administrador. El panel presenta indicadores calculados con los datos locales. La consulta de despacho permite seleccionar comuna o zona en un esquema referencial y utiliza las mismas tarifas que la compra.
 
-### 2.4. Restricciones de Diseño e Implementación
-1. **Cero Dependencias CSS Externas (No Bootstrap, No Tailwind):** La arquitectura visual debe ser 100% nativa utilizando CSS Moderno con variables CSS (`:root`), flexbox, grid y media queries.
-2. **Estilo Bento Grid + Brutalismo Táctil:**
-   - Bordes duros de `2.5px` a `3.5px solid var(--tactile-border)`.
-   - Sombras proyectadas sólidas sin difuminado (`box-shadow: 4px 4px 0 var(--tactile-shadow)` y `6px 6px 0`).
-   - Microinteracciones físicas en botones y tarjetas que simulen respuesta mecánica táctil (`:active { transform: translate(2px, 2px); }`).
-   - Paleta cromática industrial: Amarillo Seguridad (`#F59E0B`), Naranja Advertencia (`#EA580C`), Azul Contratista (`#2563EB`), Pizarra Oscura (`#0F172A`) y Fondo Cemento Claro (`#F8FAFC`).
-3. **Persistencia Autónoma en Navegador:** Los datos de catálogo, clientes, credenciales y transacciones residen en `localStorage`, garantizando persistencia reactiva durante recargas y cierres de sesión.
-4. **Validación Estricta de RUN Chileno:** El algoritmo de verificación de cédula nacional debe implementar matemáticamente la regla de ponderadores 2 a 7 con residuo 11 (Módulo 11), rechazando cualquier RUT matemáticamente inconsistente.
-5. **Cobertura Automatizada con Vitest:** El proyecto debe contar con una suite de pruebas unitarias que cubra lógica de negocio, validaciones y renderizado de componentes, superando los requerimientos de la pauta de evaluación.
+### 2.3. Características de los Usuarios
+
+Los usuarios tienen distinta experiencia digital. La atención en mesón requiere controles claros y consulta rápida de existencias. El contratista necesita identificar materiales para una obra, revisar entrega y crédito desde el teléfono. El cliente particular necesita comparar productos y comprender el total de su compra. La navegación y los iconos mantienen su identificación al cambiar de perfil o tamaño de pantalla.
+
+| Perfil | Necesidades y relación con el sistema |
+| --- | --- |
+| Visitante y cliente | Consulta productos, prepara una compra y elige retiro o despacho. El cliente registrado consulta únicamente sus pedidos. Requiere información clara de precio, disponibilidad y resultado. |
+| Contratista | Compra materiales para obras, utiliza crédito de demostración con cupo suficiente y consulta pedidos, saldo y crédito disponible. Necesita acceso desde el teléfono. |
+| Vendedor | Gestiona productos, existencias y pedidos de la tienda. Requiere controles rápidos para la atención y no dispone de administración de usuarios. |
+| Dueño o administrador | Administra cuentas, roles, catálogo y pedidos. Consulta indicadores locales; los reportes comerciales completos corresponden a la solución final. |
+
+La aplicación distingue ADMIN, VENDEDOR, CONTRATISTA y CLIENTE, además del visitante sin sesión. Para la demostración, el registro de un contratista habilita automáticamente un cupo de $2.500.000. La cuenta contratista precargada dispone de $3.500.000 y saldo inicial de $450.000. Estos valores son datos de prueba; la política definitiva de autorización y cupos pertenece a la operación comercial final.
+
+### 2.4. Restricciones
+
+La V2 utiliza React, Vite, React Router, JavaScript, CSS propio y localStorage. La interfaz se adapta con estilos del proyecto. Vitest y Testing Library constituyen el entorno de pruebas, conforme a la indicación docente para esta entrega. El repositorio conserva la primera etapa en fase1, la aplicación React en fase 2 y los documentos en docs.
+
+La tienda y el panel requieren una presentación utilizable en teléfonos, tabletas y computadores. Los datos de pedidos y cuentas corrientes se consultan según el perfil y la titularidad. Las imágenes se sirven desde archivos locales, representan el tipo de artículo y conservan sus créditos; la marca y las especificaciones se indican en cada ficha.
+
+#### 2.4.1. Reglas del negocio
+
+| Regla | Condición y requisitos relacionados |
+| --- | --- |
+| RN-01 Ubicación | La Serena, Región de Coquimbo; dirección exacta referencial. RF-003 RF-039. |
+| RN-02 Stock | No confirmar cantidades superiores a existencias ni cantidades no enteras o negativas. RF-008 RF-009 RF-031. |
+| RN-03 Reposición | La demo alerta con stock menor o igual al mínimo como prevención. No envía avisos externos. RF-032. |
+| RN-04 Entrega | Distinguir retiro y despacho; aplicar tarifa de demo por comuna y subtotal. Fuera de cobertura requiere cotización. RF-033 RF-044. |
+| RN-05 Crédito | Exigir contratista activo y cupo suficiente; el cargo incluye flete. Habilitación automática y cupos son decisiones de demo. RF-036 RF-037. |
+| RN-06 Privacidad | Cliente ve pedidos propios. Invitado ve su último comprobante en la pestaña de compra. Personal autorizado gestiona pedidos. RNF-002. |
+| RN-07 Personal | Administrador y vendedor gestionan inventario y pedidos; sólo administrador gestiona usuarios. RF-029 RF-030. |
+| RN-08 Consistencia | Guardar precio efectivo, subtotal, flete y total coherentes. Fallos no deben informar éxito. Anulación restituye stock y crédito una sola vez. RF-013 RF-035 RNF-004. |
 
 ### 2.5. Suposiciones y Dependencias
-- El usuario final cuenta con un navegador moderno compatible con ECMAScript 2022+ (Google Chrome 90+, Mozilla Firefox 88+, Microsoft Edge 90+, Safari 14+).
-- El entorno de ejecución y compilación de desarrollo requiere Node.js v18.0.0 o superior con npm v9.0.0 o superior.
-- La cuota de almacenamiento LocalStorage del navegador se encuentra disponible con un límite mínimo de 5 MB por origen.
+
+La persistencia depende de que el navegador permita localStorage y conserve sus datos. El alojamiento debe servir las rutas de React. Web Crypto requiere localhost o un contexto seguro HTTPS. No se garantiza sincronización ni transacciones concurrentes entre dispositivos.
+
+La dirección exacta, las cuentas precargadas, las tarifas y los plazos corresponden a la demostración. La tarifa urbana de La Serena y Coquimbo es $4.990 para compras menores a $100.000 y gratuita desde ese monto. Vicuña utiliza $14.990; otras comunas requieren cotización. El esquema ilustra localidades y zonas, sin calcular distancias ni validar una dirección exacta.
 
 ### 2.6. Requisitos Futuros
-- Integración con pasarela de pago real **Transbank Webpay Plus** mediante REST API y tokens de transacción.
-- Conexión a servicio de Facturación Electrónica del SII para emisión directa de Boletas y Facturas Electrónicas (DTE).
-- Integración bidireccional con software ERP de bodega (SAP Business One / Defontana).
 
----
+El resultado final esperado incorpora autenticación y autorización en servidor, persistencia relacional, inventario compartido, reportes por período y verificación geográfica precisa. Usuarios, pedidos y crédito ya se demuestran localmente; esto no completa las integraciones de RF-028, RF-038 a RF-040 y RT-001 a RT-003.
 
-## 3. REQUISITOS ESPECÍFICOS
+## 3. Requisitos Específicos
 
-### 3.1. Requisitos Comunes de las Interfaces
+La especificación contiene 57 requisitos: 46 funcionales, ocho no funcionales y tres restricciones técnicas. Mantiene los identificadores de la primera versión e incorpora las funciones de la etapa React. Implementado en V2 indica disponibilidad en el alcance local; Parcial identifica una función entregada de forma limitada; Pendiente corresponde a desarrollo posterior.
 
-#### 3.1.1. Interfaces de Usuario
-- **Estructura Bento Grid:** Distribución modular y asimétrica de componentes en rejilla responsive, optimizando el uso del espacio según el tamaño del monitor o pantalla táctil.
-- **Brutalismo Táctil:** Tipografía industrial sans-serif de alto impacto, contrastes AAA, bordes gruesos de tinta negra/pizarra, sombras sin desenfoque y etiquetas pulsantes para inventario crítico.
-- **Navegación Intuitiva:** Barra de navegación superior fija con accesos rápidos a Catálogo, Categorías, Ofertas, Blogs, Mapa, Carrito (con insignia táctil de contador) e indicador visual de usuario autenticado con botón de desconexión. En pantallas móviles, se despliega un panel lateral tipo Drawer táctil.
+Cada ficha presenta el perfil relacionado, el estado, la descripción, el criterio de aceptación, la aplicación actual y el origen. Los criterios describen el resultado esperado; la evidencia de su comprobación se desarrolla en el informe de pruebas y cobertura. La distribución es de 38 requisitos implementados en V2, 15 parciales y 4 pendientes.
 
-#### 3.1.2. Interfaces de Hardware
-- Compatibilidad nativa con pantallas táctiles capacitivas (smartphones y tablets con área táctil mínima de 44x44 px para botones interactivos) y monitores de alta resolución (Full HD, 2K y 4K).
+### 3.1. Requisitos comunes de las interfaces
 
-#### 3.1.3. Interfaces de Software
-- **Entorno de Ejecución:** React 18+ sobre Vite 5+.
-- **Enrutamiento:** `react-router-dom` v6+.
-- **Iconografía:** `lucide-react` para iconografía SVG vectorial de alta fidelidad.
-- **Entorno de Pruebas:** Vitest v4+, JSDOM, `@testing-library/react`, `@testing-library/jest-dom` y motor de cobertura `@vitest/coverage-v8`.
+#### 3.1.1. Interfaces de usuario
 
-#### 3.1.4. Interfaces de Comunicación
-- Uso de Web APIs nativas del estándar W3C (`localStorage`, `JSON`, `window.location`). Protocolo seguro HTTPS para despliegue en entornos de producción.
+La interfaz comprende tienda pública, formularios, carrito, compra, historial personal y panel administrativo. React Router gestiona rutas y el historial del navegador. La cabecera distribuye marca, enlaces y acciones según el ancho de pantalla, mantiene visibles los iconos y ofrece acceso móvil al historial. El panel utiliza navegación lateral.
 
----
+#### 3.1.2. Interfaces de hardware
 
-### 3.2. Requisitos Funcionales
+Se requiere un navegador con JavaScript, almacenamiento local y Web Crypto. La demo no necesita dispositivos especializados ni servidor de base de datos. La impresión utiliza la función del navegador.
 
-#### RF-01: Catálogo y Búsqueda en Tiempo Real
-- **Código:** RF-01
-- **Nombre:** Visualización y Búsqueda en Catálogo de Productos
-- **Actores:** Invitado, Cliente, Contratista, Vendedor, Administrador
-- **Precondiciones:** La aplicación debe encontrarse inicializada con el catálogo de productos base en almacenamiento local.
-- **Descripción:** El usuario debe poder visualizar el catálogo completo de productos con imágenes optimizadas, categoría técnica, marca del fabricante, precio unitario en pesos chilenos ($ CLP), descuento promocional si aplica y disponibilidad de inventario. El sistema debe permitir filtrar dinámicamente mediante una barra de búsqueda por nombre o código SKU.
-- **Postcondiciones:** La vista de catálogo actualiza de manera instantánea las tarjetas de producto que coinciden con los términos ingresados.
+#### 3.1.3. Interfaces de software
 
-#### RF-02: Filtrado Avanzado y Detección de Stock Crítico
-- **Código:** RF-02
-- **Nombre:** Filtrado Multicriterio y Alerta de Stock Crítico
-- **Actores:** Todos los usuarios (Detección de stock crítico ampliada para Vendedores y Administradores)
-- **Precondiciones:** Acceso a la vista de productos o panel de administración.
-- **Descripción:** El sistema debe proveer filtros por familia de productos (Cementos, Pinturas, Herramientas Eléctricas, Herramientas Manuales, Gasfitería, Electricidad, Seguridad), ordenamiento por precio (menor a mayor, mayor a menor, alfabético) y filtro exclusivo para productos en oferta. Para el personal operativo (Vendedores y Administradores), el sistema debe permitir filtrar productos cuyo inventario sea igual o inferior a su `stockMinimo`, marcándolos con una insignia pulsante "STOCK CRÍTICO".
-- **Postcondiciones:** La interfaz presenta únicamente los productos que satisfacen la combinación de criterios seleccionados.
+React gestiona vistas y estados; React Router gestiona rutas; los servicios JavaScript persisten productos, usuarios y pedidos en localStorage. Vite ejecuta y compila el frontend. Vitest, jsdom y Testing Library verifican servicios y componentes. Spring Boot aún no participa en esta versión.
 
-#### RF-03: Ficha Detallada de Producto y Especificaciones
-- **Código:** RF-03
-- **Nombre:** Visualización de Ficha de Producto y Especificaciones Técnicas
-- **Actores:** Todos los usuarios
-- **Precondiciones:** El producto debe existir en el catálogo persistido.
-- **Descripción:** Al hacer clic en una tarjeta de producto, el usuario debe navegar a la vista `/productos/:id`, donde se despliega la imagen ampliada, código SKU, marca, categoría, descripción detallada, características técnicas (garantía, dimensiones, procedencia, materialidad), precio final con descuento calculado y botón para añadir al carro con selector de cantidad respetando el límite de stock.
-- **Postcondiciones:** El usuario visualiza la información técnica exhaustiva del artículo.
+#### 3.1.4. Interfaces de comunicación
 
-#### RF-04: Carrito de Compras Dinámico y Restricciones de Inventario
-- **Código:** RF-04
-- **Nombre:** Gestión Reactiva del Carrito de Compras
-- **Actores:** Todos los usuarios
-- **Precondiciones:** Existencia de productos con stock disponible en el catálogo.
-- **Descripción:** El usuario puede agregar productos al carrito desde las tarjetas del catálogo o la ficha técnica. El carrito debe permitir incrementar, decrementar o eliminar ítems. Si el usuario intenta agregar más unidades de las disponibles en inventario físico, el sistema debe bloquear la acción y desplegar una alerta táctil informando el tope de existencias. El subtotal, descuento acumulado, costo estimado de despacho y total general deben recalcularse en tiempo real.
-- **Postcondiciones:** El estado global del carrito y el almacenamiento `carrito_v2` en LocalStorage quedan sincronizados.
+La V2 no consume una API de negocio. El servidor de Vite o alojamiento entrega archivos y los datos permanecen en el navegador. La solución final deberá comunicarse con el backend mediante API y controles de autenticación y autorización apropiados.
 
-#### RF-05: Proceso de Checkout y Despacho Regional
-- **Código:** RF-05
-- **Nombre:** Configuración de Despacho y Datos de Entrega
-- **Actores:** Cliente, Contratista, Administrador (o Invitado con datos de contacto)
-- **Precondiciones:** El carrito de compras debe contener al menos un producto.
-- **Descripción:** En la vista `/checkout`, el usuario debe ingresar o autocompletar su información de contacto (Nombre completo, RUN, Teléfono, Correo electrónico) y seleccionar el método de entrega:
-  1. *Retiro en Tienda Central:* Sucursal Balmaceda 1420, La Serena (Costo: $0).
-  2. *Despacho a Domicilio / Obra:* Selección de comuna (La Serena: $4.990, Coquimbo: $5.990, Ovalle: $12.990, Vicuña / Valle de Elqui: $14.990, etc.), dirección exacta y observaciones de acceso a faena.
-- **Postcondiciones:** El total de la orden se actualiza incorporando el recargo del flete logístico según la zona elegida.
+### 3.2. Requisitos funcionales
 
-#### RF-06: Procesamiento de Pagos y Línea de Crédito Contratista
-- **Código:** RF-06
-- **Nombre:** Liquidación de Pago y Cargo a Cuenta Corriente
-- **Actores:** Cliente Regular, Contratista
-- **Precondiciones:** Carrito válido y datos de despacho completados.
-- **Descripción:** El sistema debe ofrecer dos alternativas de pago:
-  1. *Transbank Webpay Plus (Crédito / Débito):* Simulación de pasarela electrónica bancaria con posibilidad de prueba de éxito o simulación deliberada de rechazo financiero para validación de contingencias.
-  2. *Cuenta Corriente Contratista (Crédito 30 días):* Exclusivo para usuarios autenticados con rol `contratista`. El sistema valida que el monto total de la compra no supere la línea de crédito disponible ($3.500.000). Si el saldo es suficiente, autoriza la compra inmediatamente generando un comprobante diferido a 30 días y deduciendo el saldo disponible.
-- **Postcondiciones:** Se debita el stock físico de los productos comprados y se emite la orden definitiva.
+#### 3.2.1. Navegación e información del catálogo
 
-#### RF-07: Comprobante y Resumen de Orden de Compra
-- **Código:** RF-07
-- **Nombre:** Emisión de Comprobante de Compra y Código de Seguimiento
-- **Actores:** Usuario Comprador
-- **Precondiciones:** Pago autorizado o aprobado por crédito contratista.
-- **Descripción:** El sistema redirige a la vista `/checkout/exito`, presentando el código único de seguimiento (formato `LM-2026-XXXX`), desglose de productos adquiridos, método de despacho, dirección de entrega, medio de pago utilizado, total cancelado y botón táctil para imprimir o exportar la nota de venta. El carrito de compras se vacía automáticamente tras el éxito.
-- **Postcondiciones:** La orden queda almacenada en el registro global de pedidos en `pedidos_v2`.
+| RF-001 | Navegar entre páginas |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | La aplicación deberá permitir la navegación por rutas y conservar búsqueda, categoría y ofertas según el historial del navegador. |
+| Criterio de aceptación | Abrir catálogo y carrito; retroceder y avanzar. La ruta, búsqueda, categoría y selección de ofertas deben corresponder a cada destino. |
+| Aplicación actual | React Router mantiene las rutas; Products interpreta los filtros de la URL y Navbar ofrece enlaces comunes. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-#### RF-08: Autenticación de Usuarios y Control de Acceso RBAC
-- **Código:** RF-08
-- **Nombre:** Inicio de Sesión y Protección de Rutas por Perfil
-- **Actores:** Todos los usuarios registrados
-- **Precondiciones:** Usuario previamente registrado o preconfigurado en el sistema.
-- **Descripción:** Permite autenticar usuarios mediante correo electrónico y contraseña. Al validar las credenciales, el sistema guarda la sesión activa en `usuario_actual_v2` con su respectivo rol. Si un usuario sin privilegios intenta acceder a rutas administrativas (`/admin`), el componente `ProtectedRoute` bloquea el acceso y redirige a la página de inicio o login con mensaje de advertencia. La vista de inicio de sesión provee botones de "Acceso Rápido Demo" para facilitar pruebas con cuentas de Administrador, Vendedor, Contratista y Cliente.
-- **Postcondiciones:** Se habilitan los menús y acciones correspondientes al rol en toda la navegación de la SPA.
+| RF-002 | Acceder a funciones desde inicio |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El inicio deberá ofrecer accesos a catálogo, categorías, contacto y contenido. |
+| Criterio de aceptación | Accionar los enlaces del inicio y comprobar su destino. |
+| Aplicación actual | Los enlaces del inicio permiten abrir catálogo, categorías, contacto y contenido informativo. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-#### RF-09: Registro de Usuarios y Validación de RUN Módulo 11
-- **Código:** RF-09
-- **Nombre:** Registro de Nuevas Cuentas con Algoritmo Módulo 11
-- **Actores:** Invitado
-- **Precondiciones:** Formulario de registro en `/registro`.
-- **Descripción:** El usuario completa su registro ingresando Nombre, RUN, Teléfono, Correo Electrónico, Región, Comuna y Contraseña con confirmación. El sistema ejecuta las siguientes validaciones en tiempo real:
-  - Formato y validez matemática del RUN mediante el algoritmo Módulo 11 (cálculo de ponderadores 2 al 7, resta contra 11 y comprobación del dígito verificador 0-9 o K).
-  - Dominios de correo autorizados según política institucional (`@duoc.cl`, `@profesor.duoc.cl`, `@gmail.com`).
-  - Coincidencia estricta y longitud mínima de contraseñas.
-  - Cascadas dinámicas de Comuna según la Región seleccionada.
-- **Postcondiciones:** El nuevo usuario se almacena en `usuarios_v2` con rol `cliente` y queda facultado para iniciar sesión.
+| RF-003 | Consultar información del negocio |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | La interfaz deberá identificar la ferretería con La Serena, Región de Coquimbo. |
+| Criterio de aceptación | Consultar Nosotros y pie de página y comprobar ciudad y región. |
+| Aplicación actual | About.jsx y Footer.jsx; dirección exacta y datos de contacto son referenciales. |
+| Origen | Caso de negocio y datos de demostración. |
 
-#### RF-10: Mantenedor CRUD de Productos (Backoffice)
-- **Código:** RF-10
-- **Nombre:** Administración Integral del Catálogo de Productos
-- **Actores:** Administrador, Vendedor
-- **Precondiciones:** Usuario autenticado con rol `admin` o `vendedor`.
-- **Descripción:** Interfaz administrativa en `/admin/productos` para:
-  - Listar el catálogo completo con indicadores de stock crítico.
-  - Crear nuevos productos (código SKU, nombre, descripción, precio, categoría, stock, stock mínimo, descuento, URL de imagen, especificaciones).
-  - Modificar datos comerciales, precios o reabastecer inventario de productos existentes.
-  - Eliminar artículos descontinuados previa confirmación táctil.
-- **Postcondiciones:** Los cambios se persisten inmediatamente en el repositorio de productos y se reflejan en el catálogo público sin recargar la página.
+| RF-004 | Consultar el catálogo de la entrega |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El catálogo inicial deberá presentar 27 registros en siete categorías. |
+| Criterio de aceptación | Con datos iniciales, contar 27 productos y siete categorías. |
+| Aplicación actual | El catálogo inicial muestra 27 productos agrupados en siete categorías, con búsqueda, datos comerciales y acceso a la ficha. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-#### RF-11: Mantenedor CRUD de Usuarios y Asignación de Roles
-- **Código:** RF-11
-- **Nombre:** Gestión de Usuarios y Permisos de Sistema
-- **Actores:** Administrador
-- **Precondiciones:** Usuario autenticado exclusivamente con rol `admin`.
-- **Descripción:** Interfaz protegida en `/admin/usuarios` que permite:
-  - Listar todos los usuarios registrados con su RUN, correo y rol asignado.
-  - Modificar roles operativos (ascender clientes a `contratista`, asignar rol de `vendedor` o `admin`).
-  - Asignar o ajustar cupos de crédito para contratistas autorizados.
-  - Bloquear o eliminar cuentas de usuario.
-- **Postcondiciones:** Los permisos de acceso se actualizan en tiempo real en la base de usuarios persistida.
+| RF-005 | Mantener datos comerciales |
+| --- | --- |
+| Usuario y estado | Cliente — Parcial |
+| Descripción | Los productos deberán conservar código, nombre, unidad, categoría, marca, precio y stock coherentes con el catálogo fuente. |
+| Criterio de aceptación | Comparar cada registro y su ficha con el Excel entregado. |
+| Aplicación actual | El catálogo presenta los campos comerciales de los 27 registros seleccionados. Las evidencias funcionales no incluyen la verificación íntegra de todos los valores contra el Excel de referencia. |
+| Origen | Catálogo proporcionado y ERS entregada. |
 
-#### RF-12: Gestión Logística de Pedidos
-- **Código:** RF-12
-- **Nombre:** Monitoreo y Cambio de Estado de Órdenes de Compra
-- **Actores:** Administrador, Vendedor
-- **Precondiciones:** Existencia de órdenes registradas en el sistema.
-- **Descripción:** En la vista `/admin/pedidos`, el personal autorizado puede revisar el historial de transacciones, ver el detalle de ítems y actualizar el estado logístico de cada pedido mediante una máquina de estados: *Pendiente* -> *En Preparación / Bodega* -> *En Ruta de Despacho* -> *Entregado en Faena* o *Listo para Retiro*.
-- **Postcondiciones:** El estado de la orden se actualiza de manera permanente en el registro general de pedidos.
+| RF-006 | Mostrar imágenes referenciales |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Cada producto deberá mostrar una imagen referencial coherente con su tipo, texto alternativo y encuadre completo en catálogo, ficha y carrito. |
+| Criterio de aceptación | Los 27 productos cargan su imagen local. Los botines muestran calzado y los guantes protección de manos. La actualización conserva precios, stock e imágenes personalizadas. |
+| Aplicación actual | El catálogo utiliza 26 referencias visuales distintas; las dos pinturas blancas comparten imagen. Se actualizaron 24 productos con 23 recursos nuevos. El pie ofrece créditos y la ficha indica el carácter referencial. |
+| Origen | Recurso multimedia de la primera etapa y diseño del catálogo de la V2. |
 
-#### RF-13: Consulta de Cobertura Geográfica de Despacho
-- **Código:** RF-13
-- **Nombre:** Visualización de Cobertura y Zonas de Entrega
-- **Actores:** Todos los usuarios
-- **Precondiciones:** Acceso a la sección de cobertura o mapa.
-- **Descripción:** El sistema dispone de un componente vectorial interactivo SVG con las comunas de la Cuarta Región (La Serena, Coquimbo, Ovalle, Vicuña / Elqui, Andacollo), indicando tarifas vigentes de transporte pesado/liviano, tiempos promedio de entrega (24 hrs urbano / 48 hrs rural) y condiciones para flete gratuito por compras sobre $200.000.
-- **Postcondiciones:** El usuario identifica con certeza si su obra o faena cuenta con cobertura de despacho directo.
+#### 3.2.2. Selección de productos y carrito
 
-#### RF-14: Artículos Técnicos y Guías de Construcción (Blog Ferretero)
-- **Código:** RF-14
-- **Nombre:** Consulta de Guías Técnicas y Recomendaciones de Obra
-- **Actores:** Todos los usuarios
-- **Precondiciones:** Navegación a `/blogs`.
-- **Descripción:** Módulo de contenidos técnicos especializados en construcción y ferretería industrial (p. ej., "Guía paso a paso para el curado óptimo de hormigón en climas costeros", "Mantención preventiva de herramientas eléctricas en faenas de alta exigencia", "Diferencias técnicas entre tuberías de polipropileno PPR y PVC hidráulico"). Permite leer el artículo completo, conocer herramientas sugeridas y acceder directamente a los productos recomendados.
-- **Postcondiciones:** El usuario accede a material educativo y de soporte técnico profesional.
+| RF-007 | Agregar productos al carrito |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El sistema deberá agregar una unidad del producto seleccionado o aumentar en una la cantidad de su producto existente cuando haya disponibilidad. |
+| Criterio de aceptación | Dos incorporaciones del mismo código generan un solo producto de cantidad dos, si el stock lo permite. |
+| Aplicación actual | Los botones del catálogo y la ficha agregan artículos mediante el contexto de carrito. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
-#### RF-15: Formulario de Contacto y Solicitud de Cotizaciones Técnicas
-- **Código:** RF-15
-- **Nombre:** Recepción de Consultas y Cotizaciones en Línea
-- **Actores:** Todos los usuarios
-- **Precondiciones:** Navegación a la vista `/contacto`.
-- **Descripción:** Formulario interactivo que recopila Nombre, Correo, Teléfono, Tipo de Consulta (Cotización Mayorista, Asesoría Técnica, Estado de Despacho, Servicio Postventa), Comuna y Mensaje. Incluye una calculadora estimativa rápida para cubicación aproximada de sacos de cemento y metros lineales de perfilería.
-- **Postcondiciones:** El sistema valida los campos requeridos, simula el despacho de la cotización y entrega una retroalimentación positiva al usuario.
+| RF-008 | Rechazar productos sin stock |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El sistema deberá impedir la primera incorporación y cualquier nueva incorporación si el stock del producto es cero o inferior, mostrando un aviso. |
+| Criterio de aceptación | Con un producto de prueba en stock cero, el carrito no cambia y se informa que no hay stock disponible. |
+| Aplicación actual | El carrito comprueba la existencia vigente antes de la primera incorporación y de cada incremento. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
----
+| RF-009 | Respetar existencias |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | La cantidad total por producto no deberá superar el stock vigente. |
+| Criterio de aceptación | Superar el límite al agregar y al confirmar: ambas operaciones deben rechazarse sin descontar stock. |
+| Aplicación actual | CartContext.jsx y orderService.js; las líneas repetidas se consolidan antes de validar. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-### 3.3. Requisitos No Funcionales
+| RF-010 | Modificar la cantidad seleccionada |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El carrito deberá permitir sumar o restar una unidad. Al disminuir la cantidad hasta cero, deberá eliminar el producto. |
+| Criterio de aceptación | Desde cantidad dos, pulsar menos produce uno; pulsarlo de nuevo elimina la fila y actualiza los totales. |
+| Aplicación actual | Los controles del carrito aumentan o reducen cantidades respetando stock y actualizan los importes. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
-#### RNF-01: Rendimiento y Tiempos de Respuesta
-- **Métrica:** El tiempo de primer renderizado con contenido (FCP - *First Contentful Paint*) no debe exceder los 1.0 segundos en conexiones de banda ancha estándar. El tiempo para interactividad completa (TTI - *Time to Interactive*) debe ser inferior a 1.5 segundos. La compilación de producción con Vite debe completarse en menos de 1000 ms.
+| RF-011 | Eliminar un producto |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El usuario deberá poder retirar una línea completa mediante Eliminar, conservando los demás productos. |
+| Criterio de aceptación | Con dos códigos distintos, eliminar uno retira únicamente ese código y recalcula el total. |
+| Aplicación actual | La acción Eliminar retira la línea seleccionada y recalcula el carrito. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
-#### RNF-02: Seguridad e Integridad
-- **Métrica:** Las contraseñas de usuario no deben exponerse en texto plano en logs ni en componentes no autenticados. El acceso a rutas privilegiadas (`/admin/*`) debe verificarse estrictamente en cada transición de ruta mediante el componente `ProtectedRoute`. El cálculo de RUN chileno debe ser inviolable frente a inyecciones de datos no numéricos o formatos alterados.
+| RF-012 | Vaciar el carrito con confirmación |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El sistema deberá solicitar confirmación antes de eliminar todos los productos. |
+| Criterio de aceptación | Cancelar conserva el carrito; aceptar deja el carrito vacío y el contador en cero. |
+| Aplicación actual | El vaciado utiliza una confirmación antes de retirar todos los artículos. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
-#### RNF-03: Fiabilidad y Tolerancia a Fallos
-- **Métrica:** Ante cualquier corrupción eventual de datos en `localStorage` o claves faltantes, el sistema debe autocurarse mediante el servicio de almacenamiento inicializando nuevamente las semillas de datos sin arrojar excepciones fatales de pantalla en blanco (*White Screen of Death*).
+| RF-013 | Calcular importes coherentes |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El total deberá sumar líneas con precio vigente y descuento aplicable más despacho. El pedido conservará el desglose. |
+| Criterio de aceptación | Comparar precio efectivo por cantidad, subtotal, flete y total en una compra con oferta. |
+| Aplicación actual | Checkout.jsx, productService.js y orderService.js; valores en pesos chilenos. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-#### RNF-04: Disponibilidad
-- **Métrica:** Al ser una Single Page Application del lado del cliente servida desde bundle estático optimizado, el sistema exhibirá una disponibilidad operacional superior al 99.9%, sin dependencia de servidores de aplicación dinámicos para la renderización de vistas.
+| RF-014 | Actualizar el contador del menú |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El contador deberá representar la suma de cantidades, no la cantidad de códigos distintos. |
+| Criterio de aceptación | Con dos unidades de un producto y una de otro, el contador muestra tres. |
+| Aplicación actual | La cabecera muestra la suma de unidades y actualiza el contador al cambiar el carrito. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
-#### RNF-05: Mantenibilidad y Calidad de Código
-- **Métrica:** Arquitectura desacoplada en componentes reutilizables, modularización de estilos en CSS moderno por dominios (`variables.css`, `reset.css`, `bento.css`, `components.css`) y código JavaScript limpio y libre de librerías CSS externas. El código debe superar satisfactoriamente la ejecución de pruebas unitarias automatizadas con cero fallos (`0 errors, 100% tests passing`).
+| RF-015 | Conservar el carrito en el navegador |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El sistema deberá conservar los productos y cantidades del carrito al recargar la página en el mismo navegador, cuando el almacenamiento local esté disponible. |
+| Criterio de aceptación | Después de agregar dos unidades y recargar, se mantienen el producto y su cantidad. |
+| Aplicación actual | El navegador conserva los artículos y cantidades. Al mostrarlos, el carrito recupera del catálogo vigente su precio, disponibilidad e imagen. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
-#### RNF-06: Portabilidad y Compatibilidad Cross-Browser
-- **Métrica:** Compatibilidad garantizada en los motores de navegación modernos Chromium (Google Chrome, Microsoft Edge, Brave, Opera), Gecko (Mozilla Firefox) y WebKit (Apple Safari), tanto en sistemas operativos de escritorio (Linux, Windows, macOS) como móviles (Android, iOS).
+| RF-016 | Informar el carrito vacío |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Cuando no haya productos, deberá mostrarse un mensaje de carrito vacío y un acceso al catálogo. |
+| Criterio de aceptación | Tras eliminar la última línea, desaparece la tabla y Ver Catálogo de Productos abre Productos. |
+| Aplicación actual | El carrito vacío muestra un aviso y un enlace al catálogo. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
-#### RNF-07: Usabilidad, Accesibilidad y Diseño Táctil
-- **Métrica:** Cumplimiento de estándares de usabilidad táctil: áreas clicables mínimas de 44x44 píxeles para botones, contraste cromático superior a 4.5:1 para cumplimiento WCAG 2.1 nivel AA/AAA, respuesta física visible al presionar elementos interactivos mediante el efecto de pulsación mecánica de Brutalismo Táctil (`transform: translate(2px, 2px)`).
+| RF-017 | Completar una compra local |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Una compra válida deberá registrar el pedido y mantener su confirmación visible después de vaciar el carrito. |
+| Criterio de aceptación | Confirmar y comprobar pedido guardado, ruta de éxito y carrito vacío. |
+| Aplicación actual | Checkout.jsx y CheckoutSuccess.jsx; regresión automatizada de navegación. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-#### RNF-08: Cobertura de Pruebas Unitarias
-- **Métrica:** Cobertura de pruebas unitarias superior al 75% en líneas y sentencias en los módulos críticos de lógica de negocio (`userService.js`, `productService.js`, `orderService.js`, `storageService.js`) y verificación completa de renderizado de componentes y flujos de usuario mediante Vitest.
+#### 3.2.3. Artículos y formularios
 
----
+| RF-018 | Listar artículos informativos |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El sitio deberá listar los artículos configurados y permitir elegir su lectura. |
+| Criterio de aceptación | Abrir Blogs y seleccionar un artículo del listado. |
+| Aplicación actual | La página Blogs lista los artículos configurados con acceso a su lectura. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-### 3.4. Matriz de Trazabilidad de Requisitos y Verificación
+| RF-019 | Consultar el detalle de un artículo |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El sistema deberá presentar título, autor, fecha y contenido del artículo elegido, con un botón para regresar al listado. |
+| Criterio de aceptación | Seleccionar un artículo muestra su contenido completo y Volver a Noticias retorna a Blogs. |
+| Aplicación actual | La vista del artículo muestra su contenido y permite regresar al listado. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
-| Código RF | Nombre del Requisito Funcional | Módulo / Archivo Implementador | Prueba Unitaria Vitest Asociada | Estado de Cumplimiento |
-|---|---|---|---|---|
-| **RF-01** | Catálogo y Búsqueda de Productos | `Products.jsx`, `productService.js` | `productService.test.js` (Búsqueda por texto y SKU) | **Implementado y Verificado (100%)** |
-| **RF-02** | Filtrado Avanzado y Stock Crítico | `ProductFilter.jsx`, `productService.js` | `productService.test.js` (Filtro por categoría, ofertas y stock crítico) | **Implementado y Verificado (100%)** |
-| **RF-03** | Ficha Detallada de Producto | `ProductDetail.jsx`, `ProductCard.jsx` | `ProductCard.test.jsx` (Render de precio, imagen y botón) | **Implementado y Verificado (100%)** |
-| **RF-04** | Carrito y Control de Stock | `Cart.jsx`, `CartContext.jsx` | `Cart.test.jsx` (Render de carro vacío, incremento y recálculo) | **Implementado y Verificado (100%)** |
-| **RF-05** | Checkout y Despacho Regional | `Checkout.jsx`, `chileLocations.js` | `orderService.test.js` (Creación de orden con flete y comunas) | **Implementado y Verificado (100%)** |
-| **RF-06** | Procesamiento de Pago y Contratistas | `Checkout.jsx`, `orderService.js` | `orderService.test.js` (Validación de saldo en cuenta corriente) | **Implementado y Verificado (100%)** |
-| **RF-07** | Comprobante de Compra y Seguimiento | `CheckoutSuccess.jsx`, `orderService.js`| `orderService.test.js` (Estructura de comprobante y código LM-2026) | **Implementado y Verificado (100%)** |
-| **RF-08** | Autenticación y RBAC | `Login.jsx`, `AuthContext.jsx`, `userService.js`| `Login.test.jsx`, `userService.test.js` (Autenticación y perfiles) | **Implementado y Verificado (100%)** |
-| **RF-09** | Registro de Usuarios y Módulo 11 | `Register.jsx`, `userService.js` | `userService.test.js` (Validación algorítmica de RUT Módulo 11) | **Implementado y Verificado (100%)** |
-| **RF-10** | Mantenedor CRUD de Productos | `ProductManager.jsx`, `productService.js` | `productService.test.js` (Crear, editar, eliminar y deducir stock) | **Implementado y Verificado (100%)** |
-| **RF-11** | Mantenedor CRUD de Usuarios | `UserManager.jsx`, `userService.js` | `userService.test.js` (Alta, actualización y borrado de usuarios) | **Implementado y Verificado (100%)** |
-| **RF-12** | Gestión y Monitoreo de Pedidos | `OrderManager.jsx`, `orderService.js` | `orderService.test.js` (Transición de estados de pedidos) | **Implementado y Verificado (100%)** |
-| **RF-13** | Mapa de Cobertura y Despachos | `CoverageMap.jsx` | Inspección visual e interactiva SVG en navegador | **Implementado y Verificado (100%)** |
-| **RF-14** | Blogs y Guías de Construcción | `Blogs.jsx`, `BlogDetail.jsx` | Inspección de contenido y enrutamiento SPA | **Implementado y Verificado (100%)** |
-| **RF-15** | Contacto y Cotizaciones | `Contact.jsx` | `Contact.test.jsx` (Validación de campos obligatorios y envío) | **Implementado y Verificado (100%)** |
+| RF-020 | Validar el formulario de contacto |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El contacto deberá exigir nombre de hasta 100 caracteres, correo válido y comentario de hasta 500 caracteres. El nombre y comentario no podrán quedar vacíos después de quitar espacios iniciales y finales. |
+| Criterio de aceptación | Los campos incompletos muestran errores; los datos válidos permiten continuar. El correo se comprueba según RF-023. |
+| Aplicación actual | El formulario de contacto presenta errores junto a los campos y comprueba los datos antes de continuar. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
 
----
+| RF-021 | Informar resultado del contacto |
+| --- | --- |
+| Usuario y estado | Usuario — Parcial |
+| Descripción | El formulario válido deberá comunicar su resultado sin fingir un envío no realizado. |
+| Criterio de aceptación | Completar contacto y comprobar que el aviso identifica la simulación. |
+| Aplicación actual | Se validan y limpian campos; no se envía correo ni se almacena una solicitud en servidor. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-### APROBACIÓN Y FIRMAS DE CONFORMIDAD
+| RF-022 | Validar datos de registro |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El registro deberá exigir RUN válido, nombre, apellidos, correo, contraseña confirmada, dirección, región y comuna. |
+| Criterio de aceptación | Probar RUN inválido y claves distintas; corregir datos y registrar una cuenta. |
+| Aplicación actual | Register.jsx: nombre máximo 50, apellidos 100 y dirección 300 caracteres; correo máximo 100. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
 
-| Rol de Evaluación | Nombre Completo | Firma / Estado | Fecha |
-|---|---|---|---|
-| **Líder de Desarrollo / Estudiante** | Sebastián Miranda | *Aprobado y Entregado* | Octubre 2026 |
-| **Docente Evaluador Cátedra** | Docente DSY1104 Duoc UC | *Pendiente de Calificación* | Octubre 2026 |
+| RF-023 | Validar correos de los formularios |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Contacto, login y registro deberán rechazar correos vacíos, de más de 100 caracteres o sin estructura usuario@dominio.extensión. Se comparará el dominio en minúsculas con duoc.cl, profesor.duoc.cl o gmail.com. |
+| Criterio de aceptación | usuario@gmail.com y Usuario@DUOC.CL son aceptados; usuario@otro.cl, usuario@@gmail.com y cadenas vacías son rechazados. No se verifica la existencia del buzón. |
+| Aplicación actual | Los formularios reutilizan la validación de correo de userService. |
+| Origen | ERS de la primera versión y validaciones de la interfaz. |
+
+| RF-024 | Validar claves de la demo |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Registro, inicio de sesión y cambios de clave deberán respetar el rango actual de 4 a 10 caracteres. |
+| Criterio de aceptación | Probar 3, 4, 10 y 11 caracteres; sólo el rango admitido permite continuar. |
+| Aplicación actual | Criterio conservado del prototipo; no representa una recomendación de seguridad para producción. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-025 | Seleccionar región y comuna |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Al cambiar región se deberán ofrecer las comunas configuradas para ella. |
+| Criterio de aceptación | Cambiar región y comprobar que la comuna pertenece a las opciones disponibles. |
+| Aplicación actual | Register.jsx, Checkout.jsx y chileLocations.js; no define cobertura comercial. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-026 | Registrar una cuenta local |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El registro válido deberá crear una cuenta local, rechazar correo duplicado e iniciar su sesión. |
+| Criterio de aceptación | Registrar un correo nuevo; repetirlo y verificar rechazo. |
+| Aplicación actual | Register.jsx y userService.js; contratista recibe crédito de demo automático. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-027 | Iniciar y cerrar sesión local |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El usuario deberá acceder con credenciales válidas y cerrar su sesión desde la interfaz. |
+| Criterio de aceptación | Acceder con credenciales válidas y cerrar sesión. Una cuenta sin permisos que intente entrar por el acceso administrativo debe ser rechazada sin reemplazar la sesión vigente. |
+| Aplicación actual | El acceso normal y administrativo validan credenciales antes de establecer la sesión. El acceso al panel exige un rol autorizado. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+#### 3.2.4. Usuarios inventario y operación comercial
+
+| RF-028 | Autenticar con servicios centrales |
+| --- | --- |
+| Usuario y estado | Cliente — Parcial |
+| Descripción | El sistema final deberá autenticar y persistir usuarios mediante servicios centrales. |
+| Criterio de aceptación | En la etapa final, acceder a la misma cuenta desde otro dispositivo con validación en servidor. |
+| Aplicación actual | La V2 autentica datos locales; backend y cuentas centrales pendientes. |
+| Origen | Caso de negocio y arquitectura final. |
+
+| RF-029 | Administrar usuarios y roles |
+| --- | --- |
+| Usuario y estado | Administrador — Parcial |
+| Descripción | El administrador deberá gestionar cuentas y roles; la solución final deberá permitir desactivación controlada. |
+| Criterio de aceptación | Crear y editar una cuenta como administrador; bloquear la vista a vendedor. |
+| Aplicación actual | El panel permite alta, edición y eliminación local. Desactivación con conservación histórica aún pendiente. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-030 | Gestionar catálogo e inventario |
+| --- | --- |
+| Usuario y estado | Personal — Implementado en V2 |
+| Descripción | Administrador y vendedor deberán gestionar productos y ajustar sus existencias locales. |
+| Criterio de aceptación | Modificar stock y precio y comprobar cambios en catálogo. |
+| Aplicación actual | AdminDashboard.jsx y productService.js; sin conexión al inventario físico. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-031 | Descontar stock por venta |
+| --- | --- |
+| Usuario y estado | Sistema — Implementado en V2 |
+| Descripción | La confirmación deberá descontar las unidades sólo si todas las líneas tienen disponibilidad suficiente. |
+| Criterio de aceptación | Comprar dos unidades y verificar descenso de dos; compra sin stock no produce descuento. |
+| Aplicación actual | orderService.js; cantidades enteras positivas y consolidación de líneas repetidas. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-032 | Advertir reposición |
+| --- | --- |
+| Usuario y estado | Personal — Parcial |
+| Descripción | La interfaz deberá identificar artículos que requieren reposición. |
+| Criterio de aceptación | Reducir stock hasta el mínimo y por debajo y observar indicador preventivo. |
+| Aplicación actual | Panel y filtros destacan stock menor o igual al mínimo; no se envía aviso externo al dueño. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-033 | Registrar pedido y entrega |
+| --- | --- |
+| Usuario y estado | Cliente — Implementado en V2 |
+| Descripción | El pedido deberá guardar cliente, líneas, importes y modalidad. El formulario exige dirección para despacho. |
+| Criterio de aceptación | Completar compras con retiro y despacho y comprobar los datos guardados y el flete. |
+| Aplicación actual | Checkout.jsx y orderService.js; visitantes y cuentas registradas pueden comprar localmente. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-034 | Consultar pedidos propios |
+| --- | --- |
+| Usuario y estado | Cliente — Implementado en V2 |
+| Descripción | El usuario deberá consultar sus pedidos sin que la interfaz muestre comprobantes ajenos. |
+| Criterio de aceptación | Abrir Mis pedidos e intentar consultar un identificador de otra cuenta. |
+| Aplicación actual | MyOrders.jsx y getOrderForViewer; control local pendiente de respaldo en servidor. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-035 | Actualizar y anular pedidos |
+| --- | --- |
+| Usuario y estado | Personal — Implementado en V2 |
+| Descripción | El personal deberá usar estados válidos, sin reabrir pedidos cerrados. Anular restituirá stock y crédito una sola vez. |
+| Criterio de aceptación | Anular un pedido a crédito y comprobar restitución; repetir no duplica la devolución. |
+| Aplicación actual | Estados CONFIRMADO, EN_PREPARACION, DESPACHADO, ENTREGADO y ANULADO. Se permite avanzar sin exigir cada paso intermedio; no retroceder. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-036 | Cargar compras a cuenta corriente |
+| --- | --- |
+| Usuario y estado | Contratista — Implementado en V2 |
+| Descripción | Un contratista activo con cupo suficiente podrá cargar el total del pedido, incluido despacho, a su saldo. |
+| Criterio de aceptación | Comprar con flete y comprobar incremento por el total; exceder cupo impide la compra. |
+| Aplicación actual | Nuevo contratista: $2.500.000 de cupo. Semilla: $3.500.000 y saldo inicial $450.000. |
+| Origen | Caso de negocio; alta automática y montos definidos para demo. |
+
+| RF-037 | Consultar historial y saldo |
+| --- | --- |
+| Usuario y estado | Contratista — Parcial |
+| Descripción | El contratista deberá consultar compras y saldo; el dueño deberá disponer de historial comercial por cliente. |
+| Criterio de aceptación | Acceder como contratista y comparar sus pedidos, saldo y crédito disponible. |
+| Aplicación actual | Mis pedidos muestra historial y saldo propios. Falta estado de cuenta comercial consolidado por período para el dueño. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RF-038 | Consultar reportes comerciales |
+| --- | --- |
+| Usuario y estado | Dueño — Parcial |
+| Descripción | El dueño deberá consultar compras por cliente, productos más vendidos y clientes frecuentes para un período. |
+| Criterio de aceptación | Elegir un período y contrastar los agregados con las ventas. |
+| Aplicación actual | El panel presenta indicadores locales generales; no todos los reportes ni filtros temporales del caso. |
+| Origen | Caso de negocio. |
+
+| RF-039 | Verificar ubicación y cobertura |
+| --- | --- |
+| Usuario y estado | Cliente — Parcial |
+| Descripción | El sistema final deberá mostrar cobertura geográfica y verificar la dirección de obra. |
+| Criterio de aceptación | Validar una dirección dentro y otra fuera de cobertura sobre un mapa geográfico. |
+| Aplicación actual | El esquema SVG permite elegir localidades y zonas y sincroniza comuna y tarifa. Es una representación referencial; no geocodifica direcciones ni calcula distancias. |
+| Origen | Necesidad de cobertura del caso de negocio y representación local de la V2. |
+
+| RF-040 | Consultar inventario compartido |
+| --- | --- |
+| Usuario y estado | Cliente — Parcial |
+| Descripción | El catálogo final deberá consultar existencias centralizadas y reflejar ventas de distintos dispositivos. |
+| Criterio de aceptación | Comprar desde un dispositivo y comprobar disponibilidad desde otro. |
+| Aplicación actual | La V2 actualiza el almacenamiento local; inventario central pendiente. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+#### 3.2.5. Multimedia y funciones incorporadas en V2
+
+| RF-041 | Incorporar video del negocio |
+| --- | --- |
+| Usuario y estado | Usuario — Pendiente |
+| Descripción | El sitio deberá ofrecer un video pertinente y acceso identificable para reproducirlo. |
+| Criterio de aceptación | Abrir la vista y reproducir el video con sus controles. |
+| Aplicación actual | La V2 no incorpora un video del negocio. El requisito permanece pendiente. |
+| Origen | Continuidad de la ERS de primera entrega. |
+
+| RF-042 | Filtrar y ordenar productos |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El catálogo deberá permitir búsqueda por texto, selección de categoría, ofertas y ordenamiento por el precio efectivo con descuento. |
+| Criterio de aceptación | Combinar filtros, volver al catálogo completo y usar atrás o adelante. Los controles deben reflejar la URL. Ordenar por precio debe considerar el descuento. |
+| Aplicación actual | Búsqueda, categoría y ofertas se derivan de la URL y se restablecen al abrir el catálogo sin filtros. El orden usa el precio que paga el cliente. |
+| Origen | Funciones de búsqueda y navegación de la segunda etapa. |
+
+| RF-043 | Consultar fichas y ofertas |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | El usuario deberá consultar una ficha por producto y una vista de artículos en oferta. |
+| Criterio de aceptación | Abrir una tarjeta y revisar detalle; comprobar el precio rebajado en Ofertas. |
+| Aplicación actual | La ficha presenta imagen referencial, marca, descripción, especificaciones y existencias. La vista de ofertas muestra los artículos rebajados. |
+| Origen | Funciones de segunda etapa. |
+
+| RF-044 | Calcular tarifa y cobertura local |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | La consulta de cobertura y el formulario de compra deberán utilizar la misma tarifa de demostración por comuna. Las comunas sin tarifa automática deberán solicitar cotización. |
+| Criterio de aceptación | Seleccionar comuna o zona actualiza ambas opciones y la tarifa. La Serena y Coquimbo: $4.990 bajo $100.000 y cero desde ese monto; Vicuña: $14.990; otras comunas: cotización. |
+| Aplicación actual | CoverageMap y Checkout utilizan shippingService. El retiro es gratuito; la consulta referencial no valida una dirección exacta. |
+| Origen | Configuración de despacho de la demostración V2. |
+
+| RF-045 | Demostrar compra fallida |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Simular fallo deberá mostrar resultado fallido sin registrar venta ni modificar stock o saldo. |
+| Criterio de aceptación | Activar fallo y confirmar; comprobar carrito conservado y ausencia de pedido. |
+| Aplicación actual | Checkout.jsx y CheckoutFailure.jsx. |
+| Origen | Instrucciones de segunda entrega. |
+
+| RF-046 | Autocompletar compra |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Con sesión iniciada, el checkout deberá proponer los datos disponibles de cliente y entrega. |
+| Criterio de aceptación | Abrir checkout con una cuenta y productos y comprobar datos propuestos y posibilidad de corregirlos. |
+| Aplicación actual | Checkout.jsx y AuthContext.jsx. |
+| Origen | Instrucciones de segunda entrega. |
+
+### 3.3. Requisitos no funcionales
+
+#### 3.3.1. Rendimiento
+
+El funcionamiento de esta versión se verifica con 27 productos y operaciones locales. La evaluación realizada cubre comportamiento y presentación, sin medir carga concurrente, capacidad de un servidor ni tiempos máximos de respuesta.
+
+#### 3.3.2. Seguridad
+
+| RNF-001 | Proteger credenciales |
+| --- | --- |
+| Usuario y estado | Equipo — Parcial |
+| Descripción | Las contraseñas no deberán almacenarse como texto legible; la solución final deberá protegerlas en servidor. |
+| Criterio de aceptación | Registrar o migrar cuenta y comprobar hash y sal; el objeto de sesión no debe contenerlos. |
+| Aplicación actual | PBKDF2 SHA-256, sal aleatoria y 100.000 iteraciones mediante Web Crypto. Protección de demo; no autenticación de producción. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RNF-002 | Restringir acceso por rol y titularidad |
+| --- | --- |
+| Usuario y estado | Todos — Parcial |
+| Descripción | La interfaz deberá aplicar permisos por rol y titular; el servidor deberá respaldarlos en la solución final. |
+| Criterio de aceptación | Un cliente no accede al panel ni a pedidos ajenos. El vendedor no accede a usuarios. Un intento administrativo rechazado conserva la sesión anterior. |
+| Aplicación actual | Las rutas, el acceso administrativo y la consulta de pedidos aplican controles locales. La autorización en servidor sigue pendiente. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RNF-003 | Validar operaciones en servidor |
+| --- | --- |
+| Usuario y estado | Equipo — Pendiente |
+| Descripción | El backend deberá repetir validaciones y comprobar permisos sin confiar en los datos enviados por la interfaz. |
+| Criterio de aceptación | Enviar una petición inválida a la futura API y verificar rechazo sin cambios. |
+| Aplicación actual | No existe backend en esta etapa. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+#### 3.3.3. Fiabilidad
+
+| RNF-004 | Mantener consistencia de compra |
+| --- | --- |
+| Usuario y estado | Sistema — Parcial |
+| Descripción | Las operaciones locales deberán conservar la coherencia entre pedido, existencias y saldo. La actualización de recursos visuales deberá preservar los datos comerciales guardados. |
+| Criterio de aceptación | Ante un error al guardar un pedido, no quedan cargos ni descuentos parciales. Al actualizar fotos, se conservan precios, stock, catálogo personalizado y demás registros. |
+| Aplicación actual | Las escrituras múltiples revierten cambios ante fallos. La actualización de imágenes sustituye solo referencias genéricas conocidas. El control transaccional y la concurrencia entre dispositivos corresponden al servidor. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+#### 3.3.4. Disponibilidad
+
+| RNF-005 | Utilizar recursos del proyecto |
+| --- | --- |
+| Usuario y estado | Usuario — Implementado en V2 |
+| Descripción | Catálogo, imágenes y carrito deberán funcionar con archivos servidos por el proyecto. |
+| Criterio de aceptación | Cargar las 27 imágenes y acceder a sus créditos sin solicitudes de imágenes a servicios externos durante el uso de la tienda. |
+| Aplicación actual | Los recursos se almacenan en public/assets/img/productos y se sirven desde el proyecto. Los créditos identifican fuentes, licencias y descripciones de las imágenes generadas. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+#### 3.3.5. Mantenibilidad
+
+| RNF-006 | Mantener código organizado |
+| --- | --- |
+| Usuario y estado | Equipo — Implementado en V2 |
+| Descripción | Separar páginas, componentes, contextos, datos, servicios y estilos y reutilizar reglas de cálculo y validación. |
+| Criterio de aceptación | Localizar cálculo de precio, despacho y correo y comprobar su reutilización. |
+| Aplicación actual | La aplicación organiza páginas, componentes, contextos, datos, servicios y estilos. Precio, despacho y validaciones reutilizan servicios comunes y la presentación utiliza variables CSS. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+#### 3.3.6. Portabilidad y facilidad de uso
+
+| RNF-007 | Adaptar vistas a dispositivos |
+| --- | --- |
+| Usuario y estado | Usuario — Parcial |
+| Descripción | Las vistas deberán ser utilizables a 360, 768 y 1280 píxeles con menú móvil y contenido accesible. |
+| Criterio de aceptación | Recorrer tienda, formularios y panel a distintos anchos. La marca, las acciones y los iconos deben mantenerse utilizables y el documento no debe desbordarse. |
+| Aplicación actual | Se verificaron cinco perfiles en ocho anchos de 360 a 1920 píxeles y 69 recorridos de vistas. La comprobación no cubre todos los dispositivos, estados ni criterios de accesibilidad. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RNF-008 | Facilitar formularios |
+| --- | --- |
+| Usuario y estado | Usuario — Parcial |
+| Descripción | Los campos deberán tener etiquetas, errores comprensibles y acceso por teclado. |
+| Criterio de aceptación | Recorrer campos con teclado y corregir datos según sus mensajes. |
+| Aplicación actual | Formularios públicos con etiquetas y avisos; falta auditoría completa de accesibilidad de panel y modales. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+### 3.4. Otros Requisitos
+
+#### 3.4.1. Herramientas y condiciones técnicas
+
+| RT-001 | Evolucionar a la arquitectura final |
+| --- | --- |
+| Usuario y estado | Equipo — Parcial |
+| Descripción | La solución final deberá integrar React con servicios Spring Boot mediante API REST. |
+| Criterio de aceptación | Demostrar intercambio con servicios independientes y errores JSON en la etapa correspondiente. |
+| Aplicación actual | React y Vite implementados; Spring Boot y API pendientes. CSS propio y Vitest son decisiones vigentes. |
+| Origen | ERS de la primera versión y diseño funcional de la V2. |
+
+| RT-002 | Guardar los datos en una base relacional |
+| --- | --- |
+| Usuario y estado | Equipo de desarrollo — Pendiente |
+| Descripción | Los datos del sistema final deberán persistir en MySQL, PostgreSQL u Oracle, con un modelo normalizado al menos hasta tercera forma normal. |
+| Criterio de aceptación | Usuarios, productos y operaciones se conservan después de reiniciar los servicios y el modelo cumple la normalización requerida. |
+| Aplicación actual | La V2 conserva datos en localStorage. La base relacional corresponde a la etapa de integración con servicios centrales. |
+| Origen | Tecnologías obligatorias del contexto del proyecto. |
+
+| RT-003 | Desplegar el sistema con AWS y Docker |
+| --- | --- |
+| Usuario y estado | Equipo de desarrollo — Pendiente |
+| Descripción | La solución final deberá utilizar AWS y Docker para su despliegue. |
+| Criterio de aceptación | La aplicación puede iniciarse mediante sus contenedores y accederse en el entorno desplegado. |
+| Aplicación actual | La V2 se ejecuta con Vite y genera archivos estáticos. El despliegue con AWS y Docker corresponde a una etapa posterior. |
+| Origen | Tecnologías obligatorias del contexto del proyecto. |
+
+#### 3.4.2. Criterios de las validaciones actuales
+
+El registro exige RUN válido por Módulo 11, nombre de hasta 50 caracteres, apellidos y correo de hasta 100, dirección de hasta 300, región y comuna. Contacto exige nombre de hasta 100 y comentario de hasta 500. La obligatoriedad y los límites favorecen datos completos y reducen entradas accidentales; el RUN válido no acredita por sí solo la identidad de una persona.
+
+Los dominios duoc.cl, profesor.duoc.cl y gmail.com y las contraseñas de cuatro a diez caracteres se mantienen como restricciones funcionales del prototipo. El formato y el dominio no acreditan la titularidad del correo. Las contraseñas locales se derivan mediante PBKDF2 con sal; el límite de longitud conservado no se presenta como política de seguridad de producción.
+
+Región y comuna se seleccionan entre opciones configuradas. La cobertura de despacho se comprueba por separado con la comuna y el subtotal de la compra. En la solución con servidor, las validaciones y los permisos también deberán ejecutarse en el backend.
+
+#### 3.4.3. Funciones observables de la segunda versión
+
+Los siguientes ejemplos vinculan funciones de la entrega con sus requisitos. Las cuentas y los pedidos utilizados son ficticios. La medición asociada registra 92 pruebas aprobadas y las comprobaciones complementarias en navegador, detalladas en el informe de pruebas y cobertura.
+
+| Función observable | Requisitos | Comportamiento de la V2 |
+| --- | --- | --- |
+| Navegar y filtrar el catálogo | RF-001 RF-004 RF-042 | 27 registros y siete categorías; filtros coherentes con la ruta y orden por precio con descuento. |
+| Consultar imágenes y fichas | RF-006 RF-043 RNF-005 | La referencia corresponde al tipo de artículo, se ve completa y dispone de texto alternativo y créditos. |
+| Modificar el carrito | RF-007 a RF-016 | Cantidades, contador y totales se actualizan; stock insuficiente impide aumentar unidades. |
+| Comprar con retiro o despacho | RF-013 RF-017 RF-033 RF-044 | Se guarda el desglose, se descuenta stock y se conserva la confirmación tras vaciar el carrito. |
+| Consultar cobertura referencial | RF-039 RF-044 | Comuna, zona y tarifa se sincronizan; las comunas sin tarifa automática requieren cotización. |
+| Simular compra fallida | RF-045 RNF-004 | Se conserva el carrito sin generar pedido ni descontar existencias. |
+| Comprar como contratista | RF-036 RF-037 | El total aumenta el saldo y reduce el crédito disponible; el historial muestra los pedidos propios. |
+| Controlar acceso administrativo | RF-027 RNF-002 | Se rechazan perfiles sin permiso sin reemplazar la sesión actual. |
+| Consultar y anular pedidos | RF-034 RF-035 RNF-002 | El cliente consulta pedidos propios; la anulación autorizada restituye stock y crédito una sola vez. |
+
+La entrega comprende las funciones locales identificadas en estas fichas. La integración con servidor, los pagos reales, el correo saliente y la verificación geográfica exacta permanecen fuera de esta versión.

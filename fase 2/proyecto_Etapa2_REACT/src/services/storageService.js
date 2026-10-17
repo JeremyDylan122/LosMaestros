@@ -18,7 +18,8 @@ export const storageService = {
       if (data === null || data === undefined) {
         return defaultValue;
       }
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      return Array.isArray(defaultValue) && !Array.isArray(parsed) ? defaultValue : parsed;
     } catch (error) {
       console.error(`Error al leer ${key} desde localStorage:`, error);
       return defaultValue;
@@ -37,7 +38,7 @@ export const storageService = {
       return true;
     } catch (error) {
       console.error(`Error al escribir ${key} en localStorage:`, error);
-      return false;
+      throw new Error('No fue posible guardar los cambios en este navegador.');
     }
   },
 
@@ -62,9 +63,9 @@ export const storageService = {
    */
   init(key, seedData) {
     const existing = this.get(key, null);
-    if (existing === null) {
+    if (existing === null || (Array.isArray(seedData) && !Array.isArray(existing))) {
       this.set(key, seedData);
-      return seedData;
+      return JSON.parse(JSON.stringify(seedData));
     }
     return existing;
   },
@@ -72,6 +73,21 @@ export const storageService = {
   /**
    * Limpia todas las claves del prefijo de la ferretería
    */
+  setMany(values) {
+    const previous = Object.keys(values).map(key => [key, localStorage.getItem(STORAGE_PREFIX + key)]);
+    try {
+      Object.entries(values).forEach(([key, value]) => this.set(key, value));
+    } catch (error) {
+      previous.forEach(([key, value]) => {
+        try {
+          if (value === null) localStorage.removeItem(STORAGE_PREFIX + key);
+          else localStorage.setItem(STORAGE_PREFIX + key, value);
+        } catch { /* El navegador puede haber bloqueado todo acceso al almacenamiento. */ }
+      });
+      throw error;
+    }
+  },
+
   clearAll() {
     try {
       const keysToRemove = [];

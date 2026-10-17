@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { userService } from '../services/userService';
 import { chileLocations } from '../data/chileLocations';
@@ -103,13 +103,13 @@ export const Register = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError('');
 
     if (!validate()) return;
 
-    const result = register({
+    const result = await register({
       run: formData.run,
       nombre: formData.nombre,
       apellidos: formData.apellidos,

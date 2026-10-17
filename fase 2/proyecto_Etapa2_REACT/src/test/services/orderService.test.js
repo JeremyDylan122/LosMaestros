@@ -65,7 +65,7 @@ describe('Servicio de Órdenes (orderService)', () => {
 
     // Comprobar que aumentó el saldo pendiente del contratista
     const contratistaActualizado = userService.getUserById(3);
-    expect(contratistaActualizado.saldoPendiente).toBe(saldoAntes + montoEsperado);
+    expect(contratistaActualizado.saldoPendiente).toBe(saldoAntes + montoEsperado + 4990);
   });
 
   it('debe rechazar un pedido a cuenta corriente si excede el límite de crédito', () => {

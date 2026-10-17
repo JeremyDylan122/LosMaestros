@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { productService } from '../../services/productService';
 import { storageService } from '../../services/storageService';
+import { initialProducts } from '../../data/initialProducts';
 
 describe('Servicio de Productos (productService)', () => {
   beforeEach(() => {
@@ -133,6 +134,65 @@ describe('Servicio de Productos (productService)', () => {
       results.forEach(p => {
         expect(p.categoria).toBe('Pinturas');
       });
+    });
+  });
+
+  describe('Actualización de fotografías del catálogo guardado', () => {
+    it('debe sustituir la foto genérica sin cambiar inventario, precios ni otros registros', () => {
+      const shoes = {
+        ...initialProducts.find(product => product.codigo === 'SE004'),
+        imagen: '/assets/img/productos/casco.jpg',
+        stock: 1,
+        precio: 35990,
+        descripcion: 'Descripción editada desde administración'
+      };
+      const added = { ...shoes, id: 90, codigo: 'NUEVO001', nombre: 'Producto agregado' };
+      const orders = [{ id: 'PEDIDO-1', total: 35990 }];
+      const cart = [{ id: shoes.id, cantidad: 1 }];
+      storageService.set('products', [shoes, added]);
+      storageService.set('orders', orders);
+      storageService.set('carrito_v2', cart);
+
+      const updated = productService.getProducts();
+      expect(updated).toHaveLength(2); // No restaura productos eliminados.
+      expect(updated[0].imagen).toBe('/assets/img/productos/zapatos-seguridad.webp');
+      expect({ ...updated[0], imagen: shoes.imagen }).toEqual(shoes);
+      expect(updated[1]).toEqual(added); // No modifica productos ajenos a la semilla.
+      expect(storageService.get('products')).toEqual(updated);
+      expect(storageService.get('orders')).toEqual(orders);
+      expect(storageService.get('carrito_v2')).toEqual(cart);
+    });
+
+    it('debe conservar imágenes personalizadas y no reescribir catálogos sin cambios', () => {
+      const shoes = initialProducts.find(product => product.codigo === 'SE004');
+      const products = [
+        { ...shoes, imagen: '/assets/img/personalizadas/botines.jpg' },
+        { ...shoes, id: 91, imagen: 'https://ejemplo.invalid/foto-propia.jpg' },
+        { ...shoes, id: 92, imagen: '' }
+      ];
+      storageService.set('products', products);
+      const save = vi.spyOn(storageService, 'set');
+      try {
+        expect(productService.getProducts()).toEqual(products);
+        expect(save).not.toHaveBeenCalled();
+      } finally {
+        save.mockRestore();
+      }
+    });
+
+    it('debe actualizar las imágenes antiguas una sola vez y respetar un catálogo vacío', () => {
+      const drill = initialProducts.find(product => product.codigo === 'HE001');
+      storageService.set('products', [{ ...drill, imagen: '/assets/img/productos/taladro.jpg' }]);
+      const save = vi.spyOn(storageService, 'set');
+      try {
+        expect(productService.getProducts()[0].imagen).toBe(drill.imagen);
+        expect(productService.getProducts()[0].imagen).toBe(drill.imagen);
+        expect(save).toHaveBeenCalledTimes(1);
+      } finally {
+        save.mockRestore();
+      }
+      storageService.set('products', []);
+      expect(productService.getProducts()).toEqual([]);
     });
   });
 });

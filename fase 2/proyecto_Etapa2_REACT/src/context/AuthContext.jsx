@@ -1,3 +1,4 @@
+import { credentialService } from '../services/credentialService';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { userService } from '../services/userService';
 import { storageService } from '../services/storageService';
@@ -8,7 +9,8 @@ const CURRENT_USER_KEY = 'current_user';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    return storageService.get(CURRENT_USER_KEY, null);
+    const cached = storageService.get(CURRENT_USER_KEY, null);
+    return cached?.id ? credentialService.safe(userService.getUserById(cached.id)) : null;
   });
   const [loading, setLoading] = useState(false);
 
@@ -23,10 +25,13 @@ export const AuthProvider = ({ children }) => {
   /**
    * Inicia sesión con credenciales
    */
-  const login = (email, password) => {
+  const login = async (email, password, allowedRoles = null) => {
     setLoading(true);
     try {
-      const authenticatedUser = userService.authenticate(email, password);
+      const authenticatedUser = await userService.authenticate(email, password);
+      if (allowedRoles && !allowedRoles.includes(authenticatedUser.rol)) {
+        throw new Error('Esta cuenta no tiene permisos de Administrador o Vendedor.');
+      }
       setUser(authenticatedUser);
       return { success: true, user: authenticatedUser };
     } catch (error) {
@@ -46,10 +51,10 @@ export const AuthProvider = ({ children }) => {
   /**
    * Registra una nueva cuenta de usuario
    */
-  const register = (userData) => {
+  const register = async (userData) => {
     setLoading(true);
     try {
-      const newUser = userService.createUser(userData);
+      const newUser = await userService.createUser(userData);
       setUser(newUser);
       return { success: true, user: newUser };
     } catch (error) {
@@ -65,12 +70,20 @@ export const AuthProvider = ({ children }) => {
   const refreshUser = () => {
     if (user && user.id) {
       const updated = userService.getUserById(user.id);
-      if (updated) {
-        const { password: _, ...safe } = updated;
-        setUser(safe);
-      }
+      setUser(credentialService.safe(updated));
     }
   };
+
+  // Revalidar la sesión local al volver a la pestaña o al cambiar datos desde otra.
+  useEffect(() => {
+    const sync = () => {
+      const cached = storageService.get(CURRENT_USER_KEY, null);
+      setUser(cached?.id ? credentialService.safe(userService.getUserById(cached.id)) : null);
+    };
+    window.addEventListener('focus', sync);
+    window.addEventListener('storage', sync);
+    return () => { window.removeEventListener('focus', sync); window.removeEventListener('storage', sync); };
+  }, []);
 
   const value = {
     user,

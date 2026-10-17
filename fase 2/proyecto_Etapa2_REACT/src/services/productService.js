@@ -3,13 +3,59 @@ import { initialProducts } from '../data/initialProducts';
 
 const STORAGE_KEY = 'products';
 
+// Imágenes genéricas de la versión anterior, usadas solo para actualizar sus referencias.
+const LEGACY_CATEGORY_IMAGES = {
+  'Materiales de Construcción': 'cemento.jpg',
+  Pinturas: 'pintura.jpg',
+  'Herramientas Manuales': 'martillo.jpg',
+  'Herramientas Eléctricas': 'taladro.jpg',
+  Gasfitería: 'tuberia-pvc.jpg',
+  Electricidad: 'taladro.jpg',
+  Seguridad: 'casco.jpg'
+};
+const INITIAL_PRODUCTS_BY_CODE = new Map(initialProducts.map(product => [product.codigo, product]));
+
 export const productService = {
   /**
    * Obtiene todos los productos almacenados o inicializa con la semilla
    * @returns {Array}
    */
+  getUnitPrice(product) {
+    return product.enOferta && product.descuento > 0
+      ? Math.round(product.precio * (1 - product.descuento / 100)) : product.precio;
+  },
+
+  validateProduct(product) {
+    if (!product.codigo?.trim() || !product.nombre?.trim() || !product.categoria?.trim()) throw new Error('Código, nombre y categoría son obligatorios.');
+    for (const field of ['precio', 'stock', 'stockMinimo', 'descuento']) {
+      const value = Number(product[field] ?? 0);
+      if (!Number.isFinite(value) || value < 0) throw new Error('Precio, existencias y descuento deben ser números no negativos.');
+    }
+    if (!Number.isInteger(Number(product.stock)) || !Number.isInteger(Number(product.stockMinimo ?? 0))) throw new Error('El stock debe ser un número entero.');
+    if (Number(product.descuento) > 100) throw new Error('El descuento no puede superar 100%.');
+  },
+
+  /**
+   * Actualiza únicamente las fotos genéricas del catálogo guardado.
+   * Conserva precios, stock, productos agregados/eliminados e imágenes personalizadas.
+   */
   getProducts() {
-    return storageService.init(STORAGE_KEY, initialProducts);
+    const products = storageService.init(STORAGE_KEY, initialProducts);
+    let imagesUpdated = false;
+    const updatedProducts = products.map(product => {
+      const initial = INITIAL_PRODUCTS_BY_CODE.get(product.codigo);
+      if (!initial || product.imagen === initial.imagen) return product;
+
+      const legacyImage = `/assets/img/productos/${LEGACY_CATEGORY_IMAGES[initial.categoria]}`;
+      if (product.imagen !== legacyImage) return product;
+
+      imagesUpdated = true;
+      return { ...product, imagen: initial.imagen };
+    });
+
+    // Evita reescribir el almacenamiento cuando las fotos ya están actualizadas.
+    if (imagesUpdated) storageService.set(STORAGE_KEY, updatedProducts);
+    return updatedProducts;
   },
 
   /**
@@ -67,6 +113,7 @@ export const productService = {
       especificaciones: productData.especificaciones || ''
     };
 
+    this.validateProduct(productData);
     products.push(newProduct);
     storageService.set(STORAGE_KEY, products);
     return newProduct;
@@ -107,6 +154,7 @@ export const productService = {
       descuento: updatedData.descuento !== undefined ? Number(updatedData.descuento) : current.descuento
     };
 
+    this.validateProduct({ ...current, ...updatedData });
     products[index] = updatedProduct;
     storageService.set(STORAGE_KEY, products);
     return updatedProduct;
@@ -133,6 +181,7 @@ export const productService = {
    * @param {number} quantity 
    */
   reduceStock(id, quantity) {
+    if (!Number.isInteger(quantity) || quantity <= 0) throw new Error('La cantidad debe ser un entero positivo.');
     const product = this.getProductById(id);
     if (!product) throw new Error('Producto no existe para descontar stock.');
     if (product.stock < quantity) {

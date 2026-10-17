@@ -121,6 +121,9 @@ export const Footer = () => {
         <div>
           &copy; 2026 Ferretería Los Maestros &bull; Proyecto DSY1104 FullStack II &bull; Duoc UC
         </div>
+        <a href="/assets/img/productos/CREDITOS.md" target="_blank" rel="noreferrer" style={{ color: 'inherit' }}>
+          Créditos de imágenes
+        </a>
         <div>
           Diseño en <strong>Bento Grid + Brutalismo Táctil</strong> &bull; React SPA &bull; Vitest Suite
         </div>

@@ -1,13 +1,14 @@
+import { useAuth } from '../context/AuthContext';
 import React from 'react';
-import { useLocation, useParams, Link } from 'react-router-dom';
-import { CheckCircle2, Printer, ArrowRight, Package, Truck, CreditCard, Building2 } from 'lucide-react';
+import { useParams, Link } from 'react-router-dom';
+import { CheckCircle2, Printer, ArrowRight, CreditCard } from 'lucide-react';
 import { orderService } from '../services/orderService';
 
 export const CheckoutSuccess = () => {
   const { id } = useParams();
-  const location = useLocation();
+  const { user } = useAuth();
 
-  const order = location.state?.order || orderService.getOrderById(id);
+  const order = orderService.getOrderForViewer(id, user);
 
   if (!order) {
     return (
@@ -53,7 +54,7 @@ export const CheckoutSuccess = () => {
             ¡Compra Finalizada con Éxito!
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
-            Tu orden ha sido registrada en el sistema de bodega de Ferretería Los Maestros.
+            Tu orden de demostración quedó registrada en este navegador. No se ha efectuado un cobro real.
           </p>
 
           <div style={{ marginTop: '1rem' }}>
@@ -73,11 +74,12 @@ export const CheckoutSuccess = () => {
           <div className="alert-tactile alert-tactile-info" style={{ marginBottom: '1.75rem' }}>
             <CreditCard size={22} />
             <div>
-              <strong>Pedido cargado a Cuenta Corriente Contratista:</strong> Este monto quedará consolidado en tu estado de cuenta a fin de mes. Te contactaremos cuando el camión de faena vaya en camino.
+              <strong>Pedido cargado a Cuenta Corriente Contratista:</strong> Este monto se agregó al saldo local de tu cuenta de demostración.
             </div>
           </div>
         )}
 
+        <p>Productos: ${(order.subtotal ?? order.items.reduce((sum, item) => sum + item.subtotal, 0)).toLocaleString('es-CL')} · Despacho: ${(order.shippingFee ?? 0).toLocaleString('es-CL')} · Estado de pago: {order.estadoPago}</p>
         {/* RESUMEN DE LA ORDEN EN BENTO */}
         <div style={{
           backgroundColor: 'var(--bg-surface-alt)',

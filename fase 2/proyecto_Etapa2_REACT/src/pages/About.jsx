@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Award, ShieldCheck, HeartHandshake, MapPin } from 'lucide-react';
+import { Users, Award, ShieldCheck, HeartHandshake } from 'lucide-react';
 import { CoverageMap } from '../components/common/CoverageMap';
 
 export const About = () => {

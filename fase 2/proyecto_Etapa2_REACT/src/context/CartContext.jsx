@@ -7,15 +7,17 @@ const CartContext = createContext();
 const CART_STORAGE_KEY = 'carrito_v2';
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(() => {
+  const [storedItems, setCartItems] = useState(() => {
     return storageService.get(CART_STORAGE_KEY, []);
   });
 
+  // Reconstruir datos comerciales con el catálogo vigente; conservar cantidades del carrito.
+  const cartItems = storedItems.map(item => ({ ...item, ...(productService.getProductById(item.id) || {}), cantidad: item.cantidad }));
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    storageService.set(CART_STORAGE_KEY, cartItems);
-  }, [cartItems]);
+    storageService.set(CART_STORAGE_KEY, storedItems);
+  }, [storedItems]);
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
@@ -31,6 +33,7 @@ export const CartProvider = ({ children }) => {
    * @returns {boolean}
    */
   const addToCart = (product, quantity = 1) => {
+    if (!Number.isInteger(quantity) || quantity <= 0) { showNotification('La cantidad debe ser un entero positivo.', 'danger'); return false; }
     // Verificar stock fresco desde productService
     const freshProduct = productService.getProductById(product.id) || product;
 
@@ -58,7 +61,9 @@ export const CartProvider = ({ children }) => {
         ...updated[existingIndex],
         cantidad: desiredQty,
         stock: freshProduct.stock,
-        precio: freshProduct.precio
+        precio: freshProduct.precio,
+        enOferta: freshProduct.enOferta,
+        descuento: freshProduct.descuento
       };
       setCartItems(updated);
       showNotification(`Se agregaron ${quantity} unidad(es) de ${freshProduct.nombre}.`, 'success');
@@ -98,6 +103,7 @@ export const CartProvider = ({ children }) => {
    * @param {number} delta 
    */
   const updateQuantity = (productId, delta) => {
+    if (!Number.isInteger(delta)) return;
     const item = cartItems.find(it => Number(it.id) === Number(productId));
     if (!item) return;
 

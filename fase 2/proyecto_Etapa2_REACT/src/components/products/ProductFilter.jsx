@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, ArrowUpDown, Tag, AlertOctagon } from 'lucide-react';
+import { Search, Tag, AlertOctagon } from 'lucide-react';
 
 export const ProductFilter = ({
   categories,

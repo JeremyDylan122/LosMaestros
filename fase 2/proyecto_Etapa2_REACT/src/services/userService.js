@@ -1,3 +1,4 @@
+import { credentialService } from './credentialService';
 import { storageService } from './storageService';
 import { initialUsers } from '../data/initialUsers';
 
@@ -8,6 +9,32 @@ export const userService = {
    * Obtiene la lista de todos los usuarios
    * @returns {Array}
    */
+  async migrateLegacyPasswords() {
+    const users = this.getUsers();
+    let changed = false;
+    for (const user of users) {
+      if (typeof user.password === 'string') {
+        Object.assign(user, await credentialService.hash(user.password));
+        delete user.password;
+        changed = true;
+      }
+    }
+    if (changed) storageService.set(STORAGE_KEY, users);
+    const cached = storageService.get('current_user');
+    if (cached) storageService.set('current_user', credentialService.safe(cached));
+  },
+
+  async changePassword(id, password) {
+    if (!password || password.length < 4 || password.length > 10) throw new Error('La contraseña debe tener entre 4 y 10 caracteres.');
+    const credentials = await credentialService.hash(password);
+    const users = this.getUsers();
+    const user = users.find(u => Number(u.id) === Number(id));
+    if (!user) throw new Error('Usuario no encontrado.');
+    Object.assign(user, credentials);
+    delete user.password;
+    storageService.set(STORAGE_KEY, users);
+  },
+
   getUsers() {
     return storageService.init(STORAGE_KEY, initialUsers);
   },
@@ -39,7 +66,8 @@ export const userService = {
    * @param {string} password 
    * @returns {Object} Usuario autenticado (sin exponer contraseña sensible si aplica)
    */
-  authenticate(email, password) {
+  async authenticate(email, password) {
+    await this.migrateLegacyPasswords();
     if (!this.validateEmail(email)) {
       throw new Error('El correo ingresado no cumple con el formato o dominios permitidos (@duoc.cl, @profesor.duoc.cl, @gmail.com).');
     }
@@ -49,12 +77,12 @@ export const userService = {
     }
 
     const user = this.getUserByEmail(email);
-    if (!user || user.password !== password) {
+    if (!user || !(await credentialService.verify(password, user))) {
       throw new Error('Credenciales inválidas. Verifica tu correo y contraseña.');
     }
 
     // Retorna usuario autenticado
-    const { password: _, ...userSafe } = user;
+    const userSafe = credentialService.safe(user);
     return userSafe;
   },
 
@@ -63,7 +91,7 @@ export const userService = {
    * @param {Object} userData 
    * @returns {Object}
    */
-  createUser(userData) {
+  async createUser(userData) {
     const users = this.getUsers();
 
     // Validar email
@@ -86,6 +114,7 @@ export const userService = {
       throw new Error('La contraseña debe tener entre 4 y 10 caracteres.');
     }
 
+    const credentials = await credentialService.hash(userData.password);
     const nextId = users.length > 0 ? Math.max(...users.map(u => Number(u.id) || 0)) + 1 : 1;
 
     const newUser = {
@@ -94,7 +123,7 @@ export const userService = {
       nombre: userData.nombre.trim(),
       apellidos: userData.apellidos ? userData.apellidos.trim() : '',
       email: userData.email.trim().toLowerCase(),
-      password: userData.password,
+      ...credentials,
       rol: userData.rol || 'CLIENTE', // ADMIN, VENDEDOR, CONTRATISTA, CLIENTE
       region: userData.region || '',
       comuna: userData.comuna || '',
@@ -108,7 +137,7 @@ export const userService = {
     users.push(newUser);
     storageService.set(STORAGE_KEY, users);
 
-    const { password: _, ...userSafe } = newUser;
+    const userSafe = credentialService.safe(newUser);
     return userSafe;
   },
 
@@ -137,6 +166,13 @@ export const userService = {
       }
     }
 
+    if (updatedData.run !== undefined) {
+      const result = this.validateRun(updatedData.run);
+      if (!result.isValid) throw new Error(result.message);
+      updatedData = { ...updatedData, run: result.formatted };
+    }
+    const { password: _password, passwordHash: _passwordHash, passwordSalt: _passwordSalt, ...allowedData } = updatedData;
+    updatedData = allowedData;
     const current = users[index];
     const updatedUser = {
       ...current,
@@ -150,7 +186,7 @@ export const userService = {
     users[index] = updatedUser;
     storageService.set(STORAGE_KEY, users);
 
-    const { password: _, ...userSafe } = updatedUser;
+    const userSafe = credentialService.safe(updatedUser);
     return userSafe;
   },
 
@@ -199,6 +235,7 @@ export const userService = {
       return { isValid: false, message: 'El RUN es obligatorio.', formatted: '' };
     }
 
+    if (!/^[0-9.\s-]+[0-9kK]$/.test(run.trim())) return { isValid: false, message: 'Formato de RUN inválido.', formatted: '' };
     // Limpiar puntos, espacios y guiones
     const clean = run.replace(/[^0-9kK]/g, '').toUpperCase();
     if (clean.length < 7 || clean.length > 9) {

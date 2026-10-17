@@ -34,13 +34,13 @@ export const Login = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     if (!validate()) return;
 
-    const result = login(email, password);
+    const result = await login(email, password);
     if (result.success) {
       // Si es admin o vendedor, redirigir al panel admin
       if (result.user.rol === 'ADMIN' || result.user.rol === 'VENDEDOR') {

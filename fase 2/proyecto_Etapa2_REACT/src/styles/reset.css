@@ -39,6 +39,11 @@ img, picture, video, canvas, svg {
   max-width: 100%;
 }
 
+/* Los iconos conservan su tamaño dentro de botones y filas flexibles. */
+svg.lucide {
+  flex-shrink: 0;
+}
+
 input, button, textarea, select {
   font: inherit;
 }

@@ -1,16 +1,42 @@
-# React + Vite
+# Aplicación React de Ferretería Los Maestros
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Segunda versión del proyecto DSY1104 Desarrollo FullStack II, Duoc UC. Implementa la tienda, el carrito, la compra simulada y la gestión local con React, Vite y CSS propio.
 
-Currently, two official plugins are available:
+Integrantes: Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+El [README principal](../../README.md) describe el alcance, las reglas comerciales y las cuentas de demostración. La [documentación de entrega](../../docs/README.md) reúne el ERS y el informe de pruebas, revisión 2.2.
 
-## React Compiler
+## Iniciar la aplicación
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Desde esta carpeta, con Node.js 24 y npm:
 
-## Expanding the Oxlint configuration
+```powershell
+npm ci
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+La dirección de desarrollo aparece en la terminal; por defecto es `http://localhost:5173`. Las dependencias están fijadas en `package-lock.json`. Node.js 18 no es compatible con esta entrega.
+
+## Comandos disponibles
+
+| Comando | Resultado |
+| --- | --- |
+| `npm run dev` | Inicia el servidor de desarrollo. |
+| `npm run build` | Compila la aplicación en `dist/`. |
+| `npm run preview` | Sirve la compilación de producción para revisión local. |
+| `npm test` | Inicia Vitest en modo interactivo. |
+| `npm run test:run` | Ejecuta la suite una vez. |
+| `npm run test:coverage` | Ejecuta pruebas y genera `coverage/index.html` y los contadores JSON. |
+| `npm run lint` | Ejecuta el análisis estático con Oxlint. |
+
+## Organización
+
+`src/pages/` contiene las vistas; `src/components/`, los componentes reutilizables; `src/context/`, la sesión y el carrito; `src/services/`, las reglas y la persistencia; `src/data/`, los datos iniciales; `src/styles/`, los estilos; y `src/test/`, las pruebas y su configuración de entorno.
+
+El catálogo inicial incluye 27 productos en siete categorías. Las imágenes y sus [créditos](public/assets/img/productos/CREDITOS.md) se almacenan en `public/assets/img/productos/` y se sirven desde el proyecto.
+
+## Alcance y verificación
+
+La aplicación conserva datos en el navegador. Los pagos, el despacho, el contacto y el crédito son demostraciones; no existe integración con backend ni base de datos compartida. La cobertura se representa mediante SVG y tarifas locales, sin servicio de mapas externo. Web Crypto requiere `localhost` o HTTPS.
+
+La medición final registra 92 pruebas aprobadas en 13 archivos y 60,85 % de cobertura global de líneas. La compilación se completó; Oxlint registró cero errores y seis advertencias. El [informe de pruebas y cobertura](<../../docs/PRUEBAS UNITARIAS/PRUEBAS_UNITARIAS.md>) detalla resultados, límites y reproducción.
