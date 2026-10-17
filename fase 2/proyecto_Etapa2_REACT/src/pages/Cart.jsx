@@ -65,7 +65,7 @@ export const Cart = () => {
         </p>
       </div>
 
-      <div className="grid-2" style={{ gridTemplateColumns: '2fr 1fr', gap: '2rem', alignItems: 'start' }}>
+      <div className="grid-2 cart-layout" style={{ gap: '2rem', alignItems: 'start' }}>
         {/* TABLA DE PRODUCTOS TÁCTIL */}
         <div>
           <div className="table-container-tactile">
@@ -153,7 +153,7 @@ export const Cart = () => {
             </table>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem' }}>
             <Link to="/productos" className="btn-tactile btn-tactile-sm">
               <ArrowLeft size={16} /> Seguir Comprando
             </Link>
