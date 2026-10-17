@@ -593,6 +593,34 @@
   .coverage-details dl { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* --- NOSOTROS: TRAYECTORIA Y VALORES INTERACTIVOS --- */
+.about-overview > .bento-card { min-width: 0; padding: clamp(var(--space-lg), 2.5vw, var(--space-xl)); }
+.about-card-title { font-size: 1.6rem; line-height: 1.2; margin-bottom: var(--space-md); }
+.about-history-copy { margin-bottom: var(--space-xl); font-size: 1.025rem; line-height: 1.7; }
+.about-history-copy p { margin-bottom: var(--space-md); }
+.about-history-footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-lg); margin-top: auto; padding-top: var(--space-lg); border-top: var(--border-sm); }
+.about-history-years { display: flex; flex-direction: column; gap: var(--space-sm); flex: 0 0 auto; }
+.about-history-years strong { font-size: 3.5rem; line-height: 1; letter-spacing: -0.06em; font-weight: 900; }
+.about-history-years span { max-width: 14ch; font-size: 0.65rem; line-height: 1.5; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.about-history-signature { flex: 1 1 180px; min-width: 0; }
+.about-history-signature p { font-size: 0.9rem; line-height: 1.6; }
+.about-history-signature p:last-child { margin-bottom: 0; color: var(--text-muted); }
+.about-values .about-values-badge { background: var(--color-primary); color: var(--text-main); }
+.about-values .about-values-intro { margin-bottom: 0; font-size: 0.9rem; line-height: 1.6; }
+.about-values-buttons { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-block: var(--space-lg); }
+.about-values-buttons .btn-tactile { flex: 1 1 90px; min-width: 0; flex-direction: column; gap: var(--space-sm); padding: 0.75rem 0.5rem; font-size: 0.8rem; background: var(--color-secondary-hover); color: var(--text-inverse); border-color: var(--text-muted); }
+.about-values-buttons .btn-tactile[aria-pressed="true"] { background: var(--color-primary); color: var(--text-main); border-color: var(--border-color); }
+.about-values-buttons .btn-tactile:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 4px; }
+.about-value-detail { display: flex; flex: 1; flex-direction: column; gap: var(--space-md); }
+.about-value-title { display: flex; align-items: flex-start; gap: var(--space-sm); font-size: 1.05rem; line-height: 1.5; }
+.about-value-title svg { margin-top: 2px; color: var(--color-primary); }
+.about-value-detail > p, .about-value-example p { margin-bottom: 0; font-size: 0.9rem; line-height: 1.7; }
+.about-value-example { padding: var(--space-md); background: var(--color-secondary-hover); border-left: var(--border-heavy); border-left-color: var(--color-primary); border-radius: var(--radius-sm); }
+.about-eyebrow { display: block; margin-bottom: var(--space-sm); color: var(--color-primary); font-size: 0.65rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.about-value-example h4 { margin-bottom: var(--space-sm); font-size: 0.95rem; line-height: 1.5; }
+.about-value-detail .about-value-note { display: flex; align-items: flex-start; gap: var(--space-sm); margin-top: auto; padding-top: var(--space-sm); font-size: 0.8rem; }
+.about-value-note svg { margin-top: 3px; color: var(--color-primary); }
+
 /* --- FOOTER TÁCTIL --- */
 .footer-tactile {
   background-color: var(--color-secondary);

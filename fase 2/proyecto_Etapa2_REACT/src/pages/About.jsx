@@ -1,8 +1,46 @@
-import React from 'react';
-import { Users, Award, ShieldCheck, HeartHandshake } from 'lucide-react';
+import React, { useState } from 'react';
+import { Users, Award, ShieldCheck, HeartHandshake, ArrowUpRight } from 'lucide-react';
 import { CoverageMap } from '../components/common/CoverageMap';
 
+// Valores de la empresa y ejemplos de su aplicación en la atención del mesón.
+const companyValues = [
+  {
+    id: 'compromiso',
+    nombre: 'Compromiso',
+    icon: ShieldCheck,
+    titulo: 'Tu obra necesita respuestas claras.',
+    descripcion: 'Una compra comienza por entender qué necesitas, qué materiales están disponibles y cómo se coordinará la entrega. Queremos que puedas organizar tu trabajo con información clara desde la primera consulta.',
+    ejemploTitulo: 'Necesitas materiales para comenzar una faena.',
+    ejemplo: 'Revisamos las existencias y las condiciones de entrega antes de cerrar el pedido. Si falta un material, conversamos las alternativas para que puedas organizar los siguientes pasos de tu obra.',
+    nota: 'Materiales y despacho, coordinados desde el mesón.'
+  },
+  {
+    id: 'experiencia',
+    nombre: 'Experiencia',
+    icon: Award,
+    titulo: 'El oficio también se comparte.',
+    descripcion: 'Cada reparación y cada obra requieren materiales y herramientas adecuados. Nuestra experiencia en ferretería se traduce en orientación práctica para comparar opciones y comprender sus usos antes de elegir.',
+    ejemploTitulo: 'Buscas una herramienta para un trabajo específico.',
+    ejemplo: 'Te ayudamos a revisar sus características, medidas y accesorios, considerando el material que vas a trabajar. La idea es que conozcas las diferencias entre las alternativas y elijas con mayor confianza.',
+    nota: 'Conocimiento del rubro al servicio de tu proyecto.'
+  },
+  {
+    id: 'confianza',
+    nombre: 'Confianza',
+    icon: HeartHandshake,
+    titulo: 'Una relación que continúa después de la compra.',
+    descripcion: 'Atendemos a familias, maestros y contratistas que necesitan un proveedor cercano. Construimos esa relación con acuerdos claros sobre los productos, la entrega y las condiciones de cada compra.',
+    ejemploTitulo: 'Coordinas compras para las distintas etapas de una obra.',
+    ejemplo: 'Conversamos las cantidades, el retiro o despacho y las condiciones de pago antes de confirmar. Para clientes habilitados con cuenta corriente, la claridad en sus compras y saldos es parte de esa relación.',
+    nota: 'Atención cercana y cuentas claras para seguir construyendo.'
+  }
+];
+
 export const About = () => {
+  const [activeValue, setActiveValue] = useState('compromiso');
+  const selectedValue = companyValues.find(value => value.id === activeValue);
+  const SelectedValueIcon = selectedValue.icon;
+
   const team = [
     {
       nombre: 'Don Carlos Vega Osorio',
@@ -42,50 +80,92 @@ export const About = () => {
         </p>
       </div>
 
-      {/* HISTORIA EN BENTO GRID */}
-      <div className="bento-grid" style={{ marginBottom: 'var(--space-2xl)' }}>
-        <article className="bento-card bento-col-span-2" style={{ padding: '2rem' }}>
-          <h2 style={{ fontSize: '1.6rem', marginBottom: '1rem', color: 'var(--color-secondary)' }}>
-            Nuestra Historia y Misión
-          </h2>
-          <p style={{ lineHeight: 1.7, color: '#334155', marginBottom: '1rem', fontSize: '1.025rem' }}>
-            <strong>Ferretería Los Maestros</strong> nació en la ciudad de La Serena como una iniciativa familiar 
-            para responder a una necesidad latente: los maestros de obra y contratistas requerían un proveedor que 
-            entendiera los tiempos de faena, mantuviera stock permanente sin falsas promesas y ofreciera condiciones 
-            de crédito accesibles.
-          </p>
-          <p style={{ lineHeight: 1.7, color: '#334155', fontSize: '1.025rem' }}>
-            Con más de dos décadas de experiencia, nos hemos consolidado como el punto de encuentro técnico en 
-            Av. Balmaceda, combinando atención cercana en mesón con herramientas digitales modernas de consulta y despacho.
-          </p>
+      {/* HISTORIA Y TRAYECTORIA EN BENTO GRID */}
+      <div className="grid-2 about-overview" style={{ marginBottom: 'var(--space-2xl)' }}>
+        <article className="bento-card about-history">
+          <div className="about-history-copy">
+            <h2 className="about-card-title">Nuestra Historia y Misión</h2>
+            <p>
+              <strong>Ferretería Los Maestros</strong> nació en la ciudad de La Serena como una iniciativa familiar
+              para responder a una necesidad latente: los maestros de obra y contratistas requerían un proveedor que
+              entendiera los tiempos de faena, mantuviera stock permanente sin falsas promesas y ofreciera condiciones
+              de crédito accesibles.
+            </p>
+            <p>
+              Con más de dos décadas de experiencia, nos hemos consolidado como el punto de encuentro técnico en
+              Av. Balmaceda, combinando atención cercana en mesón con herramientas digitales modernas de consulta y despacho.
+            </p>
+            <p>
+              Nuestra misión es facilitar el acceso a materiales y herramientas, con orientación para elegir
+              y una atención que entienda cada proyecto. Queremos que familias, maestros y contratistas encuentren
+              un apoyo cercano para planificar sus compras, desde una reparación en casa hasta una faena de mayor escala.
+            </p>
+          </div>
+
+          {/* CIERRE DE TRAYECTORIA */}
+          <div className="about-history-footer">
+            <div className="about-history-years">
+              <strong>22</strong>
+              <span>Años de trayectoria</span>
+            </div>
+            <div className="about-history-signature">
+              <p>El oficio nos reúne.<br /><strong>Tu proyecto nos mueve.</strong></p>
+              <p>
+                Desde La Serena, acompañamos a familias, maestros y contratistas en sus proyectos.
+                Cada consulta es una oportunidad para compartir experiencia y construir una relación de confianza,
+                desde la elección del material hasta la coordinación de su entrega.
+              </p>
+            </div>
+          </div>
         </article>
 
-        <article className="bento-card bento-card-dark" style={{ padding: '2rem' }}>
+        {/* VALORES INTERACTIVOS Y EJEMPLOS DE ATENCIÓN */}
+        <article className="bento-card bento-card-dark about-values">
           <div className="bento-header">
-            <span className="badge-tactile" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-secondary)' }}>
-              VALORES DE EMPRESA
-            </span>
+            <span className="badge-tactile about-values-badge">VALORES DE EMPRESA</span>
           </div>
-          <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
-            <li style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <ShieldCheck size={20} color="var(--color-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <div>
-                <strong style={{ color: '#ffffff' }}>Transparencia de Stock:</strong> Si el producto figura en el catálogo, está físicamente en bodega listo para entrega.
-              </div>
-            </li>
-            <li style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <HeartHandshake size={20} color="var(--color-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <div>
-                <strong style={{ color: '#ffffff' }}>Confianza con Contratistas:</strong> Cuentas corrientes claras sin sorpresas a fin de mes.
-              </div>
-            </li>
-            <li style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-              <Award size={20} color="var(--color-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <div>
-                <strong style={{ color: '#ffffff' }}>Marcas Certificadas:</strong> Solo materiales normalizados bajo estándares chilenos de calidad.
-              </div>
-            </li>
-          </ul>
+          <h2 className="about-card-title">Así trabajamos contigo</h2>
+          <p className="about-values-intro">
+            Conoce cómo llevamos nuestros valores a la atención de cada día. Selecciona uno para ver un ejemplo.
+          </p>
+
+          <div className="about-values-buttons" role="group" aria-label="Valores de la empresa">
+            {companyValues.map(value => {
+              const ValueIcon = value.icon;
+              return (
+                <button
+                  key={value.id}
+                  type="button"
+                  className="btn-tactile"
+                  aria-pressed={activeValue === value.id}
+                  aria-controls="about-value-detail"
+                  onClick={() => setActiveValue(value.id)}
+                >
+                  <ValueIcon size={20} aria-hidden="true" />
+                  <span>{value.nombre}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <section id="about-value-detail" className="about-value-detail" aria-label="Detalle del valor seleccionado" aria-live="polite" aria-atomic="true">
+            <h3 className="about-value-title">
+              <SelectedValueIcon size={22} aria-hidden="true" />
+              <span>{selectedValue.titulo}</span>
+            </h3>
+            <p>{selectedValue.descripcion}</p>
+
+            <div className="about-value-example">
+              <span className="about-eyebrow">En el mesón</span>
+              <h4>{selectedValue.ejemploTitulo}</h4>
+              <p>{selectedValue.ejemplo}</p>
+            </div>
+
+            <p className="about-value-note">
+              <ArrowUpRight size={16} aria-hidden="true" />
+              <span>{selectedValue.nota}</span>
+            </p>
+          </section>
         </article>
       </div>
 
