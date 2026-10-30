@@ -4,6 +4,8 @@ Proyecto de DSY1104 Desarrollo FullStack II, Duoc UC. La segunda versión implem
 
 **Integrantes:** Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
 
+**Preparación de la tercera entrega:** [Fase 3](<Fase 3/README.md>) reúne los anexos del profesor, dos plantillas Spring Boot configuradas y el reparto propuesto entre Martín (Usuarios), Jeremy (catálogo) y Seba (pedidos). Los módulos de pedidos y cuenta corriente de Seba ya están implementados con cinco pruebas; las partes de catálogo y Usuarios y la integración React siguen pendientes. El resto de esta guía documenta la segunda versión.
+
 El caso corresponde a una ferretería familiar de La Serena, Región de Coquimbo. La aplicación permite consultar productos, preparar una compra, registrar pedidos simulados y gestionar datos locales según el perfil. El negocio contempla más de 800 referencias; esta entrega utiliza una selección inicial de **27 productos en siete categorías**.
 
 ## 🎯 Alcance de la segunda versión
@@ -41,6 +43,10 @@ LosMaestros/
 │       ├── package.json
 │       ├── package-lock.json
 │       └── vite.config.js
+├── Fase 3/                              # Preparación del backend e integración
+│   ├── backend/                         # Plantillas Usuarios y Ventas, sin lógica de negocio
+│   ├── frontend/                        # Destino reservado para React integrado
+│   └── documentacion/                   # Propuesta, plan y anexos del profesor
 └── docs/
     ├── README.md
     ├── ERS actualizado (v2)/            # ERS vigente en Word y Markdown
