@@ -8,7 +8,11 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.ConcurrencyFailureException;
 
-@RestControllerAdvice(basePackages = {"cl.losmaestros.ventas.pedidos.controller", "cl.losmaestros.ventas.cuentacorriente.controller"})
+@RestControllerAdvice(basePackages = {
+    "cl.losmaestros.ventas.pedidos.controller",
+    "cl.losmaestros.ventas.cuentacorriente.controller",
+    "cl.losmaestros.ventas.catalogo.controller"
+})
 public class ErroresPedidos {
     @ExceptionHandler(NegocioException.class)
     ResponseEntity<?> negocio(NegocioException e) {

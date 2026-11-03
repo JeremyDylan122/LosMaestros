@@ -1,0 +1,510 @@
+import { storageService } from './storageService';
+import { initialProducts } from '../data/initialProducts';
+
+const STORAGE_KEY = 'products';
+
+// URL de la API REST de Ventas configurada vía variable de entorno Vite (Fase 3)
+const API_VENTAS_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_VENTAS_URL) 
+  ? import.meta.env.VITE_API_VENTAS_URL 
+  : 'http://localhost:8082/api/v1';
+
+// Mapeo canónico de categorías a IDs del backend relacional
+const CATEGORY_MAP = {
+  'Materiales de Construcción': 1,
+  'Herramientas Eléctricas': 2,
+  'Herramientas Manuales': 3,
+  'Gasfitería': 4,
+  'Electricidad': 5,
+  'Pinturas': 6,
+  'Seguridad': 7
+};
+
+// Imágenes genéricas de la versión anterior, usadas solo para actualizar sus referencias.
+const LEGACY_CATEGORY_IMAGES = {
+  'Materiales de Construcción': 'cemento.jpg',
+  Pinturas: 'pintura.jpg',
+  'Herramientas Manuales': 'martillo.jpg',
+  'Herramientas Eléctricas': 'taladro.jpg',
+  Gasfitería: 'tuberia-pvc.jpg',
+  Electricidad: 'taladro.jpg',
+  Seguridad: 'casco.jpg'
+};
+const INITIAL_PRODUCTS_BY_CODE = new Map(initialProducts.map(product => [product.codigo, product]));
+
+function getAuthHeaders(token) {
+  const headers = { 'Content-Type': 'application/json' };
+  const resolvedToken = token || (typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null);
+  if (resolvedToken) {
+    headers['Authorization'] = `Bearer ${resolvedToken}`;
+  }
+  return headers;
+}
+
+export const productService = {
+  /**
+   * Obtiene el precio unitario considerando ofertas activas
+   */
+  getUnitPrice(product) {
+    if (!product) return 0;
+    return product.enOferta && product.descuento > 0
+      ? Math.round(product.precio * (1 - product.descuento / 100)) : product.precio;
+  },
+
+  /**
+   * Validación de campos obligatorios y rangos numéricos
+   */
+  validateProduct(product) {
+    if (!product.codigo?.trim() || !product.nombre?.trim() || !product.categoria?.trim()) {
+      throw new Error('Código, nombre y categoría son obligatorios.');
+    }
+    for (const field of ['precio', 'stock', 'stockMinimo', 'descuento']) {
+      const value = Number(product[field] ?? 0);
+      if (!Number.isFinite(value) || value < 0) {
+        throw new Error('Precio, existencias y descuento deben ser números no negativos.');
+      }
+    }
+    if (!Number.isInteger(Number(product.stock)) || !Number.isInteger(Number(product.stockMinimo ?? 0))) {
+      throw new Error('El stock debe ser un número entero.');
+    }
+    if (Number(product.descuento) > 100) {
+      throw new Error('El descuento no puede superar 100%.');
+    }
+  },
+
+  /**
+   * Obtiene todos los productos almacenados o inicializa con la semilla
+   * @returns {Array}
+   */
+  getProducts() {
+    const products = storageService.init(STORAGE_KEY, initialProducts);
+    let imagesUpdated = false;
+    const updatedProducts = products.map(product => {
+      const initial = INITIAL_PRODUCTS_BY_CODE.get(product.codigo);
+      if (!initial || product.imagen === initial.imagen) return product;
+
+      const legacyImage = `/assets/img/productos/${LEGACY_CATEGORY_IMAGES[initial.categoria]}`;
+      if (product.imagen !== legacyImage) return product;
+
+      imagesUpdated = true;
+      return { ...product, imagen: initial.imagen };
+    });
+
+    if (imagesUpdated) storageService.set(STORAGE_KEY, updatedProducts);
+    return updatedProducts;
+  },
+
+  /**
+   * Obtiene un producto por su ID (sincrónico)
+   */
+  getProductById(id) {
+    const products = this.getProducts();
+    return products.find(p => Number(p.id) === Number(id)) || null;
+  },
+
+  /**
+   * Obtiene un producto por su código SKU (sincrónico)
+   */
+  getProductByCode(codigo) {
+    if (!codigo) return null;
+    const products = this.getProducts();
+    return products.find(p => p.codigo.trim().toUpperCase() === codigo.trim().toUpperCase()) || null;
+  },
+
+  /**
+   * Crea un nuevo producto (sincrónico)
+   */
+  createProduct(productData) {
+    const products = this.getProducts();
+
+    if (this.getProductByCode(productData.codigo)) {
+      throw new Error(`El código de producto "${productData.codigo}" ya existe.`);
+    }
+
+    const nextId = products.length > 0 ? Math.max(...products.map(p => Number(p.id) || 0)) + 1 : 1;
+
+    const newProduct = {
+      id: nextId,
+      codigo: productData.codigo.trim().toUpperCase(),
+      nombre: productData.nombre.trim(),
+      categoria: productData.categoria.trim(),
+      subcategoria: productData.subcategoria ? productData.subcategoria.trim() : 'General',
+      marca: productData.marca ? productData.marca.trim() : 'Genérico',
+      unidad: productData.unidad ? productData.unidad.trim() : 'Unidad',
+      precio: Number(productData.precio) || 0,
+      precioCompra: Number(productData.precioCompra) || 0,
+      stock: Math.max(0, parseInt(productData.stock, 10) || 0),
+      stockMinimo: Math.max(0, parseInt(productData.stockMinimo, 10) || 0),
+      enOferta: Boolean(productData.enOferta),
+      descuento: Number(productData.descuento) || 0,
+      descripcion: productData.descripcion ? productData.descripcion.trim() : '',
+      imagen: productData.imagen || '/assets/img/productos/cemento.jpg',
+      especificaciones: productData.especificaciones || '',
+      activo: productData.activo !== undefined ? Boolean(productData.activo) : true
+    };
+
+    this.validateProduct(productData);
+    products.push(newProduct);
+    storageService.set(STORAGE_KEY, products);
+    return newProduct;
+  },
+
+  /**
+   * Actualiza un producto existente (sincrónico)
+   */
+  updateProduct(id, updatedData) {
+    const products = this.getProducts();
+    const index = products.findIndex(p => Number(p.id) === Number(id));
+
+    if (index === -1) {
+      throw new Error(`Producto con ID ${id} no encontrado.`);
+    }
+
+    if (updatedData.codigo && updatedData.codigo !== products[index].codigo) {
+      const existing = this.getProductByCode(updatedData.codigo);
+      if (existing && Number(existing.id) !== Number(id)) {
+        throw new Error(`El código "${updatedData.codigo}" ya está en uso por otro producto.`);
+      }
+    }
+
+    const current = products[index];
+    const updatedProduct = {
+      ...current,
+      ...updatedData,
+      id: current.id,
+      codigo: updatedData.codigo ? updatedData.codigo.trim().toUpperCase() : current.codigo,
+      precio: updatedData.precio !== undefined ? Number(updatedData.precio) : current.precio,
+      stock: updatedData.stock !== undefined ? Math.max(0, parseInt(updatedData.stock, 10)) : current.stock,
+      stockMinimo: updatedData.stockMinimo !== undefined ? Math.max(0, parseInt(updatedData.stockMinimo, 10)) : current.stockMinimo,
+      enOferta: updatedData.enOferta !== undefined ? Boolean(updatedData.enOferta) : current.enOferta,
+      descuento: updatedData.descuento !== undefined ? Number(updatedData.descuento) : current.descuento
+    };
+
+    this.validateProduct({ ...current, ...updatedData });
+    products[index] = updatedProduct;
+    storageService.set(STORAGE_KEY, products);
+    return updatedProduct;
+  },
+
+  /**
+   * Elimina un producto (sincrónico)
+   */
+  deleteProduct(id) {
+    const products = this.getProducts();
+    const filtered = products.filter(p => Number(p.id) !== Number(id));
+    if (filtered.length === products.length) {
+      return false;
+    }
+    storageService.set(STORAGE_KEY, filtered);
+    return true;
+  },
+
+  /**
+   * Reduce el inventario tras una compra confirmada
+   */
+  reduceStock(id, quantity) {
+    if (!Number.isInteger(quantity) || quantity <= 0) throw new Error('La cantidad debe ser un entero positivo.');
+    const product = this.getProductById(id);
+    if (!product) throw new Error('Producto no existe para descontar stock.');
+    if (product.stock < quantity) {
+      throw new Error(`Stock insuficiente para ${product.nombre}. Disponible: ${product.stock}, solicitado: ${quantity}.`);
+    }
+    return this.updateProduct(id, { stock: product.stock - quantity });
+  },
+
+  /**
+   * Obtiene la lista de categorías únicas
+   */
+  getCategories() {
+    const products = this.getProducts();
+    const categoriesSet = new Set(products.map(p => p.categoria));
+    return Array.from(categoriesSet);
+  },
+
+  /**
+   * Obtiene los productos con stock crítico (stock <= stockMinimo)
+   */
+  getCriticalStockProducts() {
+    const products = this.getProducts();
+    return products.filter(p => p.stock <= p.stockMinimo);
+  },
+
+  /**
+   * Obtiene los productos en oferta
+   */
+  getOfferProducts() {
+    const products = this.getProducts();
+    return products.filter(p => p.enOferta === true);
+  },
+
+  /**
+   * Filtra productos por múltiples criterios combinados
+   */
+  filterProducts({ category, search, minPrice, maxPrice, inOffer, criticalOnly } = {}) {
+    let list = this.getProducts();
+
+    if (category && category !== 'ALL') {
+      list = list.filter(p => p.categoria.toLowerCase() === category.toLowerCase());
+    }
+
+    if (search && search.trim() !== '') {
+      const q = search.trim().toLowerCase();
+      list = list.filter(p =>
+        p.nombre.toLowerCase().includes(q) ||
+        p.codigo.toLowerCase().includes(q) ||
+        p.marca.toLowerCase().includes(q) ||
+        p.categoria.toLowerCase().includes(q)
+      );
+    }
+
+    if (minPrice !== undefined && minPrice !== null && minPrice !== '') {
+      list = list.filter(p => p.precio >= Number(minPrice));
+    }
+
+    if (maxPrice !== undefined && maxPrice !== null && maxPrice !== '') {
+      list = list.filter(p => p.precio <= Number(maxPrice));
+    }
+
+    if (inOffer) {
+      list = list.filter(p => p.enOferta === true);
+    }
+
+    if (criticalOnly) {
+      list = list.filter(p => p.stock <= p.stockMinimo);
+    }
+
+    return list;
+  },
+
+  /**
+   * Restablece el catálogo a los datos semilla del Excel
+   */
+  resetToInitial() {
+    storageService.set(STORAGE_KEY, initialProducts);
+    return initialProducts;
+  },
+
+  // =========================================================================
+  // INTEGRACIÓN ASÍNCRONA REST API (FASE 3 - BACKEND VENTAS-SERVICE)
+  // =========================================================================
+
+  /**
+   * Consulta el catálogo asíncronamente desde el backend Spring Boot.
+   * Si la API está disponible, sincroniza el almacenamiento local.
+   * Si está offline o en entorno de tests sin servidor, retorna el catálogo local.
+   */
+  async fetchProducts({ categoriaId, enOferta, buscar, page = 0, size = 50 } = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (categoriaId) params.append('categoriaId', categoriaId);
+      if (enOferta !== undefined && enOferta !== null) params.append('enOferta', enOferta);
+      if (buscar) params.append('buscar', buscar);
+      params.append('page', page);
+      params.append('size', size);
+
+      const res = await fetch(`${API_VENTAS_URL}/productos?${params.toString()}`);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.json();
+      const list = Array.isArray(data) ? data : (data.content || []);
+      if (list.length > 0) {
+        storageService.set(STORAGE_KEY, list);
+      }
+      return list;
+    } catch {
+      return this.getProducts();
+    }
+  },
+
+  /**
+   * Obtiene un producto por ID desde el backend REST.
+   */
+  async fetchProductById(id) {
+    try {
+      const res = await fetch(`${API_VENTAS_URL}/productos/${id}`);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      return await res.json();
+    } catch {
+      return this.getProductById(id);
+    }
+  },
+
+  /**
+   * Obtiene categorías oficiales desde el backend REST.
+   */
+  async fetchCategories() {
+    try {
+      const res = await fetch(`${API_VENTAS_URL}/categorias`);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const categories = await res.json();
+      return categories.map(c => c.nombre || c);
+    } catch {
+      return this.getCategories();
+    }
+  },
+
+  /**
+   * Obtiene productos con stock crítico desde el backend REST.
+   */
+  async fetchCriticalStock() {
+    try {
+      const res = await fetch(`${API_VENTAS_URL}/productos/criticos`);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      return await res.json();
+    } catch {
+      return this.getCriticalStockProducts();
+    }
+  },
+
+  /**
+   * Obtiene productos en oferta desde el backend REST.
+   */
+  async fetchOffers() {
+    try {
+      const res = await fetch(`${API_VENTAS_URL}/productos/ofertas`);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      return await res.json();
+    } catch {
+      return this.getOfferProducts();
+    }
+  },
+
+  /**
+   * Crea un producto en el backend REST (Requiere ADMIN).
+   */
+  async createProductApi(productData, token) {
+    this.validateProduct(productData);
+
+    const categoriaId = productData.categoriaId || CATEGORY_MAP[productData.categoria] || 1;
+    const payload = {
+      codigo: productData.codigo.trim().toUpperCase(),
+      nombre: productData.nombre.trim(),
+      descripcion: productData.descripcion || '',
+      categoriaId: Number(categoriaId),
+      subcategoria: productData.subcategoria || 'General',
+      marca: productData.marca || 'Genérico',
+      unidad: productData.unidad || 'Unidad',
+      precio: Number(productData.precio) || 0,
+      precioCompra: Number(productData.precioCompra) || 0,
+      stock: Math.max(0, parseInt(productData.stock, 10) || 0),
+      stockMinimo: Math.max(0, parseInt(productData.stockMinimo, 10) || 0),
+      enOferta: Boolean(productData.enOferta),
+      descuento: Number(productData.descuento) || 0,
+      imagen: productData.imagen || '/assets/img/productos/cemento.jpg',
+      especificaciones: productData.especificaciones || ''
+    };
+
+    try {
+      const res = await fetch(`${API_VENTAS_URL}/productos`, {
+        method: 'POST',
+        headers: getAuthHeaders(token),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.mensaje || `Error al crear producto: HTTP ${res.status}`);
+      }
+      const created = await res.json();
+      this.createProduct(created);
+      return created;
+    } catch (err) {
+      // Si la API falla por conexión offline en desarrollo/test, realizar en local
+      if (err.message.includes('HTTP error') || err.message.includes('Failed to fetch')) {
+        return this.createProduct(productData);
+      }
+      throw err;
+    }
+  },
+
+  /**
+   * Actualiza un producto en el backend REST (Requiere ADMIN).
+   */
+  async updateProductApi(id, updatedData, token) {
+    const categoriaId = updatedData.categoriaId || CATEGORY_MAP[updatedData.categoria];
+    const payload = {
+      nombre: updatedData.nombre,
+      descripcion: updatedData.descripcion,
+      categoriaId: categoriaId ? Number(categoriaId) : undefined,
+      subcategoria: updatedData.subcategoria,
+      marca: updatedData.marca,
+      unidad: updatedData.unidad,
+      precio: updatedData.precio !== undefined ? Number(updatedData.precio) : undefined,
+      precioCompra: updatedData.precioCompra !== undefined ? Number(updatedData.precioCompra) : undefined,
+      stock: updatedData.stock !== undefined ? Math.max(0, parseInt(updatedData.stock, 10)) : undefined,
+      stockMinimo: updatedData.stockMinimo !== undefined ? Math.max(0, parseInt(updatedData.stockMinimo, 10)) : undefined,
+      enOferta: updatedData.enOferta !== undefined ? Boolean(updatedData.enOferta) : undefined,
+      descuento: updatedData.descuento !== undefined ? Number(updatedData.descuento) : undefined,
+      imagen: updatedData.imagen,
+      especificaciones: updatedData.especificaciones,
+      activo: updatedData.activo !== undefined ? Boolean(updatedData.activo) : undefined
+    };
+
+    try {
+      const res = await fetch(`${API_VENTAS_URL}/productos/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(token),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.mensaje || `Error al actualizar producto: HTTP ${res.status}`);
+      }
+      const updated = await res.json();
+      this.updateProduct(id, updated);
+      return updated;
+    } catch (err) {
+      if (err.message.includes('HTTP error') || err.message.includes('Failed to fetch')) {
+        return this.updateProduct(id, updatedData);
+      }
+      throw err;
+    }
+  },
+
+  /**
+   * Realiza un ajuste de stock vía PATCH en el backend REST (Requiere ADMIN).
+   */
+  async adjustStockApi(id, delta, token) {
+    try {
+      const res = await fetch(`${API_VENTAS_URL}/productos/${id}/stock`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(token),
+        body: JSON.stringify({ delta })
+      });
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.mensaje || `Error al ajustar stock: HTTP ${res.status}`);
+      }
+      const updated = await res.json();
+      this.updateProduct(id, { stock: updated.stock });
+      return updated;
+    } catch (err) {
+      if (err.message.includes('HTTP error') || err.message.includes('Failed to fetch')) {
+        const prod = this.getProductById(id);
+        if (prod) {
+          return this.updateProduct(id, { stock: Math.max(0, prod.stock + delta) });
+        }
+      }
+      throw err;
+    }
+  },
+
+  /**
+   * Elimina un producto en el backend REST (Requiere ADMIN).
+   */
+  async deleteProductApi(id, token) {
+    try {
+      const res = await fetch(`${API_VENTAS_URL}/productos/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(token)
+      });
+      if (!res.ok && res.status !== 204) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.mensaje || `Error al eliminar producto: HTTP ${res.status}`);
+      }
+      return this.deleteProduct(id);
+    } catch (err) {
+      if (err.message.includes('HTTP error') || err.message.includes('Failed to fetch')) {
+        return this.deleteProduct(id);
+      }
+      throw err;
+    }
+  }
+};

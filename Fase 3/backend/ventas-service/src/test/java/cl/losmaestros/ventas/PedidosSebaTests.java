@@ -40,7 +40,9 @@ class PedidosSebaTests {
     @TestConfiguration
     static class Colaboradores {
         @Bean UsuariosContratistas usuariosPrueba() { return id -> id==1; }
-        @Bean CatalogoPedidos catalogoPrueba(JdbcTemplate jdbc) {
+        @Bean
+        @org.springframework.context.annotation.Primary
+        CatalogoPedidos catalogoPrueba(JdbcTemplate jdbc) {
             return new CatalogoPedidos() {
                 public Producto bloquear(long id) {
                     assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isTrue();

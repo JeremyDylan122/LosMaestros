@@ -42,6 +42,7 @@ public class SeguridadPedidos {
         roles.setAuthoritiesClaimName("roles"); roles.setAuthorityPrefix("ROLE_");
         var converter=new JwtAuthenticationConverter(); converter.setJwtGrantedAuthoritiesConverter(roles);
         return http.securityMatcher("/api/v1/pedidos/**","/api/v1/cuentas-corrientes/**")
+            .cors(org.springframework.security.config.Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(a -> a
