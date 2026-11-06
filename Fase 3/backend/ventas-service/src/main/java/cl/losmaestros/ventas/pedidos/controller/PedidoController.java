@@ -4,6 +4,7 @@ import cl.losmaestros.ventas.pedidos.dto.*;
 import cl.losmaestros.ventas.pedidos.service.*;
 import cl.losmaestros.ventas.pedidos.entity.Pedido.Estado;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
+@SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/api/v1/pedidos")
 public class PedidoController {
     private final PedidoService servicio;

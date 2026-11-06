@@ -1,5 +1,7 @@
 # Crear previamente la base y exportar estas variables en la terminal/IDE.
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/losmaestros_ventas}
     username: ${DB_USERNAME}
@@ -7,3 +9,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+ventas:
+  jwt:
+    public-key-location: ${VENTAS_JWT_PUBLIC_KEY_LOCATION:}
+    issuer: ${VENTAS_JWT_ISSUER:losmaestros-usuarios}
+  usuarios:
+    url: ${VENTAS_USUARIOS_URL:http://localhost:8081}
+    internal-token: ${VENTAS_USUARIOS_INTERNAL_TOKEN:}

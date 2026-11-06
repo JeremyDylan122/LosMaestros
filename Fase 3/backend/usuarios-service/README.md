@@ -1,32 +1,45 @@
-# Servicio de Usuarios
+# Usuarios
 
-Responsabilidad propuesta: **Martín**.
-
-Plantilla configurada con Java 17, Spring Boot 3.5.16 y Maven Wrapper. Incluye Web, JPA, validación, Security, soporte JWT (Resource Server y JOSE), MySQL, H2, springdoc OpenAPI y dependencias de pruebas.
+Servicio Spring Boot de registro, sesión y administración de usuarios. Usa el puerto 8081 y el perfil `local` con H2 temporal por defecto.
 
 ## Ejecutar
 
-Desde esta carpeta, con JDK 17 instalado:
+Desde esta carpeta, en PowerShell:
 
-```bash
-./mvnw test
-./mvnw spring-boot:run
+```powershell
+.\mvnw.cmd test
+.\mvnw.cmd spring-boot:run
 ```
 
-En Windows usar `mvnw.cmd` en lugar de `./mvnw`. La primera ejecución descarga Maven y dependencias, por lo que necesita internet. Puerto predeterminado: `8081`. Cambiar con `SERVER_PORT` si está ocupado.
+Para habilitar el administrador inicial `admin@duoc.cl`, definir `USUARIOS_ADMIN_PASSWORD` antes de arrancar. La clave debe tener entre 4 y 10 caracteres, como en la interfaz existente. Se crea el usuario si la base aún no tiene un administrador. Swagger está en `http://localhost:8081/swagger-ui/index.html`.
 
-El perfil predeterminado `local` usa H2 temporal y no requiere MySQL. No hay entidades ni datos de negocio. Spring Security conserva su protección automática: no hay login propio, permisos ni emisión/validación JWT configurados todavía. Si aparece una contraseña temporal en la consola, pertenece a la configuración automática de Spring, no a usuarios de Los Maestros. Swagger (`/swagger-ui/index.html`) también está protegido por esa configuración inicial.
+Para MySQL, crear `losmaestros_usuarios`, ejecutar `database/usuarios-mysql.sql`, configurar `DB_USERNAME`, `DB_PASSWORD` y arrancar con el perfil `mysql`. Se puede cambiar la URL con `DB_URL`.
 
-Para MySQL, crear `losmaestros_usuarios`, definir `DB_USERNAME` y `DB_PASSWORD` (opcionalmente `DB_URL`) en la terminal o el IDE y ejecutar:
+El [entorno dedicado del proyecto](../README.md) usa MySQL en `localhost:3307`. Con el perfil `mysql`, este servicio carga el archivo local `.env` desde su carpeta. El ejemplo está en `.env.example`.
 
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=mysql
-```
+## API
 
-El perfil MySQL valida el esquema y no crea tablas: el responsable deberá preparar el esquema al implementar las entidades. No se ha verificado una conexión MySQL real. Un archivo `.env` no se carga automáticamente con esta plantilla.
+| Método y ruta | Permiso | Respuesta |
+| --- | --- | --- |
+| POST /api/v1/auth/registro | Público | 201 con `token` y `usuario`. Solo admite CLIENTE y CONTRATISTA. |
+| POST /api/v1/auth/login | Público | 200 con `token` y `usuario`, o 401 si las credenciales son inválidas. |
+| GET /api/v1/usuarios/me | Sesión válida | 200 con el perfil propio. |
+| GET /api/v1/usuarios | ADMIN | 200 con el listado. |
+| GET /api/v1/usuarios/{id} | ADMIN | 200 con el perfil solicitado. |
+| POST /api/v1/usuarios | ADMIN | 201 con el usuario creado. |
+| PUT /api/v1/usuarios/{id} | ADMIN | 200 con el usuario actualizado. Omitir `password` conserva la clave. |
+| DELETE /api/v1/usuarios/{id} | ADMIN | 204 con desactivación lógica. |
 
-## Estructura
+Los perfiles excluyen la contraseña y el hash. El RUN se valida con Módulo 11. El correo se normaliza antes de guardarlo. Un RUN o correo duplicado devuelve 409.
 
-Cada módulo contiene paquetes `controller`, `service`, `repository`, `entity` y `dto`, reservados mediante `package-info.java`. `config` y `exception` quedan preparados para configuración y errores comunes del servicio. No hay CRUD, reglas comerciales ni integración React implementados.
+## JWT
 
-Consultar el [reparto de trabajo](../../documentacion/PLAN_DE_TRABAJO.md). JWT, CORS y autorización son trabajo pendiente; las dependencias incluidas no equivalen a una seguridad terminada.
+Las rutas protegidas reciben `Authorization: Bearer <token>`. El token dura 30 minutos y lleva el ID del usuario en `sub`, su rol en el arreglo `roles` y el emisor `losmaestros-usuarios`. Configurar `USUARIOS_JWT_PRIVATE_KEY_LOCATION` y `USUARIOS_JWT_PUBLIC_KEY_LOCATION` con rutas `file:` a archivos PEM PKCS#8 y X.509 respectivamente. En local, si ambas variables están vacías, se genera un par RSA temporal al arrancar. Para que Ventas valide el mismo token, configurar el mismo PEM público en `VENTAS_JWT_PUBLIC_KEY_LOCATION` y mantener el emisor igual en ambos servicios.
+
+Desactivar impide nuevos inicios de sesión y el acceso a `/usuarios/me`. Los permisos de un JWT emitido se mantienen hasta su vencimiento. Los cambios de rol se reflejan en el próximo inicio de sesión.
+
+## Consulta interna desde Ventas
+
+`GET /api/v1/interno/usuarios/{id}` recibe la credencial de servicio en `X-Service-Token`. Configurar `USUARIOS_INTERNAL_TOKEN` en Usuarios y el mismo valor en `VENTAS_USUARIOS_INTERNAL_TOKEN` en Ventas. Mantener ese valor fuera del repositorio. Un JWT de usuario por sí solo no habilita esta ruta.
+
+La respuesta contiene únicamente `id`, `activo` y `rol`. Devuelve 404 si el usuario no existe y 401 si falta la credencial, es incorrecta o no está configurada. En Ventas, definir también `VENTAS_USUARIOS_URL=http://localhost:8081`, sin agregar `/api/v1`. La configuración y las verificaciones conjuntas se detallan en [implementación de Martín](../../documentacion/IMPLEMENTACION_MARTIN.md).

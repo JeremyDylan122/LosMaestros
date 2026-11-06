@@ -1,6 +1,7 @@
 package cl.losmaestros.ventas.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -19,6 +20,9 @@ import java.util.List;
 
 @Configuration
 public class SeguridadCatalogo {
+
+    @Value("${APP_CORS_ALLOWED_ORIGINS:http://localhost:*,http://127.0.0.1:*}")
+    private List<String> origenesPermitidos;
 
     @Bean
     @Order(2)
@@ -55,7 +59,7 @@ public class SeguridadCatalogo {
     @org.springframework.context.annotation.Primary
     CorsConfigurationSource corsConfigurationSource() {
         var config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
+        config.setAllowedOriginPatterns(origenesPermitidos);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

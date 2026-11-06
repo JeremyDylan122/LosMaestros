@@ -5,6 +5,7 @@ import cl.losmaestros.ventas.catalogo.service.CatalogoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -60,6 +61,7 @@ public class ProductoController {
         return ResponseEntity.ok(catalogoService.obtenerOfertas());
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping
     @Operation(summary = "Crear nuevo artículo en catálogo (Sólo Administrador)")
     public ResponseEntity<ProductoResponseDto> crear(@Valid @RequestBody ProductoCreacionDto dto) {
@@ -67,6 +69,7 @@ public class ProductoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar datos y ficha técnica de un producto (Sólo Administrador)")
     public ResponseEntity<ProductoResponseDto> actualizar(
@@ -76,6 +79,7 @@ public class ProductoController {
         return ResponseEntity.ok(catalogoService.actualizarProducto(id, dto));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @PatchMapping("/{id}/stock")
     @Operation(summary = "Ajuste rápido o reabastecimiento de existencias (Sólo Administrador)")
     public ResponseEntity<ProductoResponseDto> ajustarStock(
@@ -85,6 +89,7 @@ public class ProductoController {
         return ResponseEntity.ok(catalogoService.ajustarStock(id, dto.delta()));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     @Operation(summary = "Dar de baja lógica un producto del catálogo (Sólo Administrador)")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
