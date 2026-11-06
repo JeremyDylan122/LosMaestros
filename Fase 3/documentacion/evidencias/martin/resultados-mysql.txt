@@ -1,0 +1,8 @@
+MySQL 8.4.13 disponible en instancia aislada.
+Scripts originales importados en dos bases con usuarios y permisos separados.
+Ambos servicios arrancaron con mysql y ddl-auto=validate.
+Registro, duplicados, edición, hash BCrypt, catálogo y habilitación de contratista reales.
+Compra a crédito y rollback real por crédito insuficiente, sin cambios parciales de stock.
+Perfil, pedido, stock y deuda persisten tras reiniciar ambos servicios y MySQL.
+Anulación repetida devuelve stock y crédito una sola vez.
+Dos compras simultáneas sobre el mismo stock: una aceptada y otra rechazada, sin sobreventa.

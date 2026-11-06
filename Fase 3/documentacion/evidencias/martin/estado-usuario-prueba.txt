@@ -1,0 +1,5 @@
+Verificación del 5 de noviembre de 2026. Datos ficticios de prueba.
+Consulta sobre la base losmaestros_usuarios después de las operaciones de React.
+
+run	nombre	apellidos	rol	activo
+12345678-5	Prueba	React MySQL Editado	VENDEDOR	0

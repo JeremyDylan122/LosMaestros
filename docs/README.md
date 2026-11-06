@@ -1,37 +1,35 @@
 # Documentación de Ferretería Los Maestros
 
-Documentación vigente de la segunda entrega de DSY1104 Desarrollo FullStack II, Duoc UC. Ambos informes corresponden a la **revisión 2.2 del 16 de octubre de 2026**.
+Documentos de DSY1104 Desarrollo FullStack II, Duoc UC. La revisión 3.0 del 5 de noviembre de 2026 describe la implementación integrada en `Fase 3`. Integrantes: Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
 
-Integrantes: Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
+## Tercera entrega
 
-## Documentos de entrega
+| Documento | Archivo formal | Lectura en GitHub |
+| --- | --- | --- |
+| ERS actualizado | [Word](<ERS actualizado (v3)/ERS_Ferreteria_Los_Maestros_v3.docx>) | [Markdown](<ERS actualizado (v3)/ERS_actualizado_v3.md>) |
+| Manual de usuario con capturas | [Word](<Manual de usuario/Manual_Usuario_Los_Maestros_v3.docx>) | [Markdown](<Manual de usuario/MANUAL_USUARIO.md>) |
+| APIs e integración | [Word](<APIs e Integracion/APIs_e_Integracion_Los_Maestros_v3.docx>) | [Markdown](<APIs e Integracion/APIS_E_INTEGRACION.md>) |
+| Documentación de endpoints | [Excel](<APIs e Integracion/Documentacion_APIs_Los_Maestros_v3.xlsx>) | 26 operaciones con entrada, respuestas, autenticación, roles y observaciones. |
+| Informe de pruebas y cobertura v3 | [Word](<Pruebas unitarias (v3)/Informe_Pruebas_Unitarias_y_Cobertura_v3.docx>) | [Markdown](<Pruebas unitarias (v3)/PRUEBAS_UNITARIAS_V3.md>) |
 
-| Documento | Word | Markdown | Contenido |
-| --- | --- | --- | --- |
-| Especificación de Requisitos de Software | [ERS](<ERS actualizado (v2)/ERS_Ferreteria_Los_Maestros_v2.docx>) | [ERS](<ERS actualizado (v2)/ERS_actualizado_v2.md>) | Reglas del negocio y 57 requisitos, con estado, criterio de aceptación y aplicación actual. |
-| Informe de pruebas unitarias y cobertura | [Informe](<PRUEBAS UNITARIAS/Informe_Pruebas_Unitarias_y_Cobertura.docx>) | [Informe](<PRUEBAS UNITARIAS/PRUEBAS_UNITARIAS.md>) | Procedimiento, 92 pruebas en 13 archivos, cobertura, trazabilidad y límites de la revisión. |
+El ERS conserva el formato y los 57 identificadores de fase 2 y agrega RF-047 y RF-048. Registra 59 requisitos: 48 implementados en V3, 10 parciales y uno pendiente. El manual utiliza la estructura del anexo 4 y contiene 11 figuras con título y nota. El informe sigue el anexo 2 y explica modelo de datos, seguridad, contratos, comunicación y pruebas. El Excel completa las columnas del anexo 3 en dos hojas, una por servicio.
 
-Los Word son los documentos formales de entrega. Las versiones Markdown reproducen su cuerpo y añaden enlaces de navegación para consultarlos desde el repositorio. Cada documento se conserva una sola vez, en su carpeta correspondiente.
+Las capturas forman parte de los documentos y se conservan en [Manual de usuario/imagenes](<Manual de usuario/imagenes/>). Las pruebas registran 118 casos de React y 25 del backend. La compilación fue correcta y lint informó cero errores y nueve advertencias. Las pruebas de Java utilizan H2; los recorridos de integración con MySQL se documentan por separado. El informe de pruebas v3 incorpora una nueva medición de cobertura React: 70,39 % de líneas, con [resultados y contadores por archivo](<Pruebas unitarias (v3)/evidencias/resultados-v3.json>). No se midió cobertura Java. Los resultados anteriores del informe de integración se conservan como registro previo a esta medición.
 
-## Alcance documentado
+- [Resultados automáticos de fase 3](<APIs e Integracion/evidencias/resultados-automaticos-v3.txt>).
+- [Resultados de integración y revisión manual](<APIs e Integracion/evidencias/resultados-integracion-v3.txt>).
+- [Instalación y ejecución del backend](<../Fase 3/backend/README.md>).
+- [Instalación y ejecución de React](<../Fase 3/frontend/README.md>).
+- [Plantillas docentes conservadas](<../Fase 3/documentacion/referencias-profesor/>).
+- [Preparación del despliegue completo en AWS Academy / EC2](<../Fase 3/despliegue/README.md>).
 
-La V2 utiliza React, Vite, CSS propio y almacenamiento en el navegador. El ERS distingue 38 requisitos implementados en este alcance local, 15 parciales y cuatro pendientes. Del total de 57 requisitos, 46 son funcionales, ocho no funcionales y tres restricciones técnicas.
+El alcance es un entorno local con pagos simulados. Los reportes por período, geocodificación exacta, video y despliegue completo en AWS siguen pendientes. Las instrucciones de entrega solicitan enlaces y comprimidos separados de frontend y backend; preparar, publicar y enviar esos artefactos al docente es una tarea posterior a la revisión de estos documentos.
 
-El crédito automático de contratistas, los montos precargados y las tarifas corresponden a la demostración. La integración con servidor, base de datos, pagos reales y verificación geográfica exacta pertenece a etapas posteriores. La [guía principal](../README.md) explica la ejecución, los perfiles y las reglas observables.
+## Antecedentes de fase 2
 
-## Resultados documentados
+| Documento histórico | Word | Markdown |
+| --- | --- | --- |
+| ERS revisión 2.2 del 16/10/2026 | [ERS](<ERS actualizado (v2)/ERS_Ferreteria_Los_Maestros_v2.docx>) | [ERS](<ERS actualizado (v2)/ERS_actualizado_v2.md>) |
+| Informe de pruebas unitarias y cobertura | [Informe](<PRUEBAS UNITARIAS/Informe_Pruebas_Unitarias_y_Cobertura.docx>) | [Informe](<PRUEBAS UNITARIAS/PRUEBAS_UNITARIAS.md>) |
 
-La medición final registra 92 pruebas aprobadas, sin fallos ni casos omitidos. La cobertura es 59,83 % de sentencias, 53,34 % de ramas, 49,57 % de funciones y 60,85 % de líneas. La compilación se completó y Oxlint informó cero errores y seis advertencias.
-
-El informe de pruebas contiene las métricas finales, las comprobaciones en navegador y los comandos necesarios para reproducir la medición.
-
-```text
-docs/
-├── README.md
-├── ERS actualizado (v2)/
-│   ├── ERS_Ferreteria_Los_Maestros_v2.docx
-│   └── ERS_actualizado_v2.md
-└── PRUEBAS UNITARIAS/
-    ├── Informe_Pruebas_Unitarias_y_Cobertura.docx
-    └── PRUEBAS_UNITARIAS.md
-```
+Estos archivos se mantienen sin modificaciones. El informe histórico registra 92 pruebas y su medición de cobertura. La pauta de fase 3 solicita ERS, manual, documentación de APIs y documento APIs e integración; no solicita explícitamente reemplazar ese informe de cobertura. El informe v3 se agrega como complemento, con una ejecución y medición propias de la etapa integrada.

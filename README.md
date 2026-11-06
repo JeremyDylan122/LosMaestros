@@ -4,7 +4,7 @@ Proyecto de DSY1104 Desarrollo FullStack II, Duoc UC. La segunda versión implem
 
 **Integrantes:** Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
 
-**Preparación de la tercera entrega:** [Fase 3](<Fase 3/README.md>) reúne los anexos del profesor, dos plantillas Spring Boot configuradas y el reparto propuesto entre Martín (Usuarios), Jeremy (catálogo) y Seba (pedidos). Los módulos de pedidos y cuenta corriente de Seba ya están implementados con cinco pruebas; las partes de catálogo y Usuarios y la integración React siguen pendientes. El resto de esta guía documenta la segunda versión.
+**Tercera entrega:** [Fase 3](<Fase 3/README.md>) contiene los servicios Spring Boot de Usuarios y Ventas, el frontend React y la documentación de implementación. Usuarios, catálogo, checkout, historial y cuenta corriente están integrados con React y MySQL. Se verificaron compras, anulación, restitución de stock y crédito y persistencia. Los [documentos de fase 3](docs/README.md) reúnen ERS actualizado, manual y documentación de APIs e integración. La guía de fase 3 incluye instalación, responsabilidades, pruebas y evidencias. El resto de este README documenta la segunda versión.
 
 El caso corresponde a una ferretería familiar de La Serena, Región de Coquimbo. La aplicación permite consultar productos, preparar una compra, registrar pedidos simulados y gestionar datos locales según el perfil. El negocio contempla más de 800 referencias; esta entrega utiliza una selección inicial de **27 productos en siete categorías**.
 
@@ -43,17 +43,17 @@ LosMaestros/
 │       ├── package.json
 │       ├── package-lock.json
 │       └── vite.config.js
-├── Fase 3/                              # Preparación del backend e integración
-│   ├── backend/                         # Plantillas Usuarios y Ventas, sin lógica de negocio
-│   ├── frontend/                        # Destino reservado para React integrado
-│   └── documentacion/                   # Propuesta, plan y anexos del profesor
+├── Fase 3/                              # Backend e integración de la tercera entrega
+│   ├── backend/                         # Usuarios, Ventas y preparación de MySQL
+│   ├── frontend/                        # React con integración de APIs
+│   └── documentacion/                   # Implementaciones, pruebas, evidencias y anexos
 └── docs/
     ├── README.md
-    ├── ERS actualizado (v2)/            # ERS vigente en Word y Markdown
-    └── PRUEBAS UNITARIAS/               # Informe vigente en Word y Markdown
+    ├── ERS actualizado (v2)/            # Antecedente de fase 2 en Word y Markdown
+    └── PRUEBAS UNITARIAS/               # Informe histórico de fase 2 en Word y Markdown
 ```
 
-La primera etapa se conserva como antecedente. El desarrollo y las pruebas de la entrega actual corresponden a la carpeta React.
+La primera etapa se conserva como antecedente. El desarrollo y las pruebas de la segunda entrega corresponden a su carpeta React. La tercera entrega se desarrolla en `Fase 3/`.
 
 ## 🛠️ Tecnologías y presentación
 

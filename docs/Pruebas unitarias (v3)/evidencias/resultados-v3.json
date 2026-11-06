@@ -1,0 +1,1516 @@
+{
+  "fecha": "2026-11-05",
+  "frontend": [
+    {
+      "archivo": "src/test/pages/Access.test.jsx",
+      "pruebas": 5,
+      "casos": [
+        {
+          "nombre": "Acceso con sesión validada por Usuarios descarta la sesión local de fase 2 y redirige a login",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Acceso con sesión validada por Usuarios bloquea al cliente en administración según el perfil del servidor",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Acceso con sesión validada por Usuarios muestra el historial devuelto para la sesión del titular",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Acceso con sesión validada por Usuarios rechaza RUN inválido desde el formulario administrativo",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Acceso con sesión validada por Usuarios conserva el token ante una falla de red y permite revalidar",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/AdminUsers.test.jsx",
+      "pruebas": 2,
+      "casos": [
+        {
+          "nombre": "Mantenedor de usuarios conectado conserva el formulario y el listado si el servidor rechaza la creación",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Mantenedor de usuarios conectado envía un perfil completo al cambiar de rol y refleja la desactivación confirmada",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/AuthSession.test.jsx",
+      "pruebas": 7,
+      "casos": [
+        {
+          "nombre": "Ciclo de sesión remota conserva el mismo formulario mientras revalida al recuperar el foco",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Ciclo de sesión remota una falla de red durante la revalidación conserva la página y el token",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Ciclo de sesión remota los cambios de rol siguen restringiendo el acceso al revalidar",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Ciclo de sesión remota el cierre de sesión en otra pestaña retira el acceso a la página",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Ciclo de sesión remota una sesión vencida al recuperar el foco sigue cerrándose",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Ciclo de sesión remota restaura el perfil desde el servidor y elimina el token al salir",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Ciclo de sesión remota el rechazo 401 del perfil elimina la sesión vencida",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/Cart.test.jsx",
+      "pruebas": 3,
+      "casos": [
+        {
+          "nombre": "Página del Carrito de Compras (Cart) debe mostrar el mensaje de carrito vacío cuando no hay ítems guardados",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Página del Carrito de Compras (Cart) debe renderizar los productos, subtotales y el botón de Checkout cuando tiene ítems",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Página del Carrito de Compras (Cart) debe incrementar la cantidad del ítem y recalcular el total al hacer clic en el botón +",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/Checkout.test.jsx",
+      "pruebas": 6,
+      "casos": [
+        {
+          "nombre": "Checkout completo mantiene la confirmación después de vaciar el carrito y muestra el flete",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Checkout completo un fallo de pago simulado conserva carrito y existencias",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Checkout completo muestra el error del servicio sin informar compra exitosa",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Checkout completo mantiene los datos de entrega editados cuando llega una actualización del perfil",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Checkout completo evita dos envíos mientras el primer pedido sigue pendiente",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Checkout completo el detalle informa una anulación sin presentar un cargo vigente",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/Contact.test.jsx",
+      "pruebas": 4,
+      "casos": [
+        {
+          "nombre": "Página de Contacto y Cotizaciones (Contact) debe renderizar los campos del formulario de contacto",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Página de Contacto y Cotizaciones (Contact) debe mostrar errores de validación condicionales cuando se envía el formulario vacío",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Página de Contacto y Cotizaciones (Contact) debe mostrar error cuando el correo ingresado no pertenece a los dominios permitidos",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Página de Contacto y Cotizaciones (Contact) debe procesar el formulario con éxito y mostrar la alerta de confirmación cuando los datos son válidos",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/Login.test.jsx",
+      "pruebas": 3,
+      "casos": [
+        {
+          "nombre": "Login con Usuarios muestra el formulario de acceso",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Login con Usuarios valida los campos antes de enviar",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Login con Usuarios muestra el error del servidor y permite reintentar sin crear una sesión local",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/ProductNavigation.test.jsx",
+      "pruebas": 4,
+      "casos": [
+        {
+          "nombre": "Filtros del catálogo y navegación retira la categoría anterior cuando se vuelve al catálogo sin filtros",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Filtros del catálogo y navegación no conserva ofertas activas después de volver al catálogo completo",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Filtros del catálogo y navegación recupera el término de búsqueda al retroceder en el navegador",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Filtros del catálogo y navegación ordena por el precio con descuento que paga el cliente",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/Register.test.jsx",
+      "pruebas": 2,
+      "casos": [
+        {
+          "nombre": "Registro conectado crea sesión con el token del servidor sin habilitar crédito en el formulario",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Registro conectado muestra el rechazo de registro y conserva los campos para corregirlos",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/pages/VentasIntegration.test.jsx",
+      "pruebas": 6,
+      "casos": [
+        {
+          "nombre": "Integración visible de Ventas el comprobante administrativo muestra cantidades, precios y entrega del pedido REST",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Integración visible de Ventas carga cupo y deuda de Ventas; guardar solo modifica cupo y activación",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Integración visible de Ventas conserva el cupo escrito cuando Ventas rechaza la configuración",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Integración visible de Ventas muestra el error del catálogo y permite volver a consultar",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Integración visible de Ventas el perfil 1 respeta permisos de estado de pedidos",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Integración visible de Ventas el perfil 2 respeta permisos de estado de pedidos",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/services/catalogoJeremyFase3.test.jsx",
+      "pruebas": 7,
+      "casos": [
+        {
+          "nombre": "Fase 3 - Módulo Catálogo e Inventario (Jeremy) Integración API REST asíncrona de Catálogo (productService) debe consultar productos desde API REST y actualizar almacenamiento local",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Fase 3 - Módulo Catálogo e Inventario (Jeremy) Integración API REST asíncrona de Catálogo (productService) debe crear un nuevo producto vía API REST POST",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Fase 3 - Módulo Catálogo e Inventario (Jeremy) Integración API REST asíncrona de Catálogo (productService) debe ajustar stock vía API REST PATCH",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Fase 3 - Módulo Catálogo e Inventario (Jeremy) Integración API REST asíncrona de Catálogo (productService) debe eliminar producto vía API REST DELETE",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Fase 3 - Módulo Catálogo e Inventario (Jeremy) Restricción RBAC: VENDEDOR en modo sólo lectura en AdminDashboard el perfil ADMINISTRADOR visualiza botón de crear producto y acciones de edición",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Fase 3 - Módulo Catálogo e Inventario (Jeremy) Restricción RBAC: VENDEDOR en modo sólo lectura en AdminDashboard el perfil VENDEDOR no visualiza botón de creación y ve etiquetas \"Solo Lectura\"",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Fase 3 - Módulo Catálogo e Inventario (Jeremy) Restricción RBAC: VENDEDOR en modo sólo lectura en AdminDashboard el perfil VENDEDOR en la pestaña Resumen no puede realizar ajustes rápidos de stock ni editar",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/services/orderService.test.js",
+      "pruebas": 10,
+      "casos": [
+        {
+          "nombre": "Pedidos REST envía cantidades sin aceptar identidad ni precios del navegador",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST consulta todas las páginas del historial autorizado por Ventas",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST actualiza estados con PATCH y conserva la respuesta del servidor",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST propaga errores 401 sin crear una orden local",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST propaga errores 403 sin crear una orden local",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST propaga errores 404 sin crear una orden local",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST propaga errores 409 sin crear una orden local",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST propaga errores 503 sin crear una orden local",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST distingue cuenta inexistente de una dependencia no disponible",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Pedidos REST consulta y configura crédito sin enviar deuda modificable",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/services/productService.test.js",
+      "pruebas": 15,
+      "casos": [
+        {
+          "nombre": "Servicio de Productos (productService) Operaciones CRUD y Consulta debe inicializar el catálogo con los datos representativos del Excel",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Operaciones CRUD y Consulta debe obtener un producto por su ID",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Operaciones CRUD y Consulta debe obtener un producto por su código SKU insensible a mayúsculas",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Operaciones CRUD y Consulta debe crear un nuevo producto con código único",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Operaciones CRUD y Consulta debe rechazar la creación de un producto con código duplicado",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Operaciones CRUD y Consulta debe actualizar los datos y precio de un producto existente",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Operaciones CRUD y Consulta debe eliminar un producto del catálogo",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Control de Stock Crítico y Ofertas debe detectar correctamente los productos con stock crítico (stock <= stockMinimo)",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Control de Stock Crítico y Ofertas debe retornar únicamente productos marcados en oferta",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Control de Stock Crítico y Ofertas debe descontar stock correctamente y lanzar error si se excede la existencia",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Filtros Combinados de Catálogo debe filtrar productos por término de búsqueda en nombre o código",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Filtros Combinados de Catálogo debe filtrar productos por categoría",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Actualización de fotografías del catálogo guardado debe sustituir la foto genérica sin cambiar inventario, precios ni otros registros",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Actualización de fotografías del catálogo guardado debe conservar imágenes personalizadas y no reescribir catálogos sin cambios",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Productos (productService) Actualización de fotografías del catálogo guardado debe actualizar las imágenes antiguas una sola vez y respetar un catálogo vacío",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/services/regressions.test.js",
+      "pruebas": 9,
+      "casos": [
+        {
+          "nombre": "Regresiones del catálogo REST la imagen de catalogo coincide con la que recibe el carrito",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Regresiones del catálogo REST la imagen de ofertas coincide con la que recibe el carrito",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Regresiones del catálogo REST la imagen de detalle coincide con la que recibe el carrito",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Regresiones del catálogo REST conserva las imágenes personalizadas que llegan del servidor",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Regresiones del catálogo REST conserva ids y categorías del servidor al recorrer la paginación",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Regresiones del catálogo REST vacía la caché cuando el catálogo real está vacío",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Regresiones del catálogo REST no presenta datos semilla cuando la API no responde",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Regresiones del catálogo REST resuelve la categoría por sus datos reales y conserva el id del producto creado",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Regresiones del catálogo REST una escritura rechazada no modifica la caché",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/services/userApiService.test.js",
+      "pruebas": 5,
+      "casos": [
+        {
+          "nombre": "Contrato HTTP de Usuarios envía registro público sin token ni campos de crédito",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Contrato HTTP de Usuarios envía el JWT a gestión y omite contraseña vacía al editar",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Contrato HTTP de Usuarios acepta 204 al desactivar sin intentar leer JSON",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Contrato HTTP de Usuarios propaga el rechazo del servidor y evita una escritura local de respaldo",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Contrato HTTP de Usuarios comunica caída de red y conserva la sesión para reintentar",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/services/userService.test.js",
+      "pruebas": 14,
+      "casos": [
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de Correo Institucional debe aceptar correos válidos con dominio @duoc.cl",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de Correo Institucional debe aceptar correos con dominio @profesor.duoc.cl",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de Correo Institucional debe aceptar correos con dominio @gmail.com",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de Correo Institucional debe rechazar correos con otros dominios como @hotmail.com o @yahoo.es",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de Correo Institucional debe rechazar correos vacíos o mayores a 100 caracteres",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de RUN Chileno (Módulo 11) debe validar correctamente un RUN chileno real con dígito verificador numérico",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de RUN Chileno (Módulo 11) debe validar correctamente un RUN chileno con dígito verificador K",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de RUN Chileno (Módulo 11) debe rechazar un RUN con dígito verificador erróneo",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Reglas de Validación de RUN Chileno (Módulo 11) debe rechazar RUNs con menos de 7 o más de 9 caracteres",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Autenticación y CRUD de Usuarios debe autenticar exitosamente a un usuario con credenciales correctas",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Autenticación y CRUD de Usuarios debe lanzar error al intentar autenticar con contraseña errónea",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Autenticación y CRUD de Usuarios debe crear un nuevo usuario y persistirlo en la lista",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Autenticación y CRUD de Usuarios debe actualizar los datos de un usuario existente",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Servicio de Usuarios (userService) Autenticación y CRUD de Usuarios debe eliminar un usuario existente",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/components/Navbar.test.jsx",
+      "pruebas": 4,
+      "casos": [
+        {
+          "nombre": "Componente Navbar debe renderizar la marca corporativa \"LOS MAESTROS\" y la ciudad de origen",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Componente Navbar debe renderizar los enlaces principales de navegación",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Componente Navbar debe mostrar el contador de ítems del carrito en 0 inicialmente",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Componente Navbar debe mostrar el acceso al Panel Admin cuando Usuarios confirma el perfil ADMIN",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/components/ProductCard.test.jsx",
+      "pruebas": 5,
+      "casos": [
+        {
+          "nombre": "Componente ProductCard Pruebas de Renderizado (Render Tests) debe renderizar correctamente los datos del producto (nombre, código, precio y marca)",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Componente ProductCard Pruebas de Renderizado Condicional debe mostrar el badge de oferta cuando enOferta es true y calcular el descuento",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Componente ProductCard Pruebas de Renderizado Condicional debe mostrar la alerta de Stock Crítico cuando el stock es menor o igual al stock mínimo",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Componente ProductCard Pruebas de Renderizado Condicional debe deshabilitar el botón de compra cuando el stock es 0",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Componente ProductCard Pruebas de Eventos (Event Simulation) debe simular el evento de clic en Añadir al Carrito y ejecutar la acción sin errores",
+          "estado": "passed"
+        }
+      ]
+    },
+    {
+      "archivo": "src/test/components/ProfileNavigation.test.jsx",
+      "pruebas": 7,
+      "casos": [
+        {
+          "nombre": "Acceso administrativo y navegación por perfil rechaza una cuenta de cliente sin iniciar una sesión desde el modal administrativo",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Acceso administrativo y navegación por perfil conserva la cuenta contratista si se rechaza otro perfil en el modal",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Acceso administrativo y navegación por perfil permite acceder al vendedor autenticado por Usuarios",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Acceso administrativo y navegación por perfil incluye el historial del contratista en el menú móvil y cierra el menú al elegirlo",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Coherencia de cobertura y tarifas sincroniza comuna, zona y tarifa al seleccionar Valle de Elqui",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Coherencia de cobertura y tarifas comunica cotización sin ofrecer una tarifa automática para otras comunas",
+          "estado": "passed"
+        },
+        {
+          "nombre": "Coherencia de cobertura y tarifas permite elegir una comuna desde el esquema y actualizar la tarifa urbana",
+          "estado": "passed"
+        }
+      ]
+    }
+  ],
+  "backend": [
+    {
+      "servicio": "usuarios-service",
+      "clase": "UsuariosMartinTests",
+      "pruebas": 5,
+      "fallos": 0,
+      "errores": 0,
+      "omitidas": 0,
+      "casos": [
+        "registroPerfilYDuplicado",
+        "registroPublicoRechazaRolesDeGestion",
+        "consultaInternaExigeCredencialDeServicio",
+        "adminGestionaUsuariosYDesactivacionBloqueaLogin",
+        "swaggerDistingueJwtYCredencialInterna"
+      ]
+    },
+    {
+      "servicio": "usuarios-service",
+      "clase": "UsuariosServiceApplicationTests",
+      "pruebas": 1,
+      "fallos": 0,
+      "errores": 0,
+      "omitidas": 0,
+      "casos": [
+        "contextLoads"
+      ]
+    },
+    {
+      "servicio": "ventas-service",
+      "clase": "CatalogoJeremyTests",
+      "pruebas": 9,
+      "fallos": 0,
+      "errores": 0,
+      "omitidas": 0,
+      "casos": [
+        "contratoCatalogoPedidosAjustarStock",
+        "adminPuedeCrearProducto",
+        "vendedorRechazadoEnModificaciones",
+        "swaggerDeclaraJwtEnOperacionesProtegidas",
+        "consultaPublicaCatalogo",
+        "adminPuedeAjustarStock",
+        "contratoCatalogoPedidosCalculaPrecioEfectivo",
+        "clienteOAnonimoRechazadoEnEscritura",
+        "stockCriticoIdentificaProductosBajoUmbral"
+      ]
+    },
+    {
+      "servicio": "ventas-service",
+      "clase": "PedidosSebaTests",
+      "pruebas": 6,
+      "fallos": 0,
+      "errores": 0,
+      "omitidas": 0,
+      "casos": [
+        "anularDosVecesDevuelveStockYCreditoUnaVez",
+        "pedidosRespetanIdentidadYPermisos",
+        "stockInsuficienteNoDejaCambiosParciales",
+        "consultaAdministrativaDeCuentaMantieneSaldoYPermisos",
+        "creditoInsuficienteIncluyeFleteYRevierteStock",
+        "compraUsaPrecioServidorEIdentidadAutenticada"
+      ]
+    },
+    {
+      "servicio": "ventas-service",
+      "clase": "UsuariosContratistasTests",
+      "pruebas": 3,
+      "fallos": 0,
+      "errores": 0,
+      "omitidas": 0,
+      "casos": [
+        "fallaDeUsuariosConservaCuentaPrevia",
+        "habilitaContratistaVerificadoPorHttp",
+        "rechazaInexistenteInactivoYOtroRol"
+      ]
+    },
+    {
+      "servicio": "ventas-service",
+      "clase": "VentasServiceApplicationTests",
+      "pruebas": 1,
+      "fallos": 0,
+      "errores": 0,
+      "omitidas": 0,
+      "casos": [
+        "contextLoads"
+      ]
+    }
+  ],
+  "cobertura_react": {
+    "sentencias": {
+      "cubiertas": 1062,
+      "total": 1573,
+      "porcentaje": "67,51 %"
+    },
+    "ramas": {
+      "cubiertas": 827,
+      "total": 1316,
+      "porcentaje": "62,84 %"
+    },
+    "funciones": {
+      "cubiertas": 259,
+      "total": 432,
+      "porcentaje": "59,95 %"
+    },
+    "lineas": {
+      "cubiertas": 951,
+      "total": 1351,
+      "porcentaje": "70,39 %"
+    }
+  },
+  "cobertura_por_archivo": {
+    "src/App.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 4,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 4,
+        "porcentaje": "0,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 2,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 4,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/components/admin/CuentaCorrienteModal.jsx": {
+      "sentencias": {
+        "cubiertas": 23,
+        "total": 25,
+        "porcentaje": "92,00 %"
+      },
+      "ramas": {
+        "cubiertas": 18,
+        "total": 19,
+        "porcentaje": "94,73 %"
+      },
+      "funciones": {
+        "cubiertas": 5,
+        "total": 6,
+        "porcentaje": "83,33 %"
+      },
+      "lineas": {
+        "cubiertas": 21,
+        "total": 22,
+        "porcentaje": "95,45 %"
+      }
+    },
+    "src/components/common/ApiStatus.jsx": {
+      "sentencias": {
+        "cubiertas": 5,
+        "total": 5,
+        "porcentaje": "100,00 %"
+      },
+      "ramas": {
+        "cubiertas": 7,
+        "total": 8,
+        "porcentaje": "87,50 %"
+      },
+      "funciones": {
+        "cubiertas": 1,
+        "total": 1,
+        "porcentaje": "100,00 %"
+      },
+      "lineas": {
+        "cubiertas": 3,
+        "total": 3,
+        "porcentaje": "100,00 %"
+      }
+    },
+    "src/components/common/CoverageMap.jsx": {
+      "sentencias": {
+        "cubiertas": 21,
+        "total": 22,
+        "porcentaje": "95,45 %"
+      },
+      "ramas": {
+        "cubiertas": 13,
+        "total": 14,
+        "porcentaje": "92,85 %"
+      },
+      "funciones": {
+        "cubiertas": 10,
+        "total": 11,
+        "porcentaje": "90,90 %"
+      },
+      "lineas": {
+        "cubiertas": 17,
+        "total": 18,
+        "porcentaje": "94,44 %"
+      }
+    },
+    "src/components/common/Footer.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 2,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 0,
+        "porcentaje": "100,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 1,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 2,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/components/common/Navbar.jsx": {
+      "sentencias": {
+        "cubiertas": 42,
+        "total": 49,
+        "porcentaje": "85,71 %"
+      },
+      "ramas": {
+        "cubiertas": 43,
+        "total": 54,
+        "porcentaje": "79,62 %"
+      },
+      "funciones": {
+        "cubiertas": 16,
+        "total": 18,
+        "porcentaje": "88,88 %"
+      },
+      "lineas": {
+        "cubiertas": 42,
+        "total": 49,
+        "porcentaje": "85,71 %"
+      }
+    },
+    "src/components/common/ProtectedRoute.jsx": {
+      "sentencias": {
+        "cubiertas": 13,
+        "total": 13,
+        "porcentaje": "100,00 %"
+      },
+      "ramas": {
+        "cubiertas": 14,
+        "total": 14,
+        "porcentaje": "100,00 %"
+      },
+      "funciones": {
+        "cubiertas": 1,
+        "total": 1,
+        "porcentaje": "100,00 %"
+      },
+      "lineas": {
+        "cubiertas": 11,
+        "total": 11,
+        "porcentaje": "100,00 %"
+      }
+    },
+    "src/components/products/ProductCard.jsx": {
+      "sentencias": {
+        "cubiertas": 9,
+        "total": 9,
+        "porcentaje": "100,00 %"
+      },
+      "ramas": {
+        "cubiertas": 14,
+        "total": 15,
+        "porcentaje": "93,33 %"
+      },
+      "funciones": {
+        "cubiertas": 2,
+        "total": 2,
+        "porcentaje": "100,00 %"
+      },
+      "lineas": {
+        "cubiertas": 9,
+        "total": 9,
+        "porcentaje": "100,00 %"
+      }
+    },
+    "src/components/products/ProductFilter.jsx": {
+      "sentencias": {
+        "cubiertas": 4,
+        "total": 8,
+        "porcentaje": "50,00 %"
+      },
+      "ramas": {
+        "cubiertas": 2,
+        "total": 3,
+        "porcentaje": "66,66 %"
+      },
+      "funciones": {
+        "cubiertas": 3,
+        "total": 7,
+        "porcentaje": "42,85 %"
+      },
+      "lineas": {
+        "cubiertas": 4,
+        "total": 8,
+        "porcentaje": "50,00 %"
+      }
+    },
+    "src/context/AuthContext.jsx": {
+      "sentencias": {
+        "cubiertas": 87,
+        "total": 91,
+        "porcentaje": "95,60 %"
+      },
+      "ramas": {
+        "cubiertas": 31,
+        "total": 39,
+        "porcentaje": "79,48 %"
+      },
+      "funciones": {
+        "cubiertas": 22,
+        "total": 22,
+        "porcentaje": "100,00 %"
+      },
+      "lineas": {
+        "cubiertas": 75,
+        "total": 76,
+        "porcentaje": "98,68 %"
+      }
+    },
+    "src/context/CartContext.jsx": {
+      "sentencias": {
+        "cubiertas": 56,
+        "total": 90,
+        "porcentaje": "62,22 %"
+      },
+      "ramas": {
+        "cubiertas": 19,
+        "total": 34,
+        "porcentaje": "55,88 %"
+      },
+      "funciones": {
+        "cubiertas": 15,
+        "total": 23,
+        "porcentaje": "65,21 %"
+      },
+      "lineas": {
+        "cubiertas": 52,
+        "total": 77,
+        "porcentaje": "67,53 %"
+      }
+    },
+    "src/hooks/useApiData.js": {
+      "sentencias": {
+        "cubiertas": 20,
+        "total": 20,
+        "porcentaje": "100,00 %"
+      },
+      "ramas": {
+        "cubiertas": 4,
+        "total": 7,
+        "porcentaje": "57,14 %"
+      },
+      "funciones": {
+        "cubiertas": 8,
+        "total": 8,
+        "porcentaje": "100,00 %"
+      },
+      "lineas": {
+        "cubiertas": 14,
+        "total": 14,
+        "porcentaje": "100,00 %"
+      }
+    },
+    "src/pages/About.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 12,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 0,
+        "porcentaje": "100,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 5,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 11,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/pages/BlogDetail.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 9,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 2,
+        "porcentaje": "0,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 3,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 8,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/pages/Blogs.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 3,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 0,
+        "porcentaje": "100,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 2,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 3,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/pages/Cart.jsx": {
+      "sentencias": {
+        "cubiertas": 11,
+        "total": 16,
+        "porcentaje": "68,75 %"
+      },
+      "ramas": {
+        "cubiertas": 5,
+        "total": 11,
+        "porcentaje": "45,45 %"
+      },
+      "funciones": {
+        "cubiertas": 3,
+        "total": 7,
+        "porcentaje": "42,85 %"
+      },
+      "lineas": {
+        "cubiertas": 11,
+        "total": 15,
+        "porcentaje": "73,33 %"
+      }
+    },
+    "src/pages/Categories.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 10,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 14,
+        "porcentaje": "0,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 3,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 8,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/pages/Checkout.jsx": {
+      "sentencias": {
+        "cubiertas": 74,
+        "total": 100,
+        "porcentaje": "74,00 %"
+      },
+      "ramas": {
+        "cubiertas": 59,
+        "total": 99,
+        "porcentaje": "59,59 %"
+      },
+      "funciones": {
+        "cubiertas": 12,
+        "total": 22,
+        "porcentaje": "54,54 %"
+      },
+      "lineas": {
+        "cubiertas": 70,
+        "total": 90,
+        "porcentaje": "77,77 %"
+      }
+    },
+    "src/pages/CheckoutFailure.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 7,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 6,
+        "porcentaje": "0,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 2,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 7,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/pages/CheckoutSuccess.jsx": {
+      "sentencias": {
+        "cubiertas": 10,
+        "total": 14,
+        "porcentaje": "71,42 %"
+      },
+      "ramas": {
+        "cubiertas": 12,
+        "total": 19,
+        "porcentaje": "63,15 %"
+      },
+      "funciones": {
+        "cubiertas": 2,
+        "total": 5,
+        "porcentaje": "40,00 %"
+      },
+      "lineas": {
+        "cubiertas": 8,
+        "total": 12,
+        "porcentaje": "66,66 %"
+      }
+    },
+    "src/pages/Contact.jsx": {
+      "sentencias": {
+        "cubiertas": 30,
+        "total": 35,
+        "porcentaje": "85,71 %"
+      },
+      "ramas": {
+        "cubiertas": 27,
+        "total": 30,
+        "porcentaje": "90,00 %"
+      },
+      "funciones": {
+        "cubiertas": 5,
+        "total": 7,
+        "porcentaje": "71,42 %"
+      },
+      "lineas": {
+        "cubiertas": 29,
+        "total": 33,
+        "porcentaje": "87,87 %"
+      }
+    },
+    "src/pages/Home.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 5,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 3,
+        "porcentaje": "0,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 2,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 5,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/pages/Login.jsx": {
+      "sentencias": {
+        "cubiertas": 32,
+        "total": 41,
+        "porcentaje": "78,04 %"
+      },
+      "ramas": {
+        "cubiertas": 27,
+        "total": 36,
+        "porcentaje": "75,00 %"
+      },
+      "funciones": {
+        "cubiertas": 5,
+        "total": 7,
+        "porcentaje": "71,42 %"
+      },
+      "lineas": {
+        "cubiertas": 31,
+        "total": 36,
+        "porcentaje": "86,11 %"
+      }
+    },
+    "src/pages/MyOrders.jsx": {
+      "sentencias": {
+        "cubiertas": 10,
+        "total": 10,
+        "porcentaje": "100,00 %"
+      },
+      "ramas": {
+        "cubiertas": 6,
+        "total": 16,
+        "porcentaje": "37,50 %"
+      },
+      "funciones": {
+        "cubiertas": 4,
+        "total": 4,
+        "porcentaje": "100,00 %"
+      },
+      "lineas": {
+        "cubiertas": 8,
+        "total": 8,
+        "porcentaje": "100,00 %"
+      }
+    },
+    "src/pages/Offers.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 7,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 4,
+        "porcentaje": "0,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 2,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 6,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/pages/ProductDetail.jsx": {
+      "sentencias": {
+        "cubiertas": 0,
+        "total": 29,
+        "porcentaje": "0,00 %"
+      },
+      "ramas": {
+        "cubiertas": 0,
+        "total": 28,
+        "porcentaje": "0,00 %"
+      },
+      "funciones": {
+        "cubiertas": 0,
+        "total": 9,
+        "porcentaje": "0,00 %"
+      },
+      "lineas": {
+        "cubiertas": 0,
+        "total": 24,
+        "porcentaje": "0,00 %"
+      }
+    },
+    "src/pages/Products.jsx": {
+      "sentencias": {
+        "cubiertas": 31,
+        "total": 47,
+        "porcentaje": "65,95 %"
+      },
+      "ramas": {
+        "cubiertas": 27,
+        "total": 35,
+        "porcentaje": "77,14 %"
+      },
+      "funciones": {
+        "cubiertas": 5,
+        "total": 13,
+        "porcentaje": "38,46 %"
+      },
+      "lineas": {
+        "cubiertas": 27,
+        "total": 37,
+        "porcentaje": "72,97 %"
+      }
+    },
+    "src/pages/Register.jsx": {
+      "sentencias": {
+        "cubiertas": 50,
+        "total": 71,
+        "porcentaje": "70,42 %"
+      },
+      "ramas": {
+        "cubiertas": 54,
+        "total": 90,
+        "porcentaje": "60,00 %"
+      },
+      "funciones": {
+        "cubiertas": 9,
+        "total": 12,
+        "porcentaje": "75,00 %"
+      },
+      "lineas": {
+        "cubiertas": 47,
+        "total": 62,
+        "porcentaje": "75,80 %"
+      }
+    },
+    "src/pages/admin/AdminDashboard.jsx": {
+      "sentencias": {
+        "cubiertas": 177,
+        "total": 338,
+        "porcentaje": "52,36 %"
+      },
+      "ramas": {
+        "cubiertas": 167,
+        "total": 312,
+        "porcentaje": "53,52 %"
+      },
+      "funciones": {
+        "cubiertas": 43,
+        "total": 117,
+        "porcentaje": "36,75 %"
+      },
+      "lineas": {
+        "cubiertas": 155,
+        "total": 294,
+        "porcentaje": "52,72 %"
+      }
+    },
+    "src/services/apiService.js": {
+      "sentencias": {
+        "cubiertas": 18,
+        "total": 20,
+        "porcentaje": "90,00 %"
+      },
+      "ramas": {
+        "cubiertas": 26,
+        "total": 27,
+        "porcentaje": "96,29 %"
+      },
+      "funciones": {
+        "cubiertas": 2,
+        "total": 3,
+        "porcentaje": "66,66 %"
+      },
+      "lineas": {
+        "cubiertas": 16,
+        "total": 17,
+        "porcentaje": "94,11 %"
+      }
+    },
+    "src/services/credentialService.js": {
+      "sentencias": {
+        "cubiertas": 14,
+        "total": 16,
+        "porcentaje": "87,50 %"
+      },
+      "ramas": {
+        "cubiertas": 5,
+        "total": 7,
+        "porcentaje": "71,42 %"
+      },
+      "funciones": {
+        "cubiertas": 5,
+        "total": 5,
+        "porcentaje": "100,00 %"
+      },
+      "lineas": {
+        "cubiertas": 12,
+        "total": 12,
+        "porcentaje": "100,00 %"
+      }
+    },
+    "src/services/orderService.js": {
+      "sentencias": {
+        "cubiertas": 29,
+        "total": 33,
+        "porcentaje": "87,87 %"
+      },
+      "ramas": {
+        "cubiertas": 7,
+        "total": 10,
+        "porcentaje": "70,00 %"
+      },
+      "funciones": {
+        "cubiertas": 10,
+        "total": 13,
+        "porcentaje": "76,92 %"
+      },
+      "lineas": {
+        "cubiertas": 24,
+        "total": 27,
+        "porcentaje": "88,88 %"
+      }
+    },
+    "src/services/productService.js": {
+      "sentencias": {
+        "cubiertas": 153,
+        "total": 207,
+        "porcentaje": "73,91 %"
+      },
+      "ramas": {
+        "cubiertas": 137,
+        "total": 195,
+        "porcentaje": "70,25 %"
+      },
+      "funciones": {
+        "cubiertas": 41,
+        "total": 50,
+        "porcentaje": "82,00 %"
+      },
+      "lineas": {
+        "cubiertas": 133,
+        "total": 167,
+        "porcentaje": "79,64 %"
+      }
+    },
+    "src/services/shippingService.js": {
+      "sentencias": {
+        "cubiertas": 8,
+        "total": 10,
+        "porcentaje": "80,00 %"
+      },
+      "ramas": {
+        "cubiertas": 13,
+        "total": 16,
+        "porcentaje": "81,25 %"
+      },
+      "funciones": {
+        "cubiertas": 1,
+        "total": 1,
+        "porcentaje": "100,00 %"
+      },
+      "lineas": {
+        "cubiertas": 8,
+        "total": 8,
+        "porcentaje": "100,00 %"
+      }
+    },
+    "src/services/storageService.js": {
+      "sentencias": {
+        "cubiertas": 30,
+        "total": 47,
+        "porcentaje": "63,82 %"
+      },
+      "ramas": {
+        "cubiertas": 16,
+        "total": 20,
+        "porcentaje": "80,00 %"
+      },
+      "funciones": {
+        "cubiertas": 6,
+        "total": 10,
+        "porcentaje": "60,00 %"
+      },
+      "lineas": {
+        "cubiertas": 28,
+        "total": 42,
+        "porcentaje": "66,66 %"
+      }
+    },
+    "src/services/userApiService.js": {
+      "sentencias": {
+        "cubiertas": 12,
+        "total": 16,
+        "porcentaje": "75,00 %"
+      },
+      "ramas": {
+        "cubiertas": 4,
+        "total": 6,
+        "porcentaje": "66,66 %"
+      },
+      "funciones": {
+        "cubiertas": 8,
+        "total": 9,
+        "porcentaje": "88,88 %"
+      },
+      "lineas": {
+        "cubiertas": 12,
+        "total": 15,
+        "porcentaje": "80,00 %"
+      }
+    },
+    "src/services/userService.js": {
+      "sentencias": {
+        "cubiertas": 93,
+        "total": 132,
+        "porcentaje": "70,45 %"
+      },
+      "ramas": {
+        "cubiertas": 70,
+        "total": 119,
+        "porcentaje": "58,82 %"
+      },
+      "funciones": {
+        "cubiertas": 15,
+        "total": 17,
+        "porcentaje": "88,23 %"
+      },
+      "lineas": {
+        "cubiertas": 84,
+        "total": 111,
+        "porcentaje": "75,67 %"
+      }
+    }
+  }
+}

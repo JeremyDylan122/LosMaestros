@@ -1,0 +1,12 @@
+Ferretería Los Maestros
+Integración de fase 3 verificada el 05/11/2026
+
+1. MySQL dedicado: usuarios y operaciones comerciales en bases separadas; volumen persistente. Se comprobaron persistencia tras reinicios, restricciones de cuentas SQL y uso de JWT real entre servicios.
+2. Compra y rollback: precios y usuario del servidor; cantidades, existencias y cupo validados. Un rechazo no deja descuentos de stock ni cargos parciales.
+3. Prueba adicional de API: producto ficticio de $999, descuento 10 %, precio efectivo $899,10, despacho $4.990 y total $5.889,10. La anulación repetida restituye stock una sola vez y deja deuda cero. El producto ficticio se dio de baja.
+4. Concurrencia acotada: dos compras concurrentes no consumen la misma última unidad; solo una fue aceptada. No equivale a una prueba de carga.
+5. Recorrido manual de Martín: compra a crédito confirmada, carrito vacío, pedido visible en Mis pedidos y saldo cargado. Orden LM-2026-0003: $77.473,5; sobre cupo $100.000, disponible $22.526,5. Al anular desde ADMIN se restituye crédito a $100.000 y stock, conservando el historial ANULADO.
+6. Correcciones verificadas manualmente: revalidación de sesión sin reinicio de formularios al cambiar de ventana; comprobante administrativo con cantidad, precio, subtotal y despacho correctos; imágenes específicas y coherentes entre catálogo, ofertas, detalle y carrito.
+
+Capturas de los puntos 5 y 6 incluidas en el manual y el documento de integración. Evidencia previa complementaria en Fase 3/documentacion/PRUEBAS_MYSQL.md y PRUEBAS_REACT_USUARIOS_MYSQL.md.
+Los datos son ficticios y los pagos electrónicos son simulados. No se realizó un cobro bancario real.
