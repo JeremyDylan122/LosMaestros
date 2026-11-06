@@ -1,10 +1,10 @@
 # Aplicación React de Ferretería Los Maestros
 
-Segunda versión del proyecto DSY1104 Desarrollo FullStack II, Duoc UC. Implementa la tienda, el carrito, la compra simulada y la gestión local con React, Vite y CSS propio.
+Frontend de fase 3 del proyecto DSY1104 Desarrollo FullStack II, Duoc UC. Reutiliza la tienda React y conecta registro, login, sesión y gestión de usuarios con el servicio Spring Boot de Usuarios. Catálogo, checkout, historial, pedidos y cuenta corriente se conectan con Ventas.
 
 Integrantes: Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
 
-El [README principal](../../README.md) describe el alcance, las reglas comerciales y las cuentas de demostración. La [documentación de entrega](../../docs/README.md) reúne el ERS y el informe de pruebas, revisión 2.2.
+La [implementación de Martín](../documentacion/IMPLEMENTACION_MARTIN.md) explica la configuración de Usuarios y su comunicación con Ventas. En [docs](../../docs/README.md) se encuentran los documentos de fase 3 y los antecedentes de fase 2.
 
 ## Iniciar la aplicación
 
@@ -12,10 +12,15 @@ Desde esta carpeta, con Node.js 24 y npm:
 
 ```powershell
 npm ci
+Copy-Item .env.example .env
 npm run dev
 ```
 
 La dirección de desarrollo aparece en la terminal; por defecto es `http://localhost:5173`. Las dependencias están fijadas en `package-lock.json`. Node.js 18 no es compatible con esta entrega.
+
+Arrancar Usuarios en el puerto 8081 y Ventas en el 8082 según sus README. Las variables `VITE_API_USUARIOS_URL` y `VITE_API_VENTAS_URL` incluyen `/api/v1`. Si se modifica `.env`, reiniciar Vite. Las URLs predeterminadas coinciden con `.env.example`.
+
+Para acceder al panel, iniciar sesión con el administrador creado al configurar `USUARIOS_ADMIN_PASSWORD` en Usuarios, o con una cuenta creada por ese administrador. El registro público crea clientes y contratistas. Las cuentas de demostración guardadas en el navegador durante fase 2 requieren registrarse o crearse en el servidor.
 
 ## Comandos disponibles
 
@@ -37,6 +42,18 @@ El catálogo inicial incluye 27 productos en siete categorías. Las imágenes y 
 
 ## Alcance y verificación
 
-La aplicación conserva datos en el navegador. Los pagos, el despacho, el contacto y el crédito son demostraciones; no existe integración con backend ni base de datos compartida. La cobertura se representa mediante SVG y tarifas locales, sin servicio de mapas externo. Web Crypto requiere `localhost` o HTTPS.
+`userApiService.js` realiza las operaciones REST de sesión y usuarios. `AuthContext` guarda el token bajo `auth_token`, que también utiliza el cliente de catálogo de Jeremy, y consulta `/usuarios/me` al restaurar la sesión o volver a la pestaña. Las rutas protegidas esperan esa respuesta. Un 401 en Usuarios cierra la sesión. Una caída de red permite reintentar la validación conservando el token. Los errores de registro o gestión mantienen los datos del formulario y no registran éxito local.
 
-La medición final registra 92 pruebas aprobadas en 13 archivos y 60,85 % de cobertura global de líneas. La compilación se completó; Oxlint registró cero errores y seis advertencias. El [informe de pruebas y cobertura](<../../docs/PRUEBAS UNITARIAS/PRUEBAS_UNITARIAS.md>) detalla resultados, límites y reproducción.
+El mantenedor permite crear, editar, asignar roles y desactivar usuarios. El listado y los controles distinguen cuentas activas e inactivas. La edición sin contraseña conserva la existente. El crédito se configura en Ventas, por lo que el registro y el mantenedor de Usuarios envían solo datos de perfil.
+
+Checkout, historial, comprobantes, gestión de pedidos y cuenta corriente utilizan la API de Ventas. El catálogo público y su mantenedor también consultan Ventas y muestran los errores de conexión. El carrito permanece en el navegador y conserva referencias de productos en caché. Usuarios administra los datos de perfil y Ventas administra los datos financieros.
+
+La verificación del 5 de noviembre de 2026 registra 118 pruebas aprobadas en 19 archivos, compilación de producción correcta y Oxlint con cero errores y nueve advertencias. Los [resultados automáticos de fase 3](../../docs/APIs%20e%20Integracion/evidencias/resultados-automaticos-v3.txt) reúnen los contadores. La conexión de ambos backends con MySQL se documenta en las [pruebas MySQL](../documentacion/PRUEBAS_MYSQL.md), incluyendo persistencia tras reinicio. El [informe de APIs e integración](../../docs/APIs%20e%20Integracion/APIS_E_INTEGRACION.md) registra el recorrido comercial desde React. La cobertura documentada para fase 2 corresponde a aquella entrega y no se ha recalculado en este bloque.
+
+También se completó el [recorrido de React con Usuarios/MySQL](../documentacion/PRUEBAS_REACT_USUARIOS_MYSQL.md), incluyendo registro, edición, rol, permisos, reinicio, recuperación de conexión y desactivación con rechazo de login.
+
+## Contenedor para AWS
+
+El Dockerfile compila React y sirve `dist` mediante Nginx. Para usarlo con ambos servicios y MySQL, seguir la [guía de despliegue en EC2](../despliegue/README.md). En esa construcción las URLs de APIs son relativas: `/usuarios/api/v1` y `/ventas/api/v1`. Nginx resuelve los destinos dentro de Docker; el navegador utiliza la dirección pública de la tienda. Las variables de Vite se aplican al compilar, no al iniciar el contenedor final.
+
+El [informe de pruebas v3](<../../docs/Pruebas unitarias (v3)/PRUEBAS_UNITARIAS_V3.md>) incorpora la medición posterior de cobertura React: 70,39 % de líneas.

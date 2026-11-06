@@ -1,3 +1,5 @@
+import { useApiData } from '../hooks/useApiData';
+import { ApiStatus } from '../components/common/ApiStatus';
 import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Package, RotateCcw } from 'lucide-react';
@@ -7,7 +9,10 @@ import { ProductFilter } from '../components/products/ProductFilter';
 import { useAuth } from '../context/AuthContext';
 
 export const Products = () => {
-  const [categories] = useState(() => productService.getCategories());
+  const catalog = useApiData(productService.fetchProducts, []);
+  const families = useApiData(productService.fetchCategories, []);
+  const products = catalog.data;
+  const categories = families.data;
   const [searchParams, setSearchParams] = useSearchParams();
   const { isVendor, isAdmin } = useAuth();
 
@@ -36,7 +41,7 @@ export const Products = () => {
       search: searchTerm,
       inOffer: onlyOffers,
       criticalOnly: onlyCritical
-    });
+    }, products);
 
     if (sortBy === 'price-asc') {
       result.sort((a, b) => productService.getUnitPrice(a) - productService.getUnitPrice(b));
@@ -47,13 +52,15 @@ export const Products = () => {
     }
 
     return result;
-  }, [activeCategory, searchTerm, sortBy, onlyOffers, onlyCritical]);
+  }, [products, activeCategory, searchTerm, sortBy, onlyOffers, onlyCritical]);
 
   const handleResetFilters = () => {
     setSortBy('default');
     setOnlyCritical(false);
     setSearchParams({});
   };
+
+  if (catalog.loading || families.loading || catalog.error || families.error) return <div className="container page-container"><ApiStatus loading={catalog.loading || families.loading} error={catalog.error || families.error} onRetry={() => { catalog.reload(); families.reload(); }} /></div>;
 
   return (
     <div className="container page-container">

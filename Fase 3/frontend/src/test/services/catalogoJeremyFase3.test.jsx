@@ -1,11 +1,14 @@
+import { orderService } from '../../services/orderService';
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { productService } from '../../services/productService';
 import { storageService } from '../../services/storageService';
 import { AdminDashboard } from '../../pages/admin/AdminDashboard';
 import { AuthProvider } from '../../context/AuthContext';
+import { serverSession, serverUsers } from '../helpers/serverSession';
+import { userApiService } from '../../services/userApiService';
 
 describe('Fase 3 - Módulo Catálogo e Inventario (Jeremy)', () => {
   beforeEach(() => {
@@ -48,7 +51,7 @@ describe('Fase 3 - Módulo Catálogo e Inventario (Jeremy)', () => {
         stockMinimo: 5
       };
 
-      vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      vi.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: true, json: async () => [{ id: 38, nombre: nuevoProducto.categoria }] }).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ ...nuevoProducto, id: 202 })
       });
@@ -104,7 +107,12 @@ describe('Fase 3 - Módulo Catálogo e Inventario (Jeremy)', () => {
 
   describe('Restricción RBAC: VENDEDOR en modo sólo lectura en AdminDashboard', () => {
     function renderAdminDashboard(userSession, path = '/admin/productos') {
-      storageService.set('current_user', userSession);
+      vi.spyOn(productService, 'fetchProducts').mockResolvedValue(productService.getProducts());
+      vi.spyOn(productService, 'fetchCriticalStock').mockResolvedValue([]);
+      vi.spyOn(productService, 'fetchCategories').mockResolvedValue(['Materiales de Construcción']);
+      vi.spyOn(orderService, 'getOrders').mockResolvedValue([]);
+      serverSession(userSession.id);
+      vi.spyOn(userApiService, 'getUsers').mockResolvedValue(serverUsers);
       return render(
         <MemoryRouter initialEntries={[path]}>
           <AuthProvider>
@@ -117,25 +125,29 @@ describe('Fase 3 - Módulo Catálogo e Inventario (Jeremy)', () => {
       );
     }
 
-    it('el perfil ADMINISTRADOR visualiza botón de crear producto y acciones de edición', () => {
+    it('el perfil ADMINISTRADOR visualiza botón de crear producto y acciones de edición', async () => {
       renderAdminDashboard({ id: 1, nombre: 'Carlos', rol: 'ADMIN' }, '/admin/productos');
 
       // Botón "Nuevo Producto" debe estar visible para ADMIN
-      expect(screen.getByRole('button', { name: /nuevo producto/i })).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name: /nuevo producto/i })).toBeInTheDocument();
     });
 
-    it('el perfil VENDEDOR no visualiza botón de creación y ve etiquetas "Solo Lectura"', () => {
+    it('el perfil VENDEDOR no visualiza botón de creación y ve etiquetas "Solo Lectura"', async () => {
       renderAdminDashboard({ id: 2, nombre: 'Vendedor Mesón', rol: 'VENDEDOR' }, '/admin/productos');
 
       // Botón "Nuevo Producto" NO debe existir para VENDEDOR
       expect(screen.queryByRole('button', { name: /nuevo producto/i })).not.toBeInTheDocument();
 
       // Debe indicar que las filas están en Solo Lectura
-      const soloLectura = screen.getAllByText(/solo lectura/i);
+      const soloLectura = await screen.findAllByText(/solo lectura/i);
       expect(soloLectura.length).toBeGreaterThan(0);
+      await screen.findByText('VENDEDOR', { selector: '.admin-user-role-badge' });
+      expect(screen.queryByText('Usuarios (Admin)')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /^Usuarios/ })).not.toBeInTheDocument();
+      expect(userApiService.getUsers).not.toHaveBeenCalled();
     });
 
-    it('el perfil VENDEDOR en la pestaña Resumen no puede realizar ajustes rápidos de stock ni editar', () => {
+    it('el perfil VENDEDOR en la pestaña Resumen no puede realizar ajustes rápidos de stock ni editar', async () => {
       renderAdminDashboard({ id: 2, nombre: 'Vendedor Mesón', rol: 'VENDEDOR' }, '/admin');
 
       // Botón "Nuevo Producto" no debe estar presente en el resumen
@@ -143,6 +155,7 @@ describe('Fase 3 - Módulo Catálogo e Inventario (Jeremy)', () => {
 
       // No debe haber botones de ajuste de stock (+1, +5, -1) para vendedor
       expect(screen.queryByRole('button', { name: /\+5 reabastecer/i })).not.toBeInTheDocument();
+      await waitFor(() => expect(userApiService.getProfile).toHaveBeenCalled());
     });
   });
 });

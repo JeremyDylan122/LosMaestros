@@ -1,3 +1,4 @@
+import { productService } from '../../services/productService';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Eye, AlertOctagon, CheckCircle2 } from 'lucide-react';
@@ -9,9 +10,7 @@ export const ProductCard = ({ product }) => {
   const isCritical = product.stock <= product.stockMinimo;
   const isOutOfStock = product.stock <= 0;
 
-  const finalPrice = product.enOferta && product.descuento > 0
-    ? Math.round(product.precio * (1 - product.descuento / 100))
-    : product.precio;
+  const finalPrice = productService.getUnitPrice(product);
 
   const handleAdd = (e) => {
     e.preventDefault();

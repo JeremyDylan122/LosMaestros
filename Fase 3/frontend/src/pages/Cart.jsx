@@ -1,3 +1,4 @@
+import { productService } from '../services/productService';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -81,9 +82,7 @@ export const Cart = () => {
               </thead>
               <tbody>
                 {cartItems.map((item) => {
-                  const unitPrice = item.enOferta && item.descuento > 0
-                    ? Math.round(item.precio * (1 - item.descuento / 100))
-                    : item.precio;
+                  const unitPrice = productService.getUnitPrice(item);
                   const subtotal = unitPrice * item.cantidad;
 
                   return (
@@ -212,7 +211,7 @@ export const Cart = () => {
             <div className="alert-tactile alert-tactile-info" style={{ fontSize: '0.85rem', marginBottom: '1.25rem' }}>
               <CreditCard size={18} />
               <div>
-                <strong>Línea de Crédito Activa:</strong> Puedes cargar este pedido a tu cuenta corriente mensual al pagar.
+                <strong>Cuenta corriente:</strong> Al pagar se comprobará si tu cuenta está habilitada y tiene crédito disponible.
               </div>
             </div>
           )}

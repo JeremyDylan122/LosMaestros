@@ -1,53 +1,39 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { Login } from '../../pages/Login';
 import { AuthProvider } from '../../context/AuthContext';
-import { storageService } from '../../services/storageService';
+import { userApiService } from '../../services/userApiService';
 
-const renderLogin = () => {
-  return render(
-    <BrowserRouter>
-      <AuthProvider>
-        <Login />
-      </AuthProvider>
-    </BrowserRouter>
-  );
-};
+const renderLogin = () => render(<BrowserRouter><AuthProvider><Login /></AuthProvider></BrowserRouter>);
 
-describe('Página de Inicio de Sesión (Login)', () => {
-  beforeEach(() => {
-    storageService.clearAll();
-  });
+beforeEach(() => localStorage.clear());
+afterEach(() => vi.restoreAllMocks());
 
-  it('debe renderizar los inputs de correo, contraseña y los botones demo', () => {
+describe('Login con Usuarios', () => {
+  it('muestra el formulario de acceso', () => {
     renderLogin();
     expect(screen.getByLabelText(/Correo Electrónico/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Contraseña/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Ingresar al Sistema/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Administrador/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Vendedor/i })).toBeInTheDocument();
   });
 
-  it('debe mostrar errores cuando los campos se envían vacíos', () => {
+  it('valida los campos antes de enviar', () => {
     renderLogin();
-    const submitBtn = screen.getByRole('button', { name: /Ingresar al Sistema/i });
-    fireEvent.click(submitBtn);
-
+    fireEvent.click(screen.getByRole('button', { name: /Ingresar al Sistema/i }));
     expect(screen.getByText(/El correo electrónico es obligatorio/i)).toBeInTheDocument();
     expect(screen.getByText(/La contraseña es obligatoria/i)).toBeInTheDocument();
   });
 
-  it('debe autocompletar las credenciales al hacer clic en el botón demo de Administrador', () => {
+  it('muestra el error del servidor y permite reintentar sin crear una sesión local', async () => {
+    vi.spyOn(userApiService, 'login').mockRejectedValue(new Error('Credenciales inválidas.'));
     renderLogin();
-    const adminDemoBtn = screen.getByRole('button', { name: /Administrador/i });
-    fireEvent.click(adminDemoBtn);
-
-    const emailInput = screen.getByLabelText(/Correo Electrónico/i);
-    const passInput = screen.getByLabelText(/Contraseña/i);
-
-    expect(emailInput.value).toBe('admin@duoc.cl');
-    expect(passInput.value).toBe('admin123');
+    fireEvent.change(screen.getByLabelText(/Correo Electrónico/i), { target: { value: 'admin@duoc.cl' } });
+    fireEvent.change(screen.getByLabelText(/Contraseña/i), { target: { value: 'error123' } });
+    fireEvent.submit(screen.getByLabelText(/Contraseña/i).closest('form'));
+    expect(await screen.findByText('Credenciales inválidas.')).toBeInTheDocument();
+    expect(localStorage.getItem('auth_token')).toBeNull();
+    expect(screen.getByRole('button', { name: /Ingresar al Sistema/i })).toBeEnabled();
   });
 });

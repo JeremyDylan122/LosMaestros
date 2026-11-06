@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogIn, Key, Mail, AlertCircle, ShieldCheck, UserCheck } from 'lucide-react';
+import { LogIn, Key, Mail, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { userService } from '../services/userService';
 
 export const Login = () => {
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -51,14 +51,6 @@ export const Login = () => {
     } else {
       setError(result.error);
     }
-  };
-
-  // Autocompletado para evaluación docente
-  const fillDemo = (demoEmail, demoPass) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setFieldErrors({});
-    setError('');
   };
 
   return (
@@ -148,50 +140,14 @@ export const Login = () => {
           </div>
 
           <button 
-            type="submit" 
+            type="submit"
+            disabled={loading}
             className="btn-tactile btn-tactile-primary btn-tactile-block" 
             style={{ marginTop: '1.25rem', padding: '0.85rem' }}
           >
-            <LogIn size={18} /> Ingresar al Sistema
+            <LogIn size={18} /> {loading ? 'Ingresando...' : 'Ingresar al Sistema'}
           </button>
         </form>
-
-        {/* ACCESOS RÁPIDOS PARA EVALUACIÓN DOCENTE */}
-        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: 'var(--border-sm)' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.75rem', textAlign: 'center' }}>
-            ⚡ Accesos de Prueba Rápidos (Evaluación):
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
-            <button 
-              type="button" 
-              onClick={() => fillDemo('admin@duoc.cl', 'admin123')}
-              className="btn-tactile btn-tactile-sm btn-tactile-secondary"
-            >
-              <ShieldCheck size={14} /> Administrador
-            </button>
-            <button 
-              type="button" 
-              onClick={() => fillDemo('vendedor@duoc.cl', 'vend123')}
-              className="btn-tactile btn-tactile-sm btn-tactile-primary"
-            >
-              <UserCheck size={14} /> Vendedor
-            </button>
-            <button 
-              type="button" 
-              onClick={() => fillDemo('contratista@duoc.cl', 'contra123')}
-              className="btn-tactile btn-tactile-sm btn-tactile-contractor"
-            >
-              Contratista (Crédito)
-            </button>
-            <button 
-              type="button" 
-              onClick={() => fillDemo('cliente@gmail.com', 'clie123')}
-              className="btn-tactile btn-tactile-sm"
-            >
-              Cliente Regular
-            </button>
-          </div>
-        </div>
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>

@@ -2,6 +2,9 @@ import { credentialService } from './credentialService';
 import { storageService } from './storageService';
 import { initialUsers } from '../data/initialUsers';
 
+// La sesión y el mantenedor de fase 3 usan userApiService. Los servicios de la demo
+// de pedidos todavía utilizan estos datos locales y las validaciones compartidas.
+
 const STORAGE_KEY = 'users';
 
 export const userService = {

@@ -1,3 +1,4 @@
+import { apiRequest } from './apiService';
 import { storageService } from './storageService';
 import { initialProducts } from '../data/initialProducts';
 
@@ -7,17 +8,6 @@ const STORAGE_KEY = 'products';
 const API_VENTAS_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_VENTAS_URL) 
   ? import.meta.env.VITE_API_VENTAS_URL 
   : 'http://localhost:8082/api/v1';
-
-// Mapeo canónico de categorías a IDs del backend relacional
-const CATEGORY_MAP = {
-  'Materiales de Construcción': 1,
-  'Herramientas Eléctricas': 2,
-  'Herramientas Manuales': 3,
-  'Gasfitería': 4,
-  'Electricidad': 5,
-  'Pinturas': 6,
-  'Seguridad': 7
-};
 
 // Imágenes genéricas de la versión anterior, usadas solo para actualizar sus referencias.
 const LEGACY_CATEGORY_IMAGES = {
@@ -31,14 +21,45 @@ const LEGACY_CATEGORY_IMAGES = {
 };
 const INITIAL_PRODUCTS_BY_CODE = new Map(initialProducts.map(product => [product.codigo, product]));
 
-function getAuthHeaders(token) {
-  const headers = { 'Content-Type': 'application/json' };
-  const resolvedToken = token || (typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null);
-  if (resolvedToken) {
-    headers['Authorization'] = `Bearer ${resolvedToken}`;
-  }
-  return headers;
+function normalizeProduct(product) {
+  const initial = INITIAL_PRODUCTS_BY_CODE.get(product.codigo);
+  const legacyImage = initial && `/assets/img/productos/${LEGACY_CATEGORY_IMAGES[initial.categoria]}`;
+  // Las referencias genéricas antiguas se actualizan antes de mostrar o guardar el producto.
+  // Una imagen personalizada del servidor se conserva.
+  return {
+    ...product,
+    categoria: product.categoriaNombre ?? product.categoria ?? '',
+    imagen: initial && product.imagen === legacyImage ? initial.imagen : product.imagen
+  };
 }
+
+function saveProducts(products) {
+  storageService.set(STORAGE_KEY, products);
+  window.dispatchEvent(new Event('catalog-updated'));
+}
+
+function mergeProducts(products) {
+  const cached = new Map(storageService.get(STORAGE_KEY, []).map(product => [Number(product.id), product]));
+  for (const product of products) cached.set(Number(product.id), product);
+  saveProducts(Array.from(cached.values()));
+}
+
+async function categoryRecords() {
+  const categories = await apiRequest(API_VENTAS_URL + '/categorias', { token: null });
+  if (!Array.isArray(categories)) throw new Error('No se pudo leer las categorías.');
+  const active = categories.filter(category => category.activo !== false);
+  storageService.set('api_categories', active);
+  return active;
+}
+
+async function resolveCategory(data) {
+  if (data.categoriaId) return Number(data.categoriaId);
+  const categories = await categoryRecords();
+  const category = categories.find(item => item.nombre.toLowerCase() === data.categoria?.trim().toLowerCase());
+  if (!category) throw new Error('Selecciona una categoría vigente del catálogo.');
+  return category.id;
+}
+
 
 export const productService = {
   /**
@@ -46,6 +67,7 @@ export const productService = {
    */
   getUnitPrice(product) {
     if (!product) return 0;
+    if (Number.isFinite(product.precioEfectivo)) return product.precioEfectivo;
     return product.enOferta && product.descuento > 0
       ? Math.round(product.precio * (1 - product.descuento / 100)) : product.precio;
   },
@@ -239,8 +261,8 @@ export const productService = {
   /**
    * Filtra productos por múltiples criterios combinados
    */
-  filterProducts({ category, search, minPrice, maxPrice, inOffer, criticalOnly } = {}) {
-    let list = this.getProducts();
+  filterProducts({ category, search, minPrice, maxPrice, inOffer, criticalOnly } = {}, products = this.getProducts()) {
+    let list = [...products];
 
     if (category && category !== 'ALL') {
       list = list.filter(p => p.categoria.toLowerCase() === category.toLowerCase());
@@ -283,228 +305,111 @@ export const productService = {
     return initialProducts;
   },
 
-  // =========================================================================
-  // INTEGRACIÓN ASÍNCRONA REST API (FASE 3 - BACKEND VENTAS-SERVICE)
-  // =========================================================================
+  // Consultas y escrituras REST de fase 3. El almacenamiento conserva una caché del servidor.
+  async fetchProducts({ categoriaId, enOferta, buscar, page = 0, size = 100, allPages = true } = {}) {
+    let currentPage = page;
+    let totalPages;
+    const products = [];
+    do {
+      const params = new URLSearchParams({ page: currentPage, size });
+      if (categoriaId) params.set('categoriaId', categoriaId);
+      if (enOferta !== undefined && enOferta !== null) params.set('enOferta', enOferta);
+      if (buscar) params.set('buscar', buscar);
+      const data = await apiRequest(`${API_VENTAS_URL}/productos?${params}`, { token: null });
+      const rows = Array.isArray(data) ? data : data.content;
+      if (!Array.isArray(rows)) throw new Error('No se pudo leer el catálogo.');
+      products.push(...rows.map(normalizeProduct));
+      totalPages = Array.isArray(data) ? currentPage + 1 : data.totalPages;
+      currentPage++;
+    } while (allPages && currentPage < totalPages);
 
-  /**
-   * Consulta el catálogo asíncronamente desde el backend Spring Boot.
-   * Si la API está disponible, sincroniza el almacenamiento local.
-   * Si está offline o en entorno de tests sin servidor, retorna el catálogo local.
-   */
-  async fetchProducts({ categoriaId, enOferta, buscar, page = 0, size = 50 } = {}) {
-    try {
-      const params = new URLSearchParams();
-      if (categoriaId) params.append('categoriaId', categoriaId);
-      if (enOferta !== undefined && enOferta !== null) params.append('enOferta', enOferta);
-      if (buscar) params.append('buscar', buscar);
-      params.append('page', page);
-      params.append('size', size);
-
-      const res = await fetch(`${API_VENTAS_URL}/productos?${params.toString()}`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      const data = await res.json();
-      const list = Array.isArray(data) ? data : (data.content || []);
-      if (list.length > 0) {
-        storageService.set(STORAGE_KEY, list);
-      }
-      return list;
-    } catch {
-      return this.getProducts();
-    }
+    if (!categoriaId && enOferta == null && !buscar && page === 0 && allPages) saveProducts(products);
+    else mergeProducts(products);
+    return products;
   },
 
-  /**
-   * Obtiene un producto por ID desde el backend REST.
-   */
   async fetchProductById(id) {
-    try {
-      const res = await fetch(`${API_VENTAS_URL}/productos/${id}`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      return await res.json();
-    } catch {
-      return this.getProductById(id);
+    const product = normalizeProduct(await apiRequest(`${API_VENTAS_URL}/productos/${id}`, { token: null }));
+    if (product.activo === false) {
+      const error = new Error('El producto ya no está disponible.');
+      error.status = 404;
+      throw error;
     }
+    mergeProducts([product]);
+    return product;
   },
 
-  /**
-   * Obtiene categorías oficiales desde el backend REST.
-   */
   async fetchCategories() {
-    try {
-      const res = await fetch(`${API_VENTAS_URL}/categorias`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      const categories = await res.json();
-      return categories.map(c => c.nombre || c);
-    } catch {
-      return this.getCategories();
-    }
+    return (await categoryRecords()).map(category => category.nombre);
   },
 
-  /**
-   * Obtiene productos con stock crítico desde el backend REST.
-   */
+  fetchCategoryDetails() {
+    return categoryRecords();
+  },
+
   async fetchCriticalStock() {
-    try {
-      const res = await fetch(`${API_VENTAS_URL}/productos/criticos`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      return await res.json();
-    } catch {
-      return this.getCriticalStockProducts();
-    }
+    const rows = await apiRequest(API_VENTAS_URL + '/productos/criticos', { token: null });
+    if (!Array.isArray(rows)) throw new Error('No se pudo leer el inventario.');
+    const products = rows.map(normalizeProduct);
+    mergeProducts(products);
+    return products;
   },
 
-  /**
-   * Obtiene productos en oferta desde el backend REST.
-   */
   async fetchOffers() {
-    try {
-      const res = await fetch(`${API_VENTAS_URL}/productos/ofertas`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      return await res.json();
-    } catch {
-      return this.getOfferProducts();
-    }
+    const rows = await apiRequest(API_VENTAS_URL + '/productos/ofertas', { token: null });
+    if (!Array.isArray(rows)) throw new Error('No se pudo leer las ofertas.');
+    const products = rows.map(normalizeProduct);
+    mergeProducts(products);
+    return products;
   },
 
-  /**
-   * Crea un producto en el backend REST (Requiere ADMIN).
-   */
   async createProductApi(productData, token) {
     this.validateProduct(productData);
-
-    const categoriaId = productData.categoriaId || CATEGORY_MAP[productData.categoria] || 1;
     const payload = {
+      ...productData,
       codigo: productData.codigo.trim().toUpperCase(),
       nombre: productData.nombre.trim(),
-      descripcion: productData.descripcion || '',
-      categoriaId: Number(categoriaId),
-      subcategoria: productData.subcategoria || 'General',
-      marca: productData.marca || 'Genérico',
-      unidad: productData.unidad || 'Unidad',
-      precio: Number(productData.precio) || 0,
-      precioCompra: Number(productData.precioCompra) || 0,
-      stock: Math.max(0, parseInt(productData.stock, 10) || 0),
-      stockMinimo: Math.max(0, parseInt(productData.stockMinimo, 10) || 0),
-      enOferta: Boolean(productData.enOferta),
-      descuento: Number(productData.descuento) || 0,
-      imagen: productData.imagen || '/assets/img/productos/cemento.jpg',
-      especificaciones: productData.especificaciones || ''
+      categoriaId: await resolveCategory(productData),
+      precio: Number(productData.precio),
+      precioCompra: Number(productData.precioCompra || 0),
+      stock: Number(productData.stock),
+      stockMinimo: Number(productData.stockMinimo || 0),
+      descuento: Number(productData.descuento || 0),
+      enOferta: Boolean(productData.enOferta)
     };
-
-    try {
-      const res = await fetch(`${API_VENTAS_URL}/productos`, {
-        method: 'POST',
-        headers: getAuthHeaders(token),
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw new Error(errorBody.mensaje || `Error al crear producto: HTTP ${res.status}`);
-      }
-      const created = await res.json();
-      this.createProduct(created);
-      return created;
-    } catch (err) {
-      // Si la API falla por conexión offline en desarrollo/test, realizar en local
-      if (err.message.includes('HTTP error') || err.message.includes('Failed to fetch')) {
-        return this.createProduct(productData);
-      }
-      throw err;
-    }
+    delete payload.categoria;
+    const product = normalizeProduct(await apiRequest(API_VENTAS_URL + '/productos', {
+      method: 'POST', data: payload, token
+    }));
+    mergeProducts([product]);
+    return product;
   },
 
-  /**
-   * Actualiza un producto en el backend REST (Requiere ADMIN).
-   */
   async updateProductApi(id, updatedData, token) {
-    const categoriaId = updatedData.categoriaId || CATEGORY_MAP[updatedData.categoria];
-    const payload = {
-      nombre: updatedData.nombre,
-      descripcion: updatedData.descripcion,
-      categoriaId: categoriaId ? Number(categoriaId) : undefined,
-      subcategoria: updatedData.subcategoria,
-      marca: updatedData.marca,
-      unidad: updatedData.unidad,
-      precio: updatedData.precio !== undefined ? Number(updatedData.precio) : undefined,
-      precioCompra: updatedData.precioCompra !== undefined ? Number(updatedData.precioCompra) : undefined,
-      stock: updatedData.stock !== undefined ? Math.max(0, parseInt(updatedData.stock, 10)) : undefined,
-      stockMinimo: updatedData.stockMinimo !== undefined ? Math.max(0, parseInt(updatedData.stockMinimo, 10)) : undefined,
-      enOferta: updatedData.enOferta !== undefined ? Boolean(updatedData.enOferta) : undefined,
-      descuento: updatedData.descuento !== undefined ? Number(updatedData.descuento) : undefined,
-      imagen: updatedData.imagen,
-      especificaciones: updatedData.especificaciones,
-      activo: updatedData.activo !== undefined ? Boolean(updatedData.activo) : undefined
-    };
-
-    try {
-      const res = await fetch(`${API_VENTAS_URL}/productos/${id}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(token),
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw new Error(errorBody.mensaje || `Error al actualizar producto: HTTP ${res.status}`);
-      }
-      const updated = await res.json();
-      this.updateProduct(id, updated);
-      return updated;
-    } catch (err) {
-      if (err.message.includes('HTTP error') || err.message.includes('Failed to fetch')) {
-        return this.updateProduct(id, updatedData);
-      }
-      throw err;
+    const payload = { ...updatedData };
+    if (updatedData.categoriaId || updatedData.categoria) payload.categoriaId = await resolveCategory(updatedData);
+    delete payload.categoria;
+    for (const field of ['precio', 'precioCompra', 'stock', 'stockMinimo', 'descuento']) {
+      if (payload[field] !== undefined) payload[field] = Number(payload[field]);
     }
+    const product = normalizeProduct(await apiRequest(`${API_VENTAS_URL}/productos/${id}`, {
+      method: 'PUT', data: payload, token
+    }));
+    mergeProducts([product]);
+    return product;
   },
 
-  /**
-   * Realiza un ajuste de stock vía PATCH en el backend REST (Requiere ADMIN).
-   */
   async adjustStockApi(id, delta, token) {
-    try {
-      const res = await fetch(`${API_VENTAS_URL}/productos/${id}/stock`, {
-        method: 'PATCH',
-        headers: getAuthHeaders(token),
-        body: JSON.stringify({ delta })
-      });
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw new Error(errorBody.mensaje || `Error al ajustar stock: HTTP ${res.status}`);
-      }
-      const updated = await res.json();
-      this.updateProduct(id, { stock: updated.stock });
-      return updated;
-    } catch (err) {
-      if (err.message.includes('HTTP error') || err.message.includes('Failed to fetch')) {
-        const prod = this.getProductById(id);
-        if (prod) {
-          return this.updateProduct(id, { stock: Math.max(0, prod.stock + delta) });
-        }
-      }
-      throw err;
-    }
+    const product = normalizeProduct(await apiRequest(`${API_VENTAS_URL}/productos/${id}/stock`, {
+      method: 'PATCH', data: { delta }, token
+    }));
+    mergeProducts([product]);
+    return product;
   },
 
-  /**
-   * Elimina un producto en el backend REST (Requiere ADMIN).
-   */
   async deleteProductApi(id, token) {
-    try {
-      const res = await fetch(`${API_VENTAS_URL}/productos/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(token)
-      });
-      if (!res.ok && res.status !== 204) {
-        const errorBody = await res.json().catch(() => ({}));
-        throw new Error(errorBody.mensaje || `Error al eliminar producto: HTTP ${res.status}`);
-      }
-      return this.deleteProduct(id);
-    } catch (err) {
-      if (err.message.includes('HTTP error') || err.message.includes('Failed to fetch')) {
-        return this.deleteProduct(id);
-      }
-      throw err;
-    }
+    await apiRequest(`${API_VENTAS_URL}/productos/${id}`, { method: 'DELETE', token });
+    saveProducts(storageService.get(STORAGE_KEY, []).filter(product => Number(product.id) !== Number(id)));
+    return true;
   }
 };

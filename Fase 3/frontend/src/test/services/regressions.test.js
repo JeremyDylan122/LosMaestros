@@ -1,115 +1,58 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { orderService } from '../../services/orderService';
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { productService } from '../../services/productService';
-import { userService } from '../../services/userService';
 import { storageService } from '../../services/storageService';
-import { shippingService } from '../../services/shippingService';
-
-beforeEach(() => { localStorage.clear(); sessionStorage.clear(); vi.restoreAllMocks(); });
-const purchase = (extra = {}) => ({ items: [{ id: 1, cantidad: 1 }], deliveryType: 'RETIRO_TIENDA', paymentMethod: 'WEBPAY_SIMULADO', ...extra });
-
-describe('Regresiones de pedidos y persistencia', () => {
-  it('usa el precio y descuento del catálogo y conserva la suma de líneas', () => {
-    productService.updateProduct(1, { enOferta: true, descuento: 20 });
-    const order = orderService.createOrder(purchase({ items: [{ id: 1, cantidad: 2, precio: 1 }] }));
-    expect(order.items[0].precioUnitario).toBe(Math.round(productService.getProductById(1).precio * .8));
-    expect(order.totalMonto).toBe(order.items[0].subtotal);
+import { initialProducts } from '../../data/initialProducts';
+const response = (data, status = 200) => ({ ok: status < 400, status, json: async () => data });
+beforeEach(() => localStorage.clear());
+afterEach(() => vi.restoreAllMocks());
+describe('Regresiones del catálogo REST', () => {
+  it.each(['catalogo', 'ofertas', 'detalle'])('la imagen de %s coincide con la que recibe el carrito', async view => {
+    const initial = initialProducts.find(product => product.codigo === 'SE005');
+    const remote = { ...initial, id: 927, categoriaNombre: 'Seguridad', imagen: '/assets/img/productos/casco.jpg' };
+    const body = view === 'catalogo' ? { content: [remote], totalPages: 1 } : view === 'ofertas' ? [remote] : remote;
+    vi.spyOn(global, 'fetch').mockResolvedValue(response(body));
+    const result = view === 'catalogo' ? (await productService.fetchProducts())[0]
+      : view === 'ofertas' ? (await productService.fetchOffers())[0] : await productService.fetchProductById(927);
+    expect(result.imagen).toBe(initial.imagen);
+    expect(productService.getProductById(927).imagen).toBe(result.imagen);
+    expect(result.id).toBe(927);
   });
-  it('incluye despacho en el pedido y en el saldo del contratista', () => {
-    const before = userService.getUserById(3).saldoPendiente;
-    const order = orderService.createOrder(purchase({ userId: 3, paymentMethod: 'CUENTA_CORRIENTE', deliveryType: 'DESPACHO_OBRA', commune: 'Vicuña' }));
-    expect(order.shippingFee).toBe(14990);
-    expect(order.totalMonto).toBe(order.subtotal + 14990);
-    expect(userService.getUserById(3).saldoPendiente).toBe(before + order.totalMonto);
+  it('conserva las imágenes personalizadas que llegan del servidor', async () => {
+    const initial = initialProducts.find(product => product.codigo === 'SE005');
+    vi.spyOn(global, 'fetch').mockResolvedValue(response({ ...initial, imagen: '/assets/img/productos/guantes-personalizados.jpg' }));
+    const result = await productService.fetchProductById(initial.id);
+    expect(result.imagen).toBe('/assets/img/productos/guantes-personalizados.jpg');
+    expect(productService.getProductById(initial.id).imagen).toBe(result.imagen);
   });
-  it.each([0, -1, 1.5, NaN])('rechaza cantidad inválida %s sin descontar existencias', cantidad => {
-    const stock = productService.getProductById(1).stock;
-    expect(() => orderService.createOrder(purchase({ items: [{ id: 1, cantidad }] }))).toThrow('entero positivo');
-    expect(productService.getProductById(1).stock).toBe(stock);
-    expect(orderService.getOrders()).toHaveLength(0);
+  it('conserva ids y categorías del servidor al recorrer la paginación', async () => {
+    const fetch = vi.spyOn(global, 'fetch').mockResolvedValueOnce(response({ content: [{ id: 105, categoriaNombre: 'Pinturas', precio: 999, precioEfectivo: 899.1 }], totalPages: 2 })).mockResolvedValueOnce(response({ content: [{ id: 207, categoriaNombre: 'Otra' }], totalPages: 2 }));
+    const products = await productService.fetchProducts();
+    expect(products.map(p => p.id)).toEqual([105,207]);
+    expect(products[0].categoria).toBe('Pinturas');
+    expect(productService.getUnitPrice(products[0])).toBe(899.1);
+    expect(fetch.mock.calls[1][0]).toContain('page=1');
   });
-  it('consolida líneas repetidas antes de comprobar stock', () => {
-    productService.updateProduct(1, { stock: 2 });
-    expect(() => orderService.createOrder(purchase({ items: [{ id: 1, cantidad: 2 }, { id: 1, cantidad: 2 }] }))).toThrow('Stock insuficiente');
-    expect(productService.getProductById(1).stock).toBe(2);
+  it('vacía la caché cuando el catálogo real está vacío', async () => {
+    productService.getProducts();
+    vi.spyOn(global, 'fetch').mockResolvedValue(response({ content: [], totalPages: 0 }));
+    expect(await productService.fetchProducts()).toEqual([]);
+    expect(storageService.get('products')).toEqual([]);
   });
-  it('no confirma un despacho fuera de la cobertura de la demo', () => {
-    expect(() => orderService.createOrder(purchase({ deliveryType: 'DESPACHO_OBRA', region: 'Región Metropolitana de Santiago', commune: 'Santiago' }))).toThrow('cotización');
-    expect(orderService.getOrders()).toHaveLength(0);
+  it('no presenta datos semilla cuando la API no responde', async () => {
+    vi.spyOn(global, 'fetch').mockRejectedValue(new TypeError('network'));
+    await expect(productService.fetchProducts()).rejects.toThrow('No se pudo conectar');
   });
-  it('revierte stock y saldo si falla el guardado de la orden', () => {
-    productService.getProducts(); userService.getUsers();
-    const before = JSON.stringify(localStorage);
-    const original = Storage.prototype.setItem;
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(function(key, value) {
-      if (key === 'los_maestros_orders') throw new Error('Cuota agotada');
-      return original.call(this, key, value);
-    });
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => orderService.createOrder(purchase({ userId: 3, paymentMethod: 'CUENTA_CORRIENTE' }))).toThrow('guardar');
-    expect(JSON.stringify(localStorage)).toBe(before);
+  it('resuelve la categoría por sus datos reales y conserva el id del producto creado', async () => {
+    const fetch = vi.spyOn(global, 'fetch').mockResolvedValueOnce(response([{ id: 42, nombre: 'Pinturas', activo: true }])).mockResolvedValueOnce(response({ id: 909, codigo: 'P-1', categoriaId: 42, categoriaNombre: 'Pinturas' },201));
+    const product = await productService.createProductApi({ codigo: 'P-1', nombre: 'Pintura', categoria: 'Pinturas', precio: 100, stock: 2 });
+    expect(JSON.parse(fetch.mock.calls[1][1].body).categoriaId).toBe(42);
+    expect(product.id).toBe(909);
+    expect(productService.getProductById(909).codigo).toBe('P-1');
   });
-  it('no entrega un pedido de otro cliente ni a un visitante', () => {
-    const order = orderService.createOrder(purchase({ userId: 4 }));
-    expect(orderService.getOrderForViewer(order.id, null)).toBeNull();
-    expect(orderService.getOrderForViewer(order.id, userService.getUserById(3))).toBeNull();
-    expect(orderService.getOrderForViewer(order.id, userService.getUserById(4))).not.toBeNull();
-  });
-  it('limita la confirmación invitada a la sesión que compró', () => {
-    const order = orderService.createOrder(purchase());
-    expect(orderService.getOrderForViewer(order.id, null)).not.toBeNull();
-    sessionStorage.clear();
-    expect(orderService.getOrderForViewer(order.id, null)).toBeNull();
-  });
-  it('anula una sola vez y restituye stock y crédito', () => {
-    const stock = productService.getProductById(1).stock;
-    const saldo = userService.getUserById(3).saldoPendiente;
-    const order = orderService.createOrder(purchase({ userId: 3, paymentMethod: 'CUENTA_CORRIENTE' }));
-    orderService.updateOrderStatus(order.id, 'ANULADO');
-    orderService.updateOrderStatus(order.id, 'ANULADO');
-    expect(productService.getProductById(1).stock).toBe(stock);
-    expect(userService.getUserById(3).saldoPendiente).toBe(saldo);
-    expect(() => orderService.updateOrderStatus(order.id, 'CONFIRMADO')).toThrow('cerrado');
-  });
-  it('mantiene transferencia pendiente sin fingir cobro', () => {
-    expect(orderService.createOrder(purchase({ paymentMethod: 'TRANSFERENCIA' })).estadoPago).toBe('PENDIENTE_TRANSFERENCIA');
-  });
-});
-
-describe('Credenciales locales y validaciones', () => {
-  it('migra claves antiguas y permite seguir iniciando sesión', async () => {
-    storageService.set('users', [{ id: 10, email: 'antiguo@gmail.com', password: 'pass123', rol: 'CLIENTE' }]);
-    const user = await userService.authenticate('antiguo@gmail.com', 'pass123');
-    expect(user.id).toBe(10);
-    expect(user.passwordHash).toBeUndefined();
-    expect(localStorage.getItem('los_maestros_users')).not.toContain('pass123');
-    expect(userService.getUserById(10).passwordHash).toHaveLength(64);
-  });
-  it('no permite guardar RUN inválido al editar', () => {
-    expect(() => userService.updateUser(4, { run: '12345678-0' })).toThrow('verificador');
-  });
-  it('conserva el crédito de registro elegido para la demo', async () => {
-    const user = await userService.createUser({ run: '12345678-5', nombre: 'Demo', email: 'nuevo@gmail.com', password: 'pass123', rol: 'CONTRATISTA', cuentaCorrienteActiva: true, creditoMaximo: 2500000 });
-    expect(user.cuentaCorrienteActiva).toBe(true);
-    expect(user.creditoMaximo).toBe(2500000);
-    expect(user.passwordHash).toBeUndefined();
-  });
-  it('cambia una clave y rechaza la anterior', async () => {
-    await userService.changePassword(1, 'nuevo123');
-    await expect(userService.authenticate('admin@duoc.cl', 'admin123')).rejects.toThrow('Credenciales');
-    expect((await userService.authenticate('admin@duoc.cl', 'nuevo123')).id).toBe(1);
-  });
-  it('rechaza descuentos fuera de rango y cantidades negativas', () => {
-    expect(() => productService.updateProduct(1, { descuento: 101 })).toThrow('100%');
-    expect(() => productService.reduceStock(1, -2)).toThrow('entero positivo');
-  });
-});
-
-describe('Tarifas de entrega', () => {
-  it.each([[99999, 4990], [100000, 0], [100001, 0]])('aplica el límite urbano para subtotal %s', (subtotal, fee) => {
-    expect(shippingService.quote({ deliveryType: 'DESPACHO_OBRA', commune: 'Coquimbo', subtotal }).fee).toBe(fee);
-  });
-  it('permite retiro sin costo independientemente de la región', () => {
-    expect(shippingService.quote({ deliveryType: 'RETIRO_TIENDA', region: 'Otra', subtotal: 100 }).fee).toBe(0);
+  it('una escritura rechazada no modifica la caché', async () => {
+    const before = productService.getProducts();
+    vi.spyOn(global, 'fetch').mockResolvedValue(response({ mensaje: 'Acceso denegado' },403));
+    await expect(productService.adjustStockApi(1,1)).rejects.toThrow('Acceso denegado');
+    expect(productService.getProducts()).toEqual(before);
   });
 });

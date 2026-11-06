@@ -52,8 +52,8 @@ function AppContent() {
           <Route path="/mis-pedidos" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
           {/* Flujo de Compra y Carrito */}
           <Route path="/carrito" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/compra-exitosa/:id" element={<CheckoutSuccess />} />
+          <Route path="/checkout" element={<ProtectedRoute allowedRoles={['CLIENTE', 'CONTRATISTA', 'ADMIN']}><Checkout /></ProtectedRoute>} />
+          <Route path="/compra-exitosa/:id" element={<ProtectedRoute><CheckoutSuccess /></ProtectedRoute>} />
           <Route path="/compra-fallida" element={<CheckoutFailure />} />
 
           {/* Vistas Protegidas del Panel Administrativo (RBAC) */}

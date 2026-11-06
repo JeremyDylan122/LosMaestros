@@ -1,6 +1,8 @@
+import { useApiData } from '../hooks/useApiData';
+import { ApiStatus } from '../components/common/ApiStatus';
 import { shippingService } from '../services/shippingService';
 import { productService } from '../services/productService';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   CreditCard, 
@@ -16,9 +18,15 @@ import { chileLocations } from '../data/chileLocations';
 
 export const Checkout = () => {
   const { cartItems, totalPrice, totalCount: _totalCount, clearCart, isEmpty } = useCart();
-  const { user, isAuthenticated, isContractor, refreshUser } = useAuth();
+  const { user, isAuthenticated, isContractor } = useAuth();
   const navigate = useNavigate();
   const completed = useRef(false);
+  const submitting = useRef(false);
+  const autofilledUser = useRef(null);
+  const catalog = useApiData(productService.fetchProducts, []);
+  const loadAccount = useCallback(() => isContractor ? orderService.getMyAccount() : Promise.resolve(null), [isContractor]);
+  const account = useApiData(loadAccount);
+  const currentAccount = account.error ? null : account.data;
 
   // Redirigir al carrito si está vacío
   useEffect(() => {
@@ -37,23 +45,22 @@ export const Checkout = () => {
   const [commune, setCommune] = useState('La Serena');
   const [address, setAddress] = useState('');
   const [notes, setNotes] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState(isContractor ? 'CUENTA_CORRIENTE' : 'WEBPAY_SIMULADO');
+  const [paymentMethod, setPaymentMethod] = useState('WEBPAY_SIMULADO');
   const [simulateError, setSimulateError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Auto-llenado si el usuario ha iniciado sesión
   useEffect(() => {
-    if (user) {
+    if (user && autofilledUser.current !== user.id) {
+      autofilledUser.current = user.id;
       setCustomerName(`${user.nombre} ${user.apellidos}`.trim());
       setCustomerEmail(user.email || '');
       setAddress(user.direccion || '');
       if (user.region) setRegion(user.region);
       if (user.comuna) setCommune(user.comuna);
       if (user.empresa) setEmpresa(user.empresa);
-      if (user.rol === 'CONTRATISTA') {
-        setPaymentMethod('CUENTA_CORRIENTE');
-      }
+
     }
   }, [user]);
 
@@ -63,8 +70,9 @@ export const Checkout = () => {
 
   const grandTotal = totalPrice + shippingFee;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting.current || catalog.loading || catalog.error) return;
     setErrorMsg('');
 
     // Validaciones básicas
@@ -96,10 +104,15 @@ export const Checkout = () => {
       return;
     }
 
+    if (!isAuthenticated) { setErrorMsg('Inicia sesión para realizar tu pedido.'); return; }
+    if (paymentMethod === 'CUENTA_CORRIENTE' && (!currentAccount?.activa || account.loading || currentAccount.creditoDisponible < grandTotal)) {
+      setErrorMsg('Cuenta corriente inactiva o crédito insuficiente.'); return;
+    }
+    submitting.current = true;
     setLoading(true);
 
     try {
-      const order = orderService.createOrder({
+      const order = await orderService.createOrder({
         userId: user?.id || null,
         customerName,
         customerEmail,
@@ -118,13 +131,14 @@ export const Checkout = () => {
       // Limpiar carrito y refrescar usuario
       completed.current = true;
       clearCart();
-      refreshUser();
+
 
       // Navegar a vista de compra exitosa
       navigate(`/compra-exitosa/${order.id}`, { state: { order } });
     } catch (err) {
       setErrorMsg(err.message);
     } finally {
+      submitting.current = false;
       setLoading(false);
     }
   };
@@ -143,7 +157,7 @@ export const Checkout = () => {
         </h1>
         <p className="section-subtitle">
           {isAuthenticated 
-            ? `Datos autocompletados con tu cuenta (${user.nombre} &bull; ${user.rol})`
+            ? `Datos autocompletados con tu cuenta (${user.nombre} • ${user.rol})`
             : 'Completa tus datos de entrega y selecciona tu método de pago.'}
         </p>
       </div>
@@ -155,6 +169,8 @@ export const Checkout = () => {
         </div>
       )}
 
+      <ApiStatus loading={catalog.loading} error={catalog.error} onRetry={catalog.reload} />
+      {isContractor && <ApiStatus loading={account.loading} error={account.error} onRetry={account.reload} />}
       <p role="status">{shipping.message}</p>
       <form onSubmit={handleSubmit} data-testid="checkout-form">
         <div className="grid-2 checkout-layout" style={{ gridTemplateColumns: '2fr 1fr', gap: '2rem', alignItems: 'start' }}>
@@ -370,7 +386,7 @@ export const Checkout = () => {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {/* OPCIÓN CUENTA CORRIENTE CONTRATISTA */}
-                {isAuthenticated && isContractor && (
+                {isAuthenticated && isContractor && currentAccount?.activa && (
                   <label style={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -396,7 +412,7 @@ export const Checkout = () => {
                         💳 Cuenta Corriente para Contratistas (Pago a Fin de Mes)
                       </div>
                       <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', opacity: 0.95 }}>
-                        Cargar este pedido a tu línea de crédito. Línea máxima: ${user.creditoMaximo?.toLocaleString('es-CL')} &bull; Saldo pendiente actual: ${user.saldoPendiente?.toLocaleString('es-CL')}.
+                        Cargar este pedido a tu línea de crédito. Línea máxima: ${currentAccount.creditoMaximo?.toLocaleString('es-CL')} &bull; Saldo pendiente actual: ${currentAccount.saldoPendiente?.toLocaleString('es-CL')}.
                       </p>
                     </div>
                   </label>
@@ -515,7 +531,7 @@ export const Checkout = () => {
 
             <button
               type="submit"
-              disabled={loading || !shipping.available}
+              disabled={loading || catalog.loading || !!catalog.error || !shipping.available}
               className="btn-tactile btn-tactile-primary btn-tactile-block"
               style={{ padding: '0.9rem', fontSize: '1.05rem' }}
               data-testid="confirm-order-btn"

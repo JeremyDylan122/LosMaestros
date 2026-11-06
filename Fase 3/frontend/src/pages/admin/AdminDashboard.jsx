@@ -1,3 +1,5 @@
+import { ApiStatus } from '../../components/common/ApiStatus';
+import { CuentaCorrienteModal } from '../../components/admin/CuentaCorrienteModal';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -25,10 +27,11 @@ import {
 import { productService } from '../../services/productService';
 import { orderService } from '../../services/orderService';
 import { userService } from '../../services/userService';
+import { userApiService } from '../../services/userApiService';
 import { useAuth } from '../../context/AuthContext';
 
 export const AdminDashboard = () => {
-  const { user, isAdmin, isVendor: _isVendor, logout } = useAuth();
+  const { user, isAdmin, isVendor: _isVendor, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -45,10 +48,19 @@ export const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Estados de datos sincronizados con persistencia
-  const [products, setProducts] = useState(() => productService.getProducts());
-  const [orders, setOrders] = useState(() => orderService.getOrders());
-  const [users, setUsers] = useState(() => userService.getUsers());
-  const [criticalProducts, setCriticalProducts] = useState(() => productService.getCriticalStockProducts());
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState('');
+  const [usersRevision, setUsersRevision] = useState(0);
+  const [userSaving, setUserSaving] = useState(false);
+  const [criticalProducts, setCriticalProducts] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [dataError, setDataError] = useState(null);
+  const [dataRevision, setDataRevision] = useState(0);
+  const [accountUser, setAccountUser] = useState(null);
   const [feedback, setFeedback] = useState(null);
 
   // Estados de búsqueda y filtros
@@ -98,10 +110,7 @@ export const AdminDashboard = () => {
     region: 'Región de Coquimbo',
     comuna: 'La Serena',
     direccion: '',
-    empresa: '',
-    cuentaCorrienteActiva: false,
-    creditoMaximo: 2000000,
-    saldoPendiente: 0
+    empresa: ''
   };
 
   const [productFormData, setProductFormData] = useState(initialProductForm);
@@ -111,36 +120,38 @@ export const AdminDashboard = () => {
   const [userFormErrors, setUserFormErrors] = useState({});
 
   // Cargar datos
-  const reloadAllData = () => {
-    const prods = productService.getProducts();
-    const ords = orderService.getOrders();
-    const usrs = userService.getUsers();
-
-    setProducts(prods);
-    setOrders(ords);
-    setUsers(usrs);
-    setCriticalProducts(productService.getCriticalStockProducts());
-  };
+  const reloadAllData = () => setDataRevision(value => value + 1);
 
   useEffect(() => {
-    let isMounted = true;
-    const loadFreshCatalog = async () => {
-      try {
-        const liveProds = await productService.fetchProducts();
-        if (isMounted && liveProds && liveProds.length > 0) {
-          setProducts(liveProds);
-        }
-        const liveCrit = await productService.fetchCriticalStock();
-        if (isMounted && liveCrit) {
-          setCriticalProducts(liveCrit);
-        }
-      } catch {
-        // Fallback local ya está en memoria
-      }
-    };
-    loadFreshCatalog();
-    return () => { isMounted = false; };
-  }, []);
+    let active = true;
+    if (!isAdmin) {
+      setUsers([]);
+      return;
+    }
+    setUsersLoading(true);
+    setUsersError('');
+    userApiService.getUsers().then(data => {
+      if (active) setUsers(data);
+    }).catch(error => {
+      if (active) setUsersError(error.message);
+    }).finally(() => {
+      if (active) setUsersLoading(false);
+    });
+    return () => { active = false; };
+  }, [isAdmin, usersRevision]);
+
+  useEffect(() => {
+    let active = true;
+    setDataLoading(true);
+    setDataError(null);
+    Promise.all([productService.fetchProducts(), productService.fetchCriticalStock(), productService.fetchCategories(), orderService.getOrders()])
+      .then(([catalog, critical, categories, history]) => {
+        if (!active) return;
+        setProducts(catalog); setCriticalProducts(critical); setAllCategories(categories); setOrders(history);
+      }).catch(error => { if (active) setDataError(error); })
+      .finally(() => { if (active) setDataLoading(false); });
+    return () => { active = false; };
+  }, [dataRevision]);
 
   const showFeedback = (msg, type = 'success') => {
     setFeedback({ msg, type });
@@ -182,7 +193,7 @@ export const AdminDashboard = () => {
       return;
     }
     setEditingProduct(null);
-    setProductFormData(initialProductForm);
+    setProductFormData({ ...initialProductForm, categoria: allCategories[0] || '' });
     setProductFormErrors({});
     setProductModalOpen(true);
   };
@@ -263,12 +274,13 @@ export const AdminDashboard = () => {
   };
 
   // --- GESTIÓN PEDIDOS ---
-  const handleOrderStatusChange = (orderId, newStatus) => {
+  const handleOrderStatusChange = async (orderId, newStatus) => {
+    if (!isAdmin) return;
     try {
-      orderService.updateOrderStatus(orderId, newStatus);
+      const updated = await orderService.updateOrderStatus(orderId, newStatus);
       reloadAllData();
       if (selectedOrder && Number(selectedOrder.id) === Number(orderId)) {
-        setSelectedOrder(prev => ({ ...prev, estado: newStatus }));
+        setSelectedOrder(updated);
       }
       showFeedback(`Estado del pedido actualizado a "${newStatus}".`);
     } catch (e) {
@@ -296,37 +308,41 @@ export const AdminDashboard = () => {
       region: u.region || 'Región de Coquimbo',
       comuna: u.comuna || 'La Serena',
       direccion: u.direccion || '',
-      empresa: u.empresa || '',
-      cuentaCorrienteActiva: Boolean(u.cuentaCorrienteActiva),
-      creditoMaximo: u.creditoMaximo || 2000000,
-      saldoPendiente: u.saldoPendiente || 0
+      empresa: u.empresa || ''
     });
     setUserFormErrors({});
     setUserModalOpen(true);
   };
 
-  const handleUserRoleChange = (userId, newRole) => {
+  const handleUserRoleChange = async (userId, newRole) => {
+    setUserSaving(true);
     try {
-      userService.updateUser(userId, { rol: newRole });
-      reloadAllData();
+      const current = users.find(candidate => candidate.id === userId);
+      const updated = await userApiService.updateUser(userId, { ...current, rol: newRole });
+      setUsers(previous => previous.map(candidate => candidate.id === userId ? updated : candidate));
       showFeedback(`Rol de usuario actualizado a "${newRole}".`);
     } catch (e) {
       showFeedback(e.message, 'danger');
+    } finally {
+      setUserSaving(false);
     }
   };
 
-  const handleDeleteUser = (id, nombre) => {
+  const handleDeleteUser = async (id, nombre) => {
     if (Number(id) === Number(user?.id)) {
       alert('No puedes eliminar tu propia cuenta en sesión activa.');
       return;
     }
-    if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario "${nombre}"?`)) {
+    if (window.confirm(`¿Deseas desactivar al usuario "${nombre}"?`)) {
+      setUserSaving(true);
       try {
-        userService.deleteUser(id);
-        reloadAllData();
-        showFeedback(`Usuario "${nombre}" eliminado correctamente.`);
+        await userApiService.deleteUser(id);
+        setUsers(previous => previous.map(candidate => candidate.id === id ? { ...candidate, activo: false } : candidate));
+        showFeedback(`Usuario "${nombre}" desactivado correctamente.`);
       } catch (e) {
         showFeedback(e.message, 'danger');
+      } finally {
+        setUserSaving(false);
       }
     }
   };
@@ -351,19 +367,23 @@ export const AdminDashboard = () => {
       return;
     }
 
+    setUserSaving(true);
     try {
       if (editingUser) {
-        if (userFormData.password) await userService.changePassword(editingUser.id, userFormData.password);
-        userService.updateUser(editingUser.id, userFormData);
+        const updated = await userApiService.updateUser(editingUser.id, userFormData);
+        setUsers(previous => previous.map(candidate => candidate.id === updated.id ? updated : candidate));
+        if (updated.id === user.id) refreshUser();
         showFeedback(`Usuario "${userFormData.nombre}" actualizado con éxito.`);
       } else {
-        await userService.createUser(userFormData);
+        const created = await userApiService.createUser(userFormData);
+        setUsers(previous => [...previous, created]);
         showFeedback(`Usuario "${userFormData.nombre}" registrado exitosamente.`);
       }
       setUserModalOpen(false);
-      reloadAllData();
     } catch (err) {
       showFeedback(err.message, 'danger');
+    } finally {
+      setUserSaving(false);
     }
   };
 
@@ -396,7 +416,7 @@ export const AdminDashboard = () => {
   });
 
   // Categorías únicas
-  const allCategories = Array.from(new Set(products.map(p => p.categoria)));
+
 
   return (
     <div className="admin-layout-root">
@@ -469,7 +489,7 @@ export const AdminDashboard = () => {
             <span className="admin-nav-item-chevron">&rsaquo;</span>
           </button>
 
-          {isAdmin ? (
+          {isAdmin && (
             <button 
               type="button"
               onClick={() => handleTabChange('usuarios')}
@@ -481,17 +501,6 @@ export const AdminDashboard = () => {
               </div>
               <span className="admin-nav-item-chevron">&rsaquo;</span>
             </button>
-          ) : (
-            <div 
-              className="admin-nav-item" 
-              style={{ opacity: 0.45, cursor: 'not-allowed' }} 
-              title="Usuarios disponible solo para perfil Administrador"
-            >
-              <div className="admin-nav-item-content">
-                <Users size={18} />
-                <span>Usuarios (Admin)</span>
-              </div>
-            </div>
           )}
 
           <button 
@@ -542,6 +551,7 @@ export const AdminDashboard = () => {
       {/* ÁREA PRINCIPAL DE CONTENIDO */}
       <main className="admin-main-canvas">
         {/* MENSAJE DE FEEDBACK TÁCTIL */}
+        <ApiStatus loading={dataLoading} error={dataError} onRetry={reloadAllData} />
         {feedback && (
           <div className={`alert-tactile alert-tactile-${feedback.type}`} style={{ marginBottom: '1.5rem' }}>
             {feedback.type === 'danger' ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
@@ -1025,10 +1035,11 @@ export const AdminDashboard = () => {
                 style={{ minWidth: '190px' }}
               >
                 <option value="ALL">Todos los Estados</option>
-                <option value="Pendiente">Pendiente</option>
-                <option value="En Preparación">En Preparación</option>
-                <option value="En Ruta">En Ruta</option>
-                <option value="Entregado">Entregado</option>
+                <option value="CONFIRMADO">Confirmado</option>
+                <option value="EN_PREPARACION">En preparación</option>
+                <option value="DESPACHADO">Despachado</option>
+                <option value="ENTREGADO">Entregado</option>
+                <option value="ANULADO">Anulado</option>
               </select>
             </div>
 
@@ -1072,15 +1083,18 @@ export const AdminDashboard = () => {
                         </td>
                         <td style={{ textAlign: 'center' }}>
                           <select 
+                            disabled={!isAdmin || dataLoading || ['ENTREGADO', 'ANULADO'].includes(o.estado)}
+                            aria-label={`Estado del pedido ${o.codigoOrden}`}
                             value={o.estado} 
                             onChange={(e) => handleOrderStatusChange(o.id, e.target.value)}
                             className="select-tactile"
                             style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', fontWeight: 800 }}
                           >
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="En Preparación">En Preparación</option>
-                            <option value="En Ruta">En Ruta</option>
-                            <option value="Entregado">Entregado</option>
+                            <option value="CONFIRMADO">Confirmado</option>
+                            <option value="EN_PREPARACION">En preparación</option>
+                            <option value="DESPACHADO">Despachado</option>
+                            <option value="ENTREGADO">Entregado</option>
+                            <option value="ANULADO">Anulado</option>
                           </select>
                         </td>
                         <td style={{ textAlign: 'center' }}>
@@ -1115,7 +1129,7 @@ export const AdminDashboard = () => {
               <div className="admin-overline">SEGURIDAD / CONTROL DE ACCESO RBAC</div>
               <h1 className="admin-title">Gestión de Usuarios y Roles</h1>
               <p className="admin-subtitle">
-                Administración de cuentas, privilegios de acceso y líneas de crédito comercial para contratistas.
+                Administración de cuentas, datos personales y privilegios de acceso.
               </p>
             </div>
 
@@ -1136,12 +1150,18 @@ export const AdminDashboard = () => {
                 type="button" 
                 onClick={handleOpenCreateUser} 
                 className="btn-admin-primary"
+                disabled={userSaving || usersLoading}
               >
                 <Plus size={18} /> Nuevo Usuario
               </button>
             </div>
 
             {/* Tabla de Usuarios */}
+            {usersLoading && <p role="status">Cargando usuarios...</p>}
+            {usersError && <div role="alert">
+              <p>{usersError}</p>
+              <button type="button" className="btn-tactile" onClick={() => setUsersRevision(value => value + 1)}>Reintentar</button>
+            </div>}
             <div className="admin-card-container">
               <table className="admin-table">
                 <thead>
@@ -1151,7 +1171,7 @@ export const AdminDashboard = () => {
                     <th>Correo Electrónico</th>
                     <th style={{ textAlign: 'center' }}>Rol Asignado</th>
                     <th>Comuna</th>
-                    <th style={{ textAlign: 'right' }}>Línea Crédito</th>
+                    <th>Estado</th>
                     <th style={{ textAlign: 'center' }}>Acciones</th>
                   </tr>
                 </thead>
@@ -1170,7 +1190,7 @@ export const AdminDashboard = () => {
                           onChange={(e) => handleUserRoleChange(u.id, e.target.value)}
                           className="select-tactile"
                           style={{ padding: '0.25rem 0.5rem', fontSize: '0.8rem', fontWeight: 800 }}
-                          disabled={Number(u.id) === Number(user?.id)}
+                          disabled={userSaving || !u.activo || Number(u.id) === Number(user?.id)}
                         >
                           <option value="ADMIN">ADMIN</option>
                           <option value="VENDEDOR">VENDEDOR</option>
@@ -1179,22 +1199,16 @@ export const AdminDashboard = () => {
                         </select>
                       </td>
                       <td>{u.comuna}</td>
-                      <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
-                        {u.rol === 'CONTRATISTA' ? (
-                          <span style={{ fontWeight: 800, color: 'var(--color-contractor)' }}>
-                            ${(u.creditoMaximo || 0).toLocaleString('es-CL')}
-                          </span>
-                        ) : (
-                          <span style={{ color: '#94a3b8' }}>-</span>
-                        )}
-                      </td>
+                      <td>{u.activo ? 'Activo' : 'Inactivo'}</td>
                       <td style={{ textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
+                          {isAdmin && u.activo && u.rol === 'CONTRATISTA' && <button type="button" className="btn-tactile btn-tactile-sm" onClick={() => setAccountUser(u)}>Cuenta corriente</button>}
                           <button 
                             type="button"
                             onClick={() => handleOpenEditUser(u)} 
                             className="btn-tactile btn-tactile-sm"
                             title="Editar usuario"
+                            disabled={userSaving || !u.activo}
                           >
                             <Edit3 size={13} />
                           </button>
@@ -1202,8 +1216,8 @@ export const AdminDashboard = () => {
                             type="button"
                             onClick={() => handleDeleteUser(u.id, `${u.nombre} ${u.apellidos}`)} 
                             className="btn-tactile btn-tactile-sm btn-tactile-danger"
-                            title="Eliminar usuario"
-                            disabled={Number(u.id) === Number(user?.id)}
+                            title="Desactivar usuario"
+                            disabled={userSaving || !u.activo || Number(u.id) === Number(user?.id)}
                           >
                             <Trash2 size={13} />
                           </button>
@@ -1337,13 +1351,8 @@ export const AdminDashboard = () => {
                     value={productFormData.categoria}
                     onChange={(e) => setProductFormData({ ...productFormData, categoria: e.target.value })}
                   >
-                    <option value="Materiales de Construcción">Materiales de Construcción</option>
-                    <option value="Herramientas Eléctricas">Herramientas Eléctricas</option>
-                    <option value="Herramientas Manuales">Herramientas Manuales</option>
-                    <option value="Seguridad">Seguridad</option>
-                    <option value="Gasfitería">Gasfitería</option>
-                    <option value="Electricidad">Electricidad</option>
-                    <option value="Pinturas">Pinturas</option>
+                    <option value="">Selecciona una categoría</option>
+                    {allCategories.map(name => <option key={name} value={name}>{name}</option>)}
                   </select>
                 </div>
 
@@ -1471,6 +1480,7 @@ export const AdminDashboard = () => {
       {/* ========================================================
           MODAL: CREAR / EDITAR USUARIO
           ======================================================== */}
+      {accountUser && <CuentaCorrienteModal user={accountUser} onClose={() => setAccountUser(null)} />}
       {userModalOpen && (
         <div className="modal-overlay-tactile" onClick={() => setUserModalOpen(false)}>
           <div className="modal-box-tactile" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
@@ -1574,22 +1584,6 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              {/* Si es contratista, opciones de crédito */}
-              {userFormData.rol === 'CONTRATISTA' && (
-                <div style={{ padding: '0.85rem', backgroundColor: '#eff6ff', border: '1.5px solid #3b82f6', borderRadius: '4px', marginBottom: '0.75rem' }}>
-                  <label className="label-tactile" style={{ color: '#1e40af' }}>
-                    Cupo Línea de Crédito a 30 Días ($)
-                  </label>
-                  <input 
-                    type="number"
-                    className="input-tactile"
-                    value={userFormData.creditoMaximo}
-                    onChange={(e) => setUserFormData({ ...userFormData, creditoMaximo: Number(e.target.value) })}
-                    placeholder="3500000"
-                  />
-                </div>
-              )}
-
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem' }}>
                 <button 
                   type="button" 
@@ -1601,8 +1595,9 @@ export const AdminDashboard = () => {
                 <button 
                   type="submit" 
                   className="btn-tactile btn-tactile-secondary"
+                  disabled={userSaving}
                 >
-                  <Save size={16} /> Guardar Usuario
+                  <Save size={16} /> {userSaving ? 'Guardando...' : 'Guardar Usuario'}
                 </button>
               </div>
             </form>
@@ -1637,13 +1632,12 @@ export const AdminDashboard = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem', fontSize: '0.88rem' }}>
               <div>
                 <strong>Cliente:</strong> {selectedOrder.customerName}<br />
-                <strong>RUN:</strong> {selectedOrder.customerRun || 'N/A'}<br />
                 <strong>Email:</strong> {selectedOrder.customerEmail}
               </div>
               <div>
                 <strong>Modalidad:</strong> {selectedOrder.deliveryType === 'DESPACHO_OBRA' ? 'Despacho a Obra' : 'Retiro Tienda'}<br />
-                <strong>Dirección:</strong> {selectedOrder.deliveryAddress || 'Sucursal Balmaceda 1420'}<br />
-                <strong>Medio de Pago:</strong> {selectedOrder.paymentMethod === 'CUENTA_CORRIENTE' ? 'Cuenta Corriente Contratista' : 'Webpay Plus'}
+                <strong>Dirección:</strong> {selectedOrder.deliveryType === 'RETIRO_TIENDA' ? 'Sucursal Balmaceda 1420' : `${selectedOrder.address} (${selectedOrder.commune})`}<br />
+                <strong>Medio de Pago:</strong> {selectedOrder.paymentMethod === 'CUENTA_CORRIENTE' ? 'Cuenta Corriente Contratista' : selectedOrder.paymentMethod === 'TRANSFERENCIA' ? 'Transferencia Electrónica' : 'Webpay Plus'}
               </div>
             </div>
 
@@ -1661,9 +1655,9 @@ export const AdminDashboard = () => {
                   {selectedOrder.items?.map(it => (
                     <tr key={it.id}>
                       <td><strong>{it.nombre}</strong></td>
-                      <td style={{ textAlign: 'center' }}>{it.quantity}</td>
-                      <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)' }}>${it.precio?.toLocaleString('es-CL')}</td>
-                      <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>${(it.precio * it.quantity)?.toLocaleString('es-CL')}</td>
+                      <td style={{ textAlign: 'center' }}>{it.cantidad}</td>
+                      <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)' }}>${it.precioUnitario.toLocaleString('es-CL')}</td>
+                      <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>${it.subtotal.toLocaleString('es-CL')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1671,6 +1665,7 @@ export const AdminDashboard = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: 'var(--border-sm)', paddingTop: '0.75rem', marginBottom: '1.25rem' }}>
+              <p>Productos: ${selectedOrder.subtotal.toLocaleString('es-CL')} · Despacho: ${selectedOrder.shippingFee.toLocaleString('es-CL')}</p>
               <div>
                 <strong>Estado Actual:</strong>{' '}
                 <span className="badge-admin-ok" style={{ marginLeft: '0.35rem' }}>
