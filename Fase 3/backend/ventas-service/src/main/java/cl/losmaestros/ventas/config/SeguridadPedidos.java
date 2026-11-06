@@ -49,6 +49,7 @@ public class SeguridadPedidos {
                 .requestMatchers(HttpMethod.PATCH,"/api/v1/pedidos/*/estado").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,"/api/v1/cuentas-corrientes/*").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET,"/api/v1/cuentas-corrientes/me").hasRole("CONTRATISTA")
+                .requestMatchers(HttpMethod.GET,"/api/v1/cuentas-corrientes/*").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST,"/api/v1/pedidos").hasAnyRole("CLIENTE","CONTRATISTA","ADMIN")
                 .requestMatchers(HttpMethod.GET,"/api/v1/pedidos","/api/v1/pedidos/*").hasAnyRole("CLIENTE","CONTRATISTA","ADMIN","VENDEDOR")
                 .anyRequest().denyAll())

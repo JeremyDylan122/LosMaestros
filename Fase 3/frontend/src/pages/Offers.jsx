@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { useApiData } from '../hooks/useApiData';
+import { ApiStatus } from '../components/common/ApiStatus';
+import React from 'react';
 import { Tag, Sparkles, Percent } from 'lucide-react';
 import { productService } from '../services/productService';
 import { ProductCard } from '../components/products/ProductCard';
 
 export const Offers = () => {
-  const [offerProducts, setOfferProducts] = useState([]);
-
-  useEffect(() => {
-    const offers = productService.getOfferProducts();
-    setOfferProducts(offers);
-  }, []);
+  const offers = useApiData(productService.fetchOffers, []);
+  const offerProducts = offers.data;
+  if (offers.loading || offers.error) return <div className="container page-container"><ApiStatus loading={offers.loading} error={offers.error} onRetry={offers.reload} /></div>;
 
   return (
     <div className="container page-container">

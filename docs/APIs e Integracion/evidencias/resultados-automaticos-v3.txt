@@ -1,0 +1,18 @@
+Ferretería Los Maestros
+Resultados automáticos de fase 3
+Revisión del 05/11/2026
+
+React: Vitest, 118 pruebas aprobadas en 19 archivos, 0 fallos.
+Ejecución final de imágenes: 17:50:48, duración 6,13 s.
+Incluye regresiones de foco de ventana, permisos de sesión, comprobante y consistencia de imágenes entre respuestas REST y caché del carrito.
+
+Usuarios: Maven package, 6 pruebas, 0 fallos, 0 errores, 0 omitidas. BUILD SUCCESS.
+Ventas: Maven package, 19 pruebas, 0 fallos, 0 errores, 0 omitidas. BUILD SUCCESS.
+Backend automatizado: perfil local con H2. Incluye validaciones, roles, propiedad de pedidos, rollback, crédito, consulta HTTP interna y Swagger.
+
+Vite: compilación de producción correcta.
+Oxlint: 0 errores y 9 advertencias sobre efectos y exportaciones de contextos.
+No se ejecutó una nueva medición de cobertura de V3. Los porcentajes del informe de fase 2 conservan su alcance histórico.
+
+Reproducir desde Fase 3/frontend: npm test -- --run; npm run build; npm run lint.
+Desde cada servicio backend: .\mvnw.cmd test; .\mvnw.cmd package.

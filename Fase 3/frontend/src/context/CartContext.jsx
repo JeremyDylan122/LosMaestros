@@ -11,6 +11,13 @@ export const CartProvider = ({ children }) => {
     return storageService.get(CART_STORAGE_KEY, []);
   });
 
+  const [, setCatalogRevision] = useState(0);
+  useEffect(() => {
+    const updated = () => setCatalogRevision(value => value + 1);
+    window.addEventListener('catalog-updated', updated);
+    return () => window.removeEventListener('catalog-updated', updated);
+  }, []);
+
   // Reconstruir datos comerciales con el catálogo vigente; conservar cantidades del carrito.
   const cartItems = storedItems.map(item => ({ ...item, ...(productService.getProductById(item.id) || {}), cantidad: item.cantidad }));
   const [notification, setNotification] = useState(null);
@@ -62,6 +69,7 @@ export const CartProvider = ({ children }) => {
         cantidad: desiredQty,
         stock: freshProduct.stock,
         precio: freshProduct.precio,
+        precioEfectivo: freshProduct.precioEfectivo,
         enOferta: freshProduct.enOferta,
         descuento: freshProduct.descuento
       };
@@ -83,6 +91,7 @@ export const CartProvider = ({ children }) => {
         nombre: freshProduct.nombre,
         categoria: freshProduct.categoria,
         precio: freshProduct.precio,
+        precioEfectivo: freshProduct.precioEfectivo,
         enOferta: freshProduct.enOferta,
         descuento: freshProduct.descuento,
         stock: freshProduct.stock,
@@ -152,9 +161,7 @@ export const CartProvider = ({ children }) => {
   const totalCount = cartItems.reduce((acc, it) => acc + it.cantidad, 0);
 
   const totalPrice = cartItems.reduce((acc, it) => {
-    const unitPrice = it.enOferta && it.descuento > 0
-      ? Math.round(it.precio * (1 - it.descuento / 100))
-      : it.precio;
+    const unitPrice = productService.getUnitPrice(it);
     return acc + (unitPrice * it.cantidad);
   }, 0);
 

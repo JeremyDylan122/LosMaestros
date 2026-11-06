@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -6,7 +6,7 @@ import { userService } from '../services/userService';
 import { chileLocations } from '../data/chileLocations';
 
 export const Register = () => {
-  const { register } = useAuth();
+  const { register, loading } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -26,6 +26,12 @@ export const Register = () => {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!success) return;
+    const timeout = setTimeout(() => navigate('/', { replace: true }), 2000);
+    return () => clearTimeout(timeout);
+  }, [success, navigate]);
 
   const availableComunas = chileLocations[formData.region] || [];
 
@@ -119,17 +125,11 @@ export const Register = () => {
       region: formData.region,
       comuna: formData.comuna,
       direccion: formData.direccion,
-      empresa: formData.empresa,
-      cuentaCorrienteActiva: formData.rol === 'CONTRATISTA',
-      creditoMaximo: formData.rol === 'CONTRATISTA' ? 2500000 : 0,
-      saldoPendiente: 0
+      empresa: formData.empresa
     });
 
     if (result.success) {
       setSuccess(true);
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
     } else {
       setServerError(result.error);
     }
@@ -157,7 +157,7 @@ export const Register = () => {
             Registro de Usuario
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem' }}>
-            Crea tu cuenta como Cliente Particular o Contratista con línea de crédito
+            Crea tu cuenta como Cliente Particular o Contratista
           </p>
         </div>
 
@@ -395,10 +395,11 @@ export const Register = () => {
 
           <button 
             type="submit" 
+            disabled={loading || success}
             className="btn-tactile btn-tactile-primary btn-tactile-block"
             style={{ marginTop: '1.25rem', padding: '0.85rem' }}
           >
-            <UserPlus size={18} /> Crear Cuenta
+            <UserPlus size={18} /> {loading ? 'Registrando...' : 'Crear Cuenta'}
           </button>
         </form>
 

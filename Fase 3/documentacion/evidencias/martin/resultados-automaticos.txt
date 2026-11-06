@@ -1,0 +1,40 @@
+Extractos de ejecución de la verificación del 5 de noviembre de 2026.
+
+
+USUARIOS - MAVEN
+Comando: .\mvnw.cmd -o -B package
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.10 s -- in cl.losmaestros.usuarios.UsuariosMartinTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.920 s -- in cl.losmaestros.usuarios.UsuariosServiceApplicationTests
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+VENTAS - MAVEN
+Comando: .\mvnw.cmd -o -B package
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.970 s -- in cl.losmaestros.ventas.CatalogoJeremyTests
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.308 s -- in cl.losmaestros.ventas.PedidosSebaTests
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.180 s -- in cl.losmaestros.ventas.UsuariosContratistasTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.671 s -- in cl.losmaestros.ventas.VentasServiceApplicationTests
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+FRONTEND - VITEST
+Ejecución equivalente: npm run test:run
+Test Files  18 passed (18)
+Tests  111 passed (111)
+
+FRONTEND - VITE
+Ejecución equivalente: npm run build
+✓ 1951 modules transformed.
+✓ built in 918ms
+
+FRONTEND - OXLINT
+Ejecución equivalente: npm run lint
+Código de salida registrado: 0
+src/context/CartContext.jsx:181:14: warning react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+src/pages/Offers.jsx:11:5: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders
+src/context/AuthContext.jsx:110:14: warning react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+src/context/AuthContext.jsx:29:7: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders
+src/pages/Home.jsx:23:5: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders
+src/pages/ProductDetail.jsx:25:5: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders
+src/pages/Checkout.jsx:48:7: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders
+src/pages/admin/AdminDashboard.jsx:128:7: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders

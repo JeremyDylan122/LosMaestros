@@ -1,96 +1,109 @@
-import { credentialService } from '../services/credentialService';
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { userService } from '../services/userService';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { AUTH_TOKEN_KEY, userApiService } from '../services/userApiService';
 import { storageService } from '../services/storageService';
 
 const AuthContext = createContext();
 
-const CURRENT_USER_KEY = 'current_user';
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const cached = storageService.get(CURRENT_USER_KEY, null);
-    return cached?.id ? credentialService.safe(userService.getUserById(cached.id)) : null;
-  });
+  const [token, setToken] = useState(() => localStorage.getItem(AUTH_TOKEN_KEY));
+  const [user, setUser] = useState(null);
+  const [initializing, setInitializing] = useState(Boolean(token));
   const [loading, setLoading] = useState(false);
+  const [sessionError, setSessionError] = useState('');
+  const [revision, setRevision] = useState(0);
+  const validatedToken = useRef(null);
+
+  const logout = () => {
+    validatedToken.current = null;
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    setToken(null);
+    setUser(null);
+    setSessionError('');
+  };
+
+  const refreshUser = () => setRevision(previous => previous + 1);
 
   useEffect(() => {
-    if (user) {
-      storageService.set(CURRENT_USER_KEY, user);
-    } else {
-      storageService.remove(CURRENT_USER_KEY);
+    // Las sesiones locales anteriores requieren iniciar sesión en el servidor.
+    storageService.remove('current_user');
+    let active = true;
+    if (!token) {
+      setInitializing(false);
+      return;
     }
-  }, [user]);
+    // Al recuperar el foco se consulta en segundo plano, sin desmontar la ruta.
+    const background = validatedToken.current === token;
+    if (!background) setInitializing(true);
+    userApiService.getProfile(token).then(profile => {
+      if (active) {
+        validatedToken.current = token;
+        setUser(previous => JSON.stringify(previous) === JSON.stringify(profile) ? previous : profile);
+        setSessionError('');
+      }
+    }).catch(error => {
+      if (active && !background && error.status !== 401) setSessionError(error.message);
+    }).finally(() => {
+      if (active) setInitializing(false);
+    });
+    return () => { active = false; };
+  }, [token, revision]);
 
-  /**
-   * Inicia sesión con credenciales
-   */
-  const login = async (email, password, allowedRoles = null) => {
+  useEffect(() => {
+    const expired = event => {
+      if (event.detail === localStorage.getItem(AUTH_TOKEN_KEY)) logout();
+    };
+    const sync = event => {
+      if (event.key !== AUTH_TOKEN_KEY && event.key !== null) return;
+      if (localStorage.getItem(AUTH_TOKEN_KEY) === validatedToken.current) return;
+      validatedToken.current = null;
+      setUser(null);
+      setSessionError('');
+      setInitializing(Boolean(localStorage.getItem(AUTH_TOKEN_KEY)));
+      setToken(localStorage.getItem(AUTH_TOKEN_KEY));
+      refreshUser();
+    };
+    const focus = () => refreshUser();
+    window.addEventListener('auth-expired', expired);
+    window.addEventListener('storage', sync);
+    window.addEventListener('focus', focus);
+    return () => {
+      window.removeEventListener('auth-expired', expired);
+      window.removeEventListener('storage', sync);
+      window.removeEventListener('focus', focus);
+    };
+  }, []);
+
+  const startSession = async (operation, allowedRoles) => {
     setLoading(true);
     try {
-      const authenticatedUser = await userService.authenticate(email, password);
-      if (allowedRoles && !allowedRoles.includes(authenticatedUser.rol)) {
+      const session = await operation();
+      if (!session?.token || !session.usuario?.id || !session.usuario.rol) {
+        throw new Error('No se pudo iniciar la sesión. Intenta nuevamente.');
+      }
+      if (allowedRoles && !allowedRoles.includes(session.usuario.rol)) {
         throw new Error('Esta cuenta no tiene permisos de Administrador o Vendedor.');
       }
-      setUser(authenticatedUser);
-      return { success: true, user: authenticatedUser };
+      localStorage.setItem(AUTH_TOKEN_KEY, session.token);
+      validatedToken.current = session.token;
+      setUser(session.usuario);
+      setToken(session.token);
+      setSessionError('');
+      return { success: true, user: session.usuario };
     } catch (error) {
       return { success: false, error: error.message };
     } finally {
       setLoading(false);
     }
   };
-
-  /**
-   * Cierra la sesión activa
-   */
-  const logout = () => {
-    setUser(null);
-  };
-
-  /**
-   * Registra una nueva cuenta de usuario
-   */
-  const register = async (userData) => {
-    setLoading(true);
-    try {
-      const newUser = await userService.createUser(userData);
-      setUser(newUser);
-      return { success: true, user: newUser };
-    } catch (error) {
-      return { success: false, error: error.message };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
-   * Actualiza el perfil del usuario actual (ej. saldo de cuenta corriente)
-   */
-  const refreshUser = () => {
-    if (user && user.id) {
-      const updated = userService.getUserById(user.id);
-      setUser(credentialService.safe(updated));
-    }
-  };
-
-  // Revalidar la sesión local al volver a la pestaña o al cambiar datos desde otra.
-  useEffect(() => {
-    const sync = () => {
-      const cached = storageService.get(CURRENT_USER_KEY, null);
-      setUser(cached?.id ? credentialService.safe(userService.getUserById(cached.id)) : null);
-    };
-    window.addEventListener('focus', sync);
-    window.addEventListener('storage', sync);
-    return () => { window.removeEventListener('focus', sync); window.removeEventListener('storage', sync); };
-  }, []);
 
   const value = {
     user,
     loading,
-    login,
+    initializing,
+    sessionError,
+    login: (email, password, allowedRoles = null) => startSession(() => userApiService.login(email, password), allowedRoles),
+    register: data => startSession(() => userApiService.register(data)),
     logout,
-    register,
     refreshUser,
     isAuthenticated: Boolean(user),
     isAdmin: user?.rol === 'ADMIN',
@@ -99,17 +112,11 @@ export const AuthProvider = ({ children }) => {
     userRole: user?.rol || 'GUEST'
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser utilizado dentro de un AuthProvider');
-  }
+  if (!context) throw new Error('useAuth debe ser utilizado dentro de un AuthProvider');
   return context;
 };

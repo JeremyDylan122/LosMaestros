@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useApiData } from '../hooks/useApiData';
+import { ApiStatus } from '../components/common/ApiStatus';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Wrench, 
@@ -15,13 +17,8 @@ import { ProductCard } from '../components/products/ProductCard';
 import { CoverageMap } from '../components/common/CoverageMap';
 
 export const Home = () => {
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-
-  useEffect(() => {
-    const all = productService.getProducts();
-    // Seleccionar 6 productos destacados
-    setFeaturedProducts(all.slice(0, 6));
-  }, []);
+  const catalog = useApiData(productService.fetchProducts, []);
+  const featuredProducts = catalog.data.slice(0, 6);
 
   return (
     <div className="container page-container">
@@ -181,7 +178,8 @@ export const Home = () => {
         </div>
 
         <div className="grid-3">
-          {featuredProducts.map(product => (
+          <ApiStatus loading={catalog.loading} error={catalog.error} onRetry={catalog.reload} />
+          {!catalog.loading && !catalog.error && featuredProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

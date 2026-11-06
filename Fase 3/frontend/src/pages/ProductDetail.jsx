@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useApiData } from '../hooks/useApiData';
+import { ApiStatus } from '../components/common/ApiStatus';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -16,23 +18,11 @@ export const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const p = productService.getProductById(id);
-    setProduct(p);
-    setLoading(false);
-  }, [id]);
-
-  if (loading) {
-    return (
-      <div className="container page-container" style={{ textAlign: 'center', padding: '4rem 0' }}>
-        <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>Cargando ficha del producto...</div>
-      </div>
-    );
-  }
+  const load = useCallback(() => productService.fetchProductById(id), [id]);
+  const { data: product, loading, error, reload } = useApiData(load);
+  useEffect(() => { setQuantity(1); }, [id]);
+  if (loading || (error && error.status !== 404)) return <div className="container page-container"><ApiStatus loading={loading} error={error} onRetry={reload} /></div>;
 
   if (!product) {
     return (
@@ -53,9 +43,7 @@ export const ProductDetail = () => {
   const isCritical = product.stock <= product.stockMinimo;
   const isOutOfStock = product.stock <= 0;
 
-  const finalPrice = product.enOferta && product.descuento > 0
-    ? Math.round(product.precio * (1 - product.descuento / 100))
-    : product.precio;
+  const finalPrice = productService.getUnitPrice(product);
 
   const handleIncrease = () => {
     if (quantity < product.stock) {

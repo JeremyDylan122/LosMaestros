@@ -1,14 +1,17 @@
-import { useAuth } from '../context/AuthContext';
-import React from 'react';
+import { useApiData } from '../hooks/useApiData';
+import { ApiStatus } from '../components/common/ApiStatus';
+import React, { useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle2, Printer, ArrowRight, CreditCard } from 'lucide-react';
 import { orderService } from '../services/orderService';
 
 export const CheckoutSuccess = () => {
   const { id } = useParams();
-  const { user } = useAuth();
 
-  const order = orderService.getOrderForViewer(id, user);
+
+  const load = useCallback(() => orderService.getOrderById(id), [id]);
+  const { data: order, loading, error, reload } = useApiData(load);
+  if (loading || (error && error.status !== 404 && error.status !== 403)) return <div className="container page-container"><ApiStatus loading={loading} error={error} onRetry={reload} /></div>;
 
   if (!order) {
     return (
@@ -51,10 +54,10 @@ export const CheckoutSuccess = () => {
           </div>
 
           <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '0.5rem', color: 'var(--color-secondary)' }}>
-            ¡Compra Finalizada con Éxito!
+            {order.estado === 'ANULADO' ? 'Pedido anulado' : '¡Compra Finalizada con Éxito!'}
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
-            Tu orden de demostración quedó registrada en este navegador. No se ha efectuado un cobro real.
+            Tu orden quedó registrada. Los pagos electrónicos son simulados y no realizan un cobro bancario real.
           </p>
 
           <div style={{ marginTop: '1rem' }}>
@@ -70,16 +73,17 @@ export const CheckoutSuccess = () => {
         </div>
 
         {/* NOTIFICACIÓN ESPECIAL PARA CONTRATISTAS */}
-        {order.paymentMethod === 'CUENTA_CORRIENTE' && (
+        {order.paymentMethod === 'CUENTA_CORRIENTE' && order.estado !== 'ANULADO' && (
           <div className="alert-tactile alert-tactile-info" style={{ marginBottom: '1.75rem' }}>
             <CreditCard size={22} />
             <div>
-              <strong>Pedido cargado a Cuenta Corriente Contratista:</strong> Este monto se agregó al saldo local de tu cuenta de demostración.
+              <strong>Pedido cargado a Cuenta Corriente Contratista:</strong> Este monto se agregó al saldo pendiente de tu cuenta corriente.
             </div>
           </div>
         )}
 
-        <p>Productos: ${(order.subtotal ?? order.items.reduce((sum, item) => sum + item.subtotal, 0)).toLocaleString('es-CL')} · Despacho: ${(order.shippingFee ?? 0).toLocaleString('es-CL')} · Estado de pago: {order.estadoPago}</p>
+        <p>Estado del pedido: {order.estado} · Estado de pago: {order.estadoPago}</p>
+        <p>Productos: ${(order.subtotal ?? order.items.reduce((sum, item) => sum + item.subtotal, 0)).toLocaleString('es-CL')} · Despacho: ${(order.shippingFee ?? 0).toLocaleString('es-CL')}</p>
         {/* RESUMEN DE LA ORDEN EN BENTO */}
         <div style={{
           backgroundColor: 'var(--bg-surface-alt)',

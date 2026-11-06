@@ -84,6 +84,19 @@ class PedidosSebaTests {
     }
 
     @Test
+    void consultaAdministrativaDeCuentaMantieneSaldoYPermisos() throws Exception {
+        cuenta(100000,12000);
+        mvc.perform(get("/api/v1/cuentas-corrientes/1").with(como(90,"ADMIN")))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.saldoPendiente").value(12000))
+            .andExpect(jsonPath("$.creditoDisponible").value(88000));
+        mvc.perform(get("/api/v1/cuentas-corrientes/1").with(como(1,"CONTRATISTA")))
+            .andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/cuentas-corrientes/1").with(como(2,"VENDEDOR")))
+            .andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/cuentas-corrientes/999").with(como(90,"ADMIN")))
+            .andExpect(status().isNotFound());
+    }
+    @Test
     void compraUsaPrecioServidorEIdentidadAutenticada() throws Exception {
         var request=new java.util.HashMap<>(compra("WEBPAY_SIMULADO","RETIRO_TIENDA",
             List.of(Map.of("id",1,"cantidad",2,"precioUnitario",1))));

@@ -1,3 +1,5 @@
+import { useApiData } from '../hooks/useApiData';
+import { ApiStatus } from '../components/common/ApiStatus';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -13,7 +15,7 @@ import {
 import { productService } from '../services/productService';
 
 export const Categories = () => {
-  const products = productService.getProducts();
+  const families = useApiData(productService.fetchCategoryDetails, []);
 
   const categoryDetails = [
     {
@@ -74,6 +76,8 @@ export const Categories = () => {
     }
   ];
 
+  if (families.loading || families.error) return <div className="container page-container"><ApiStatus loading={families.loading} error={families.error} onRetry={families.reload} /></div>;
+
   return (
     <div className="container page-container">
       {/* CABECERA */}
@@ -91,21 +95,22 @@ export const Categories = () => {
 
       {/* BENTO GRID DE CATEGORÍAS */}
       <div className="bento-grid">
-        {categoryDetails.map((cat, idx) => {
-          const count = products.filter(p => p.categoria.toLowerCase() === cat.nombre.toLowerCase()).length;
+        {families.data.map((category, idx) => {
+          const cat = { ...categoryDetails.find(item => item.nombre === category.nombre), ...category };
+          const count = category.totalProductos;
 
           return (
             <article 
               key={cat.nombre} 
-              className={`bento-card ${cat.color} ${idx === 0 ? 'bento-col-span-2' : ''}`}
+              className={`bento-card ${cat.color || ''} ${idx === 0 ? 'bento-col-span-2' : ''}`}
               style={{ minHeight: '230px' }}
             >
               <div className="bento-header">
-                <span className="badge-tactile" style={{ backgroundColor: cat.bgTag, color: '#ffffff' }}>
-                  {cat.referencias}
+                <span className="badge-tactile" style={{ backgroundColor: cat.bgTag || 'var(--color-secondary)', color: '#ffffff' }}>
+                  {cat.referencias || count + " productos"}
                 </span>
                 <div className="bento-icon-badge">
-                  {cat.icon}
+                  {cat.icon || <Layers size={26} />}
                 </div>
               </div>
 

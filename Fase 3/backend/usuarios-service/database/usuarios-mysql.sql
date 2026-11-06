@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS usuarios (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    run VARCHAR(10) NOT NULL UNIQUE,
+    nombre VARCHAR(50) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(60) NOT NULL,
+    rol ENUM('ADMIN', 'CLIENTE', 'CONTRATISTA', 'VENDEDOR') NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    region VARCHAR(100),
+    comuna VARCHAR(100),
+    direccion VARCHAR(300),
+    empresa VARCHAR(150)
+);

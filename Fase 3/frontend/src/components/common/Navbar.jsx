@@ -13,8 +13,7 @@ import {
   Lock,
   Mail,
   Key,
-  AlertCircle,
-  UserCheck
+  AlertCircle
 } from 'lucide-react';
 
 export const Navbar = () => {
@@ -40,7 +39,7 @@ export const Navbar = () => {
   const openAdminModal = () => {
     setAdminLoginError('');
     setAdminEmail('admin@duoc.cl');
-    setAdminPassword('admin123');
+    setAdminPassword('');
     setAdminModalOpen(true);
     setMobileMenuOpen(false);
   };
@@ -51,7 +50,7 @@ export const Navbar = () => {
   };
 
   // Validar el perfil operativo antes de reemplazar la sesión actual.
-  const handleQuickDemoLogin = async (email, password) => {
+  const handleOperationalLogin = async (email, password) => {
     setAdminLoginError('');
     const result = await login(email, password, ['ADMIN', 'VENDEDOR']);
     if (result.success) {
@@ -68,7 +67,7 @@ export const Navbar = () => {
       setAdminLoginError('Por favor ingresa correo y contraseña.');
       return;
     }
-    await handleQuickDemoLogin(adminEmail, adminPassword);
+    await handleOperationalLogin(adminEmail, adminPassword);
   };
 
   return (
@@ -358,32 +357,7 @@ export const Navbar = () => {
               </button>
             </form>
 
-            {/* ACCESOS RÁPIDOS 1-CLIC PARA EVALUACIÓN DOCENTE */}
-            <div className="admin-demo-grid">
-              <button 
-                type="button" 
-                disabled={authLoading}
-                onClick={() => handleQuickDemoLogin('admin@duoc.cl', 'admin123')}
-                className="btn-demo-quick btn-demo-quick-admin"
-                title="Acceder como Administrador Don Carlos Vega"
-              >
-                <ShieldCheck size={18} />
-                <span>Don Carlos Vega</span>
-                <span style={{ fontSize: '0.7rem', opacity: 0.85 }}>Rol: Administrador</span>
-              </button>
 
-              <button 
-                type="button" 
-                disabled={authLoading}
-                onClick={() => handleQuickDemoLogin('vendedor@duoc.cl', 'vend123')}
-                className="btn-demo-quick"
-                title="Acceder como Vendedor Ricardo Valdés"
-              >
-                <UserCheck size={18} />
-                <span>Ricardo Valdés</span>
-                <span style={{ fontSize: '0.7rem', opacity: 0.85 }}>Rol: Vendedor Mesón</span>
-              </button>
-            </div>
           </div>
         </div>
       )}

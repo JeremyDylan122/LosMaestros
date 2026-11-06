@@ -44,6 +44,15 @@ class CatalogoJeremyTests {
     }
 
     @Test
+    void swaggerDeclaraJwtEnOperacionesProtegidas() throws Exception {
+        mvc.perform(get("/v3/api-docs")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
+                .andExpect(jsonPath("$.paths['/api/v1/productos'].post.security[0].bearerAuth").isArray())
+                .andExpect(jsonPath("$.paths['/api/v1/productos'].get.security").doesNotExist())
+                .andExpect(jsonPath("$.paths['/api/v1/pedidos'].post.security[0].bearerAuth").isArray())
+                .andExpect(jsonPath("$.paths['/api/v1/cuentas-corrientes/{usuarioId}'].get.security[0].bearerAuth").isArray());
+    }
+    @Test
     @DisplayName("1. Consulta pública de catálogo, categorías y detalle sin autenticación")
     void consultaPublicaCatalogo() throws Exception {
         mvc.perform(get("/api/v1/productos"))

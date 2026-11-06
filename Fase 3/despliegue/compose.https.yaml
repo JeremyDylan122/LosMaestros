@@ -1,0 +1,23 @@
+services:
+  frontend:
+    ports: !reset []
+  https:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    mem_limit: 128m
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Define el dominio público para HTTPS}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [web]
+    depends_on:
+      frontend: {condition: service_healthy}
+
+volumes:
+  caddy_data:
+  caddy_config:
