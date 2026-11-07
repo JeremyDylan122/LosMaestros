@@ -7,7 +7,7 @@ stamp=$(date -u +%Y%m%dT%H%M%SZ)
 for service in usuarios ventas; do
     output="respaldos/${service}-${stamp}.sql"
     if docker compose exec -T "mysql-$service" sh -c \
-        'MYSQL_PWD="$MYSQL_PASSWORD" exec mysqldump --no-tablespaces --single-transaction -u"$MYSQL_USER" "$MYSQL_DATABASE"' > "$output.tmp"; then
+        'MYSQL_PWD="$MYSQL_PASSWORD" exec mysqldump --default-character-set=utf8mb4 --no-tablespaces --single-transaction -u"$MYSQL_USER" "$MYSQL_DATABASE"' > "$output.tmp"; then
         mv "$output.tmp" "$output"
     else
         echo "Falló el respaldo de $service; el archivo .tmp no es un respaldo válido." >&2

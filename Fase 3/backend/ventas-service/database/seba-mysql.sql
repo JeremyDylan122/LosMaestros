@@ -1,5 +1,7 @@
 -- Ejecutar sobre losmaestros_ventas antes de usar el perfil mysql.
 -- Solo tablas de Seba. Catálogo queda a cargo de Jeremy.
+SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS cuentas_corrientes (
     usuario_id BIGINT PRIMARY KEY,
     version BIGINT NOT NULL,

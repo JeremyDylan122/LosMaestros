@@ -1,10 +1,12 @@
 # Despliegue de Los Maestros en AWS
 
-Esta configuración prepara la demostración de fase 3 en una sola instancia EC2 de AWS Academy / Learner Lab. Docker Compose levanta React compilado con Nginx, Usuarios, Ventas y dos instancias MySQL independientes. Los datos y las claves de este entorno se generan aparte de los utilizados durante el desarrollo local.
+Esta configuración prepara la demostración de fase 3 en una sola instancia EC2, tanto en una cuenta AWS personal como en AWS Academy / Learner Lab. Docker Compose levanta React compilado con Nginx, Usuarios, Ventas y dos instancias MySQL independientes. Los datos y las claves de este entorno se generan aparte de los utilizados durante el desarrollo local.
 
 Los archivos permiten preparar el despliegue; su existencia no acredita que la aplicación ya esté publicada en AWS. La comprobación final debe hacerse en la instancia del equipo antes de la presentación.
 
 Los [resultados de la verificación Docker local](VERIFICACION_DOCKER.md) registran las comprobaciones realizadas y sus límites.
+
+La [verificación en EC2](VERIFICACION_EC2.md) registra el despliegue y el ensayo de detención y encendido realizados en AWS, incluido el cambio automático del origen público y la persistencia de los datos.
 
 ## 1. Arquitectura
 
@@ -22,23 +24,27 @@ Las dos bases no publican puertos en EC2. Cada microservicio utiliza el usuario 
 
 Una instalación nueva carga el catálogo inicial y crea el administrador configurado. No migra automáticamente las cuentas, pedidos ni cambios de inventario del entorno local. Preparar en EC2 las cuentas ficticias necesarias para la demostración o realizar una migración explícita mediante respaldos.
 
-## 2. Laboratorio y recursos
+Los SQL de inicialización declaran `SET NAMES utf8mb4` antes de cargar datos. Esto evita que el cliente interprete las tildes del archivo UTF-8 como caracteres de otra codificación, aunque las tablas ya sean `utf8mb4`. En un volumen existente estos SQL no se vuelven a ejecutar: corregir los registros afectados con respaldo previo, sin borrar la base para reinicializarla.
+
+## 2. Cuenta y recursos
+
+En una cuenta personal, comprobar el plan, el saldo de créditos, la región y las tarifas antes de crear recursos. Que una instancia sea elegible para Free Tier no significa que su ejecución no consuma créditos. No es necesario cambiar al plan de pago para este despliegue si los recursos están habilitados en el plan gratuito.
 
 Iniciar el Learner Lab desde AWS Academy y consultar el saldo y las restricciones de la sesión. Los recursos consumen créditos del laboratorio; no se promete uso ilimitado ni disponibilidad permanente. El acceso al laboratorio depende de la institución y del plazo del curso. [AWS Academy](https://aws.amazon.com/training/awsacademy/) describe este entorno para proyectos educativos.
 
 Propuesta para esta demostración:
 
 - Una EC2 con Ubuntu Server 24.04 LTS de 64 bits x86_64.
-- Al menos 4 GiB de RAM; 8 GiB dan mayor margen para compilar y operar. Elegir un tipo permitido por el laboratorio. No asumir que una micro de 1 GiB puede sostener dos JVM y dos MySQL.
-- Un disco EBS de aproximadamente 30 GiB, sujeto al saldo y límites del laboratorio.
+- Al menos 4 GiB de RAM; 8 GiB dan mayor margen para compilar y operar. Elegir un tipo permitido por la cuenta o el laboratorio. No asumir que una micro de 1 GiB puede sostener dos JVM y dos MySQL.
+- Un disco EBS gp3 cifrado de aproximadamente 30 GiB, sujeto al saldo y límites de la cuenta.
 - Una IPv4 pública y salida a Internet para descargar imágenes y dependencias.
 - Sin RDS, balanceador, NAT Gateway, EKS ni registro ECR para esta configuración. No se necesita comprar un dominio para la demostración HTTP.
 
-La selección de recursos debe confirmarse en la consola del laboratorio antes de crear la instancia. Detener EC2 fuera de las pruebas reduce su tiempo de ejecución, pero no equivale a eliminar almacenamiento u otros recursos. Revisar el consumo del laboratorio.
+La selección de recursos debe confirmarse antes de crear la instancia. Detener EC2 fuera de las pruebas interrumpe el consumo de cómputo; el disco EBS sigue generando consumo mientras exista. Cerrar el navegador o detener únicamente los contenedores no detiene EC2. Utilizar una IPv4 pública automática evita reservar una Elastic IP durante los días de espera; la dirección puede cambiar al encender. Consultar los [estados y la facturación de EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html).
 
 ## 3. Instancia y acceso
 
-1. Iniciar la sesión del Learner Lab y abrir su consola AWS.
+1. Iniciar sesión en la consola AWS de la cuenta personal o del Learner Lab.
 2. Crear la instancia Ubuntu con los recursos anteriores y un par de claves SSH que el equipo pueda custodiar. La clave SSH de AWS es distinta del par RSA de JWT que generará la aplicación.
 3. En el grupo de seguridad permitir TCP 22 desde la IP del integrante que administrará el servidor. Permitir TCP 80 desde las IP de la demostración, o desde Internet si se requiere una URL pública. No abrir 3306, 8081 ni 8082.
 4. Consultar el DNS público o la IPv4 pública asignada. Conectarse como `ubuntu` mediante SSH o el método habilitado en su laboratorio.
@@ -157,8 +163,31 @@ La variante HTTPS agrega Caddy, retira el puerto publicado del frontend y conser
 
 ## 9. Reinicios, cambios y respaldo
 
+### Arranque automático en EC2 con HTTP por IP
+
+Para que baste encender la instancia, instalar el proyecto en `/opt/losmaestros`, construir las imágenes y generar `.env` una sola vez con el puerto 80. Luego instalar la unidad incluida:
+
+```bash
+cd "/opt/losmaestros/Fase 3/despliegue"
+sudo install -m 644 losmaestros.service /etc/systemd/system/losmaestros.service
+sudo systemd-analyze verify /etc/systemd/system/losmaestros.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now losmaestros.service
+sudo systemctl status losmaestros.service --no-pager
+```
+
+`arrancar-ec2.sh` consulta la IPv4 pública mediante IMDSv2 y actualiza únicamente `PUBLIC_ORIGIN`. Después inicia las imágenes ya construidas, espera los healthchecks y comprueba las rutas HTTP. Conserva contraseñas, claves JWT y volúmenes; no ejecuta nuevamente `preparar.sh`. La unidad espera Docker y la red, y detiene ordenadamente los contenedores cuando se apaga el servidor.
+
+Este arranque es para HTTP por IPv4 y puerto 80, con `HTTP_BIND=0.0.0.0`. La unidad tiene una ruta de instalación fija; adaptarla si el repositorio está en otra carpeta. No utilizarla sin adaptar en la variante HTTPS con dominio. La consulta a los metadatos requiere que IMDS esté habilitado en EC2; se recomienda exigir tokens IMDSv2.
+
+Después de encender, consultar la nueva IPv4 en la consola y abrir `http://IP_ACTUAL`. No hay que reconstruir React ni regenerar credenciales. Si cambió la IP del equipo administrador, actualizar la regla SSH a su nueva IP `/32`. Para diagnosticar el arranque: `sudo journalctl -u losmaestros.service -n 80 --no-pager`.
+
+Ensayar una detención y un encendido completos antes de la presentación, comprobando que los cinco contenedores estén saludables y que usuarios, pedidos, stock y crédito se conserven. Detener EC2 al finalizar el ensayo; encender con anticipación el día de la exposición.
+
+### Operación manual y respaldos
+
 - Después de reiniciar EC2, Docker y los contenedores tienen reinicio automático. Si el laboratorio detuvo o eliminó recursos, revisar su estado en la consola.
-- Si cambia la IP o el DNS público, editar únicamente `PUBLIC_ORIGIN` en `.env` y ejecutar `docker compose up -d --wait --wait-timeout 300`. Abrir la nueva dirección. No regenerar claves ni credenciales. Las URLs relativas del frontend no requieren recompilar por ese cambio.
+- Si no se instaló la unidad anterior y cambia la IP o el DNS público, editar únicamente `PUBLIC_ORIGIN` en `.env` y ejecutar `docker compose up -d --wait --wait-timeout 300`. Abrir la nueva dirección. No regenerar claves ni credenciales. Las URLs relativas del frontend no requieren recompilar por ese cambio.
 - Antes de la presentación, iniciar el laboratorio con anticipación y comprobar acceso desde otro equipo del grupo. Una sesión de laboratorio tiene restricciones de duración y disponibilidad que deben verificarse en su portal.
 - Para actualizar código: obtener la versión acordada con Git, construir `usuarios`, `ventas` y `frontend` por separado como en el primer arranque y ejecutar `docker compose up -d --wait --wait-timeout 300`.
 - Para detener la aplicación sin borrar datos: `docker compose stop`. `docker compose down` también conserva los volúmenes; no usar la opción `-v` sobre datos que quieran conservar.
