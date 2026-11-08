@@ -1,6 +1,6 @@
 # Implementación de pedidos y cuenta corriente de Seba
 
-Se implementaron las entidades, repositorios, servicios transaccionales, DTO y controladores de pedidos y cuenta corriente en `backend/ventas-service`. No se modificaron las entregas anteriores ni se implementó catálogo o Usuarios.
+Se implementaron las entidades, repositorios, servicios transaccionales, DTO y controladores de pedidos y cuenta corriente en `backend/ventas-service`. Catálogo y Usuarios están integrados mediante los adaptadores del equipo; React consume estos endpoints en Fase 3.
 
 ## API
 
@@ -13,9 +13,10 @@ Base local: `http://localhost:8082`. Swagger: `/swagger-ui/index.html`. La API u
 | GET `/api/v1/pedidos/{id}` | Dueño del pedido, ADMIN o VENDEDOR | 200; 404 si no existe o pertenece a otro cliente |
 | PATCH `/api/v1/pedidos/{id}/estado` | ADMIN | 200, avance o anulación |
 | GET `/api/v1/cuentas-corrientes/me` | CONTRATISTA | 200, cupo, saldo y disponible; 404 si no tiene cuenta |
+| GET `/api/v1/cuentas-corrientes/{usuarioId}` | ADMIN | 200, cuenta del usuario; 404 si no existe |
 | PUT `/api/v1/cuentas-corrientes/{usuarioId}` | ADMIN | 200, configuración del cupo y habilitación |
 
-Sin autenticación: 401. Sin permiso de rol: 403. JSON inválido o validaciones de entrada: 400. Stock/cupo insuficiente o transición inválida: 409. Dependencia sin implementar: 503. Los errores propios incluyen `mensaje`.
+Sin autenticación: 401. Sin permiso de rol: 403. JSON inválido o validaciones de entrada: 400. Stock/cupo insuficiente o transición inválida: 409. Dependencia no disponible: 503. Los errores propios incluyen `mensaje`.
 
 Compra de ejemplo:
 
@@ -39,7 +40,7 @@ Configurar cuenta: `{"activa":true,"creditoMaximo":100000}`. No permite editar l
 
 ## Contrato con Jeremy
 
-Implementar un bean de `pedidos.service.CatalogoPedidos`:
+El adaptador `CatalogoPedidosAdapter` implementa `pedidos.service.CatalogoPedidos` con este contrato:
 
 - `bloquear(id)` carga el producto con bloqueo de escritura y devuelve identificador, código, nombre, **precio efectivo**, stock y bandera `activo`. Un producto dado de baja sigue disponible para restituir el stock de pedidos anteriores; Pedidos rechaza compras nuevas cuando `activo=false`.
 - `ajustarStock(id, delta)` modifica las existencias del producto bloqueado: negativo descuenta, positivo restituye. Debe impedir existencias negativas.
@@ -47,7 +48,7 @@ Implementar un bean de `pedidos.service.CatalogoPedidos`:
 - No lanzar excepciones comprobadas sin configurar rollback; usar `NegocioException` para producto inexistente, inactivo o stock insuficiente.
 - La compra bloquea productos por ID ascendente, luego la cuenta. La anulación bloquea primero el pedido, después los productos ordenados y la cuenta. Mantener ese orden al ampliar el sistema.
 
-Mientras no exista ese bean, comprar o anular devuelve 503. El catálogo de prueba solo existe en `src/test`, no se usa como implementación de Jeremy.
+El adaptador de catálogo está implementado en el código de producción. El catálogo de prueba en `src/test` permite verificar rollback de forma aislada.
 
 ## Contrato con Martín
 
@@ -60,9 +61,9 @@ export VENTAS_JWT_ISSUER=losmaestros-usuarios
 
 Se valida firma, emisor y vigencia; no se emiten tokens aquí. Sin clave pública configurada la aplicación arranca, pero rechaza los tokens. No hay usuarios, contraseñas ni tokens de prueba incorporados en ejecución normal.
 
-Implementar un bean de `cuentacorriente.service.UsuariosContratistas` que consulte por canal autenticado si el usuario existe, está activo y es CONTRATISTA. Si Usuarios falla, propagar un error de dependencia sin habilitar la cuenta. Mientras falte ese bean, configurar cuentas devuelve 503. La compra a crédito exige tanto el rol del JWT como una cuenta activa con cupo suficiente.
+El adaptador de `cuentacorriente.service.UsuariosContratistas` consulta por canal autenticado si el usuario existe, está activo y es CONTRATISTA. Si Usuarios falla, propagar un error de dependencia sin habilitar la cuenta. La dependencia no disponible produce un error 503. La compra a crédito exige tanto el rol del JWT como una cuenta activa con cupo suficiente.
 
-La cadena de seguridad de Seba cubre pedidos y cuentas. Una cadena de cierre deniega las otras rutas excepto Swagger. Jeremy puede añadir una cadena de catálogo con orden entre 2 y 99, acordando permisos con Martín. CORS y la integración de emisión de tokens siguen pendientes de coordinación; no se abrió acceso global a la API.
+La cadena de pedidos y cuentas tiene orden 1; la de catálogo, orden 2. Una cadena de cierre deniega las rutas restantes excepto Swagger. CORS permite configurar los orígenes mediante `APP_CORS_ALLOWED_ORIGINS`. Usuarios emite los tokens que Ventas valida.
 
 ## Datos y ejecución
 
@@ -73,7 +74,7 @@ Desde `Fase 3/backend/ventas-service`:
 ./mvnw spring-boot:run
 ```
 
-El perfil local usa H2 temporal. Para MySQL crear la base, ejecutar `database/seba-mysql.sql`, definir `DB_USERNAME` y `DB_PASSWORD` y usar `./mvnw spring-boot:run -Dspring-boot.run.profiles=mysql`. El script solo crea las tablas de Seba; no crea cuentas MySQL ni datos de catálogo. La conexión real a MySQL sigue pendiente de comprobar.
+El perfil local usa H2 temporal. Para MySQL crear la base, ejecutar `database/seba-mysql.sql`, definir `DB_USERNAME` y `DB_PASSWORD` y usar `./mvnw spring-boot:run -Dspring-boot.run.profiles=mysql`. El script solo crea las tablas de Seba; no crea cuentas MySQL ni datos de catálogo. El perfil MySQL carga `.env`; la preparación completa y ambos esquemas se describen en el [backend](../backend/README.md). Las [pruebas MySQL](PRUEBAS_MYSQL.md) registran persistencia, concurrencia y rollback.
 
 ## Pruebas y límites
 
@@ -81,6 +82,6 @@ El perfil local usa H2 temporal. Para MySQL crear la base, ejecutar `database/se
 
 El contexto autenticado se simula mediante Spring Security Test. Estos cinco casos no prueban firma criptográfica de tokens, concurrencia real de varias compras ni MySQL. Resultado verificado: los cinco casos aprobados, sin fallos, errores ni omisiones. La prueba de arranque de la plantilla también aprobó y se conserva aparte. No hay meta de cobertura.
 
-El frontend de fase 2 permanece intacto: sigue siendo una demostración local. La conexión de sus pantallas necesita el catálogo y el login del equipo; no se presenta como integración terminada.
+Fase 2 se conserva como demostración histórica local. El frontend de Fase 3 integra login, catálogo, compra, historial y cuenta corriente con ambos servicios.
 
 Referencias técnicas: [JWT Resource Server de Spring Security](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html), [transacciones JPA](https://docs.spring.io/spring-data/jpa/reference/jpa/transactions.html) y [bloqueos JPA](https://docs.spring.io/spring-data/jpa/reference/3.5/jpa/locking.html).

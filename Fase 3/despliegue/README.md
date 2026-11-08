@@ -2,7 +2,7 @@
 
 Esta configuración prepara la demostración de fase 3 en una sola instancia EC2 de AWS Academy / Learner Lab. Docker Compose levanta React compilado con Nginx, Usuarios, Ventas y dos instancias MySQL independientes. Los datos y las claves de este entorno se generan aparte de los utilizados durante el desarrollo local.
 
-Los archivos permiten preparar el despliegue; su existencia no acredita que la aplicación ya esté publicada en AWS. La comprobación final debe hacerse en la instancia del equipo antes de la presentación.
+El equipo confirma que el proyecto está desplegado en AWS. Esta guía permite reproducir y mantener el entorno; las evidencias de Docker local no certifican la disponibilidad actual de la instancia. La URL pública depende de la configuración del equipo.
 
 Los [resultados de la verificación Docker local](VERIFICACION_DOCKER.md) registran las comprobaciones realizadas y sus límites.
 

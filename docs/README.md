@@ -23,7 +23,7 @@ Las capturas forman parte de los documentos y se conservan en [Manual de usuario
 - [Plantillas docentes conservadas](<../Fase 3/documentacion/referencias-profesor/>).
 - [Preparación del despliegue completo en AWS Academy / EC2](<../Fase 3/despliegue/README.md>).
 
-El alcance es un entorno local con pagos simulados. Los reportes por período, geocodificación exacta, video y despliegue completo en AWS siguen pendientes. Las instrucciones de entrega solicitan enlaces y comprimidos separados de frontend y backend; preparar, publicar y enviar esos artefactos al docente es una tarea posterior a la revisión de estos documentos.
+El sistema está desplegado en AWS según confirmación del equipo. Los informes y sus versiones Word/Excel conservan los resultados y el alcance de su fecha de entrega; no son una comprobación actual del servidor. Para instalación y operación, utilizar las guías enlazadas arriba. Los pagos siguen siendo simulados; no se implementan reportes por período, geocodificación exacta ni video del negocio.
 
 ## Antecedentes de fase 2
 
