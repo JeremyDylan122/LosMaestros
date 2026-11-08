@@ -1,5 +1,7 @@
 # APIs e integración de Ferretería Los Maestros
 
+> Documento de entrega y evidencia de la revisión indicada en el informe. Las referencias a AWS pendiente describen ese momento: el equipo confirmó posteriormente el despliegue. Para operación actual, consultar la [guía de despliegue](<../../Fase 3/despliegue/README.md>). Los resultados medidos y los archivos Word/Excel se conservan como registro de entrega.
+
 Revisión 3.0 del 5 de noviembre de 2026.
 
 [Documento Word](<APIs_e_Integracion_Los_Maestros_v3.docx>) · [Índice de documentación](../README.md)

@@ -6,7 +6,7 @@ Se implementó el módulo integral de **Catálogo e Inventario** en el backend (
 
 ## 1. Arquitectura y Componentes Backend (`ventas-service`)
 
-El backend fue desarrollado bajo el paquete `cl.losmaestros.ventas.catalogo`, coexistiendo armónicamente con los módulos de pedidos y cuenta corriente de Sebastián:
+El backend fue desarrollado bajo el paquete `cl.losmaestros.ventas.catalogo`, integrado con los módulos de pedidos y cuenta corriente de Sebastián:
 
 - **Entidades JPA**:
   - `Categoria`: id autoincremental, nombre obligatorio y único (`@Column(unique = true)`), descripción y fecha de registro.
@@ -89,7 +89,7 @@ Se configuró la cadena de filtros `SeguridadCatalogo` con orden de precedencia 
 Ubicado en `Fase 3/backend/ventas-service/database/jeremy-catalogo-mysql.sql`:
 - Creación de tablas `categorias` y `productos`.
 - Índices de rendimiento para `codigo` (SKU), `categoria_id`, `stock` y `en_oferta`.
-- Inserción de las 7 categorías y 27 productos ferreteros base con existencias y precios reales.
+- Inserción de las 7 categorías y 27 productos ferreteros base con existencias y precios de demostración.
 
 ---
 
@@ -106,7 +106,7 @@ Se migró y adaptó la aplicación React construida con Vite:
 3. **Servicio de Productos Asíncrono (`productService.js`)**:
    - Integración asíncrona mediante `fetch` hacia `${VITE_API_VENTAS_URL}/productos` y `${VITE_API_VENTAS_URL}/categorias`.
    - Métodos asíncronos implementados: `fetchProducts()`, `fetchProductById()`, `fetchCriticalStock()`, `fetchOffers()`, `fetchCategories()`, `createProductApi()`, `updateProductApi()`, `adjustStockApi()` y `deleteProductApi()`.
-   - **Mecanismo de Resiliencia / Fallback**: ante desconexión temporal del backend o ejecución en tests unitarios aislados, sincroniza y consulta el almacenamiento local manteniendo plena funcionalidad operativa.
+   - **Mecanismo de Resiliencia / Fallback**: el navegador conserva una caché para el carrito y utilidades locales; las pantallas integradas consultan Ventas y muestran los errores de conexión. La caché no sustituye las operaciones del servidor.
 4. **Restricción RBAC de Vendedor en `AdminDashboard.jsx`**:
    - Cumplimiento de la regla de negocio: **El vendedor solo tiene acceso de consulta**.
    - Se ocultan los botones "Nuevo Producto", las acciones de ajuste rápido de stock (`-1`, `+1`, `+5 Reabastecer`) y los botones de edición/eliminación para usuarios con rol `VENDEDOR`.
@@ -115,7 +115,9 @@ Se migró y adaptó la aplicación React construida con Vite:
 
 ---
 
-## 7. Matriz de Pruebas y Resultados de Verificación
+## 7. Resultados históricos de implementación
+
+Estos resultados corresponden a la incorporación inicial del catálogo. La medición integrada posterior está en el [índice documental](../../docs/README.md).
 
 ### Backend (`ventas-service` - Maven)
 - Comando ejecutado: `.\mvnw.cmd test`

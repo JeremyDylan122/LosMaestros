@@ -1,5 +1,7 @@
 # Plan de trabajo para la fase 3
 
+> Antecedente histórico de planificación. Sus pendientes corresponden al inicio de la fase, no al estado actual. Para arquitectura, instalación y API vigentes, consultar la [guía de Fase 3](../README.md).
+
 Reparto propuesto para que los tres integrantes desarrollen backend, prueben su parte y la conecten al frontend. Las plantillas ya están configuradas; la lógica de negocio queda a cargo del equipo.
 
 ## Secuencia

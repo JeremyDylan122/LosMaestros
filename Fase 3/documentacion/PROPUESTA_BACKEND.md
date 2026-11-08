@@ -1,5 +1,7 @@
 # Propuesta de backend para Los Maestros
 
+> Antecedente histórico de planificación. Sus pendientes corresponden al inicio de la fase, no al estado actual. Para arquitectura, instalación y API vigentes, consultar la [guía de Fase 3](../README.md).
+
 ## Decisión propuesta
 
 Implementar **dos aplicaciones Spring Boot independientes**, Usuarios y Ventas, y conectarlas al frontend React existente mediante REST y JSON. Es una propuesta del equipo para mantener el alcance sencillo: el anexo de instrucciones revisado exige Spring Boot, persistencia, API y seguridad, pero no fija una cantidad de microservicios.

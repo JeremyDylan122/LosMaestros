@@ -1,5 +1,7 @@
 # Aplicación React de Ferretería Los Maestros
 
+> Entrega histórica con persistencia en el navegador. La aplicación integrada con backend, MySQL y despliegue AWS está en [Fase 3](<../../Fase 3/README.md>).
+
 Segunda versión del proyecto DSY1104 Desarrollo FullStack II, Duoc UC. Implementa la tienda, el carrito, la compra simulada y la gestión local con React, Vite y CSS propio.
 
 Integrantes: Sebastián Diaz, Jeremy Hanglin y Martín Caviedes.
