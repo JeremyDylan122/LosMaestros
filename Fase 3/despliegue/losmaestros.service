@@ -1,0 +1,19 @@
+[Unit]
+Description=Los Maestros - contenedores y direccion publica de EC2
+Wants=network-online.target
+Requires=docker.service
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/losmaestros
+ExecStart=/bin/sh "/opt/losmaestros/Fase 3/despliegue/arrancar-ec2.sh"
+ExecStop=/bin/sh -c "cd 'Fase 3/despliegue' && exec /usr/bin/docker compose stop --timeout 30"
+TimeoutStartSec=600
+TimeoutStopSec=120
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -3,6 +3,9 @@
 -- Base de datos: losmaestros_ventas
 -- ====================================================================
 
+-- El cliente que importa el archivo también debe interpretar sus bytes como UTF-8.
+SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS categorias (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL UNIQUE,
