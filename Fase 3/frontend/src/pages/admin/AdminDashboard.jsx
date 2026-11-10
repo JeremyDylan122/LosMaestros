@@ -46,6 +46,14 @@ export const AdminDashboard = () => {
 
   const activeTab = getTabFromPath();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const closeOnEscape = event => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [sidebarOpen]);
 
   // Estados de datos sincronizados con persistencia
   const [products, setProducts] = useState([]);
@@ -427,7 +435,9 @@ export const AdminDashboard = () => {
             type="button"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-            aria-label="Abrir menú de administración"
+            aria-label={sidebarOpen ? "Cerrar menú de administración" : "Abrir menú de administración"}
+            aria-expanded={sidebarOpen}
+            aria-controls="admin-sidebar"
           >
             {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -439,7 +449,8 @@ export const AdminDashboard = () => {
       </div>
 
       {/* SIDEBAR LATERAL IZQUIERDO (DISEÑO EXACTO AL DE LA IMAGEN) */}
-      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
+      {sidebarOpen && <button type="button" className="admin-sidebar-backdrop" aria-label="Cerrar navegación" onClick={() => setSidebarOpen(false)} />}
+      <aside id="admin-sidebar" className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
         {/* Cabecera del Sidebar */}
         <div className="admin-sidebar-header">
           <Link to="/admin" className="admin-sidebar-brand" onClick={() => handleTabChange('resumen')}>
@@ -1244,7 +1255,7 @@ export const AdminDashboard = () => {
               </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
+            <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '1.25rem' }}>
               {allCategories.map(cat => {
                 const prodsInCat = products.filter(p => p.categoria === cat);
                 const totalStock = prodsInCat.reduce((sum, p) => sum + p.stock, 0);
@@ -1315,7 +1326,7 @@ export const AdminDashboard = () => {
             </div>
 
             <form onSubmit={handleSaveProduct}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div className="form-group">
                   <label className="label-tactile">Código SKU *</label>
                   <input 
@@ -1343,7 +1354,7 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div className="form-group">
                   <label className="label-tactile">Categoría *</label>
                   <select 
@@ -1368,7 +1379,7 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div className="form-group">
                   <label className="label-tactile">Precio Venta ($) *</label>
                   <input 
@@ -1408,7 +1419,7 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div className="form-group">
                   <label className="label-tactile">Unidad de Medida</label>
                   <input 
@@ -1498,7 +1509,7 @@ export const AdminDashboard = () => {
             </div>
 
             <form onSubmit={handleSaveUser}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div className="form-group">
                   <label className="label-tactile">RUN Chileno *</label>
                   <input 
@@ -1527,7 +1538,7 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div className="form-group">
                   <label className="label-tactile">Nombre *</label>
                   <input 
@@ -1555,7 +1566,7 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
                 <div className="form-group">
                   <label className="label-tactile">Correo Institucional *</label>
                   <input 
@@ -1629,7 +1640,7 @@ export const AdminDashboard = () => {
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem', fontSize: '0.88rem' }}>
+            <div className="admin-responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem', fontSize: '0.88rem' }}>
               <div>
                 <strong>Cliente:</strong> {selectedOrder.customerName}<br />
                 <strong>Email:</strong> {selectedOrder.customerEmail}

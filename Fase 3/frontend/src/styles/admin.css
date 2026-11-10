@@ -777,3 +777,31 @@
     font-size: 1.85rem;
   }
 }
+
+.admin-sidebar-backdrop { display: none; }
+.admin-layout-root input,
+.admin-layout-root select,
+.admin-layout-root textarea { min-width: 0; max-width: 100%; }
+
+@media (max-width: 1024px) {
+  .admin-sidebar { top: 60px; height: calc(100dvh - 60px); max-width: 85vw; z-index: 170; }
+  .admin-mobile-topbar { height: 60px; box-sizing: border-box; }
+  .admin-mobile-topbar button { min-width: 44px; min-height: 44px; justify-content: center; }
+  .admin-sidebar-backdrop { display: block; position: fixed; inset: 60px 0 0; background: rgb(0 0 0 / 45%); border: 0; z-index: 160; }
+  .admin-sidebar-nav { min-height: 0; }
+  .admin-card-container { overflow-x: auto; }
+  .admin-table { min-width: 640px; }
+  .admin-stock-actions { flex-wrap: wrap; }
+}
+
+@media (max-width: 600px) {
+  .admin-main-canvas { padding: 1.25rem 0.75rem 2rem; }
+  .admin-responsive-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .admin-toolbar { align-items: stretch; }
+  .admin-search-box { flex-basis: 100%; max-width: none; min-width: 0; }
+  .admin-toolbar > div { max-width: 100%; }
+  .admin-kpi-card { padding: 1.25rem; }
+  .admin-layout-root .modal-box-tactile { padding: 1rem; max-height: calc(100dvh - 2rem); }
+  .admin-layout-root .modal-box-tactile button { min-height: 44px; }
+  .admin-title { overflow-wrap: anywhere; }
+}
