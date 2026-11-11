@@ -41,6 +41,7 @@ export const Checkout = () => {
   const [phone, setPhone] = useState('');
   const [empresa, setEmpresa] = useState('');
   const [deliveryType, setDeliveryType] = useState('DESPACHO_OBRA'); // DESPACHO_OBRA o RETIRO_TIENDA
+  const [pickupSuggested, setPickupSuggested] = useState(false);
   const [region, setRegion] = useState('Región de Coquimbo');
   const [commune, setCommune] = useState('La Serena');
   const [address, setAddress] = useState('');
@@ -57,12 +58,22 @@ export const Checkout = () => {
       setCustomerName(`${user.nombre} ${user.apellidos}`.trim());
       setCustomerEmail(user.email || '');
       setAddress(user.direccion || '');
+      const profileShipping = shippingService.quote({
+        deliveryType: 'DESPACHO_OBRA',
+        region: user.region || 'Región de Coquimbo',
+        commune: user.comuna || 'La Serena',
+        subtotal: totalPrice
+      });
+      if (!profileShipping.available) {
+        setDeliveryType('RETIRO_TIENDA');
+        setPickupSuggested(true);
+      }
       if (user.region) setRegion(user.region);
       if (user.comuna) setCommune(user.comuna);
       if (user.empresa) setEmpresa(user.empresa);
 
     }
-  }, [user]);
+  }, [user, totalPrice]);
 
   // Costo de despacho
   const shipping = shippingService.quote({ deliveryType, region, commune, subtotal: totalPrice });
@@ -171,7 +182,17 @@ export const Checkout = () => {
 
       <ApiStatus loading={catalog.loading} error={catalog.error} onRetry={catalog.reload} />
       {isContractor && <ApiStatus loading={account.loading} error={account.error} onRetry={account.reload} />}
-      <p role="status">{shipping.message}</p>
+      <p role="status">{pickupSuggested && deliveryType === 'RETIRO_TIENDA'
+        ? 'Tu dirección guardada está fuera de la cobertura de despacho. Seleccionamos retiro gratuito en nuestra tienda de La Serena para que puedas continuar tu compra. También puedes elegir despacho e ingresar otra dirección dentro de la cobertura.'
+        : shipping.message}</p>
+      {!shipping.available && (
+        <div className="alert-tactile" style={{ marginBottom: '1rem' }}>
+          <span>El despacho está disponible en La Serena, Coquimbo y Vicuña. Para esta dirección puedes comprar con retiro gratuito en tienda.</span>
+          <button type="button" className="btn-tactile" onClick={() => setDeliveryType('RETIRO_TIENDA')}>
+            Continuar con retiro en tienda
+          </button>
+        </div>
+      )}
       <form onSubmit={handleSubmit} data-testid="checkout-form">
         <div className="grid-2 checkout-layout" style={{ gridTemplateColumns: '2fr 1fr', gap: '2rem', alignItems: 'start' }}>
           {/* COLUMNA IZQUIERDA: FORMULARIOS */}

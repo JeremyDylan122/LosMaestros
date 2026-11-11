@@ -13,8 +13,10 @@ import { orderService } from '../../services/orderService';
 
 beforeEach(() => { localStorage.clear(); sessionStorage.clear(); vi.restoreAllMocks(); });
 const receipt = { id: 12, codigoOrden: 'LM-0012', fecha: '2026-11-05T12:00:00', fechaLegible: '05/11/2026', customerName: 'Cliente de prueba', customerEmail: 'prueba@gmail.com', subtotal: 5000, shippingFee: 4990, totalMonto: 9990, items: [], paymentMethod: 'WEBPAY_SIMULADO', deliveryType: 'DESPACHO_OBRA', estado: 'CONFIRMADO', estadoPago: 'PAGADO_SIMULADO' };
-async function setup() {
-  serverSession(4);
+async function setup(profile = {}) {
+  const user = serverSession(4);
+  const { userApiService } = await import('../../services/userApiService');
+  userApiService.getProfile.mockResolvedValue({ ...user, ...profile });
   vi.spyOn(productService, 'fetchProducts').mockResolvedValue(productService.getProducts());
   vi.spyOn(orderService, 'createOrder').mockResolvedValue(receipt);
   vi.spyOn(orderService, 'getOrderById').mockResolvedValue(receipt);
@@ -29,10 +31,26 @@ async function setup() {
   await waitFor(() => expect(screen.getByRole('button', { name: /confirmar|pagar/i })).toBeEnabled());
   fireEvent.change(screen.getByLabelText('Nombre Completo *'), { target: { value: 'Cliente de prueba' } });
   fireEvent.change(screen.getByLabelText('Correo Electrónico *'), { target: { value: 'prueba@gmail.com' } });
-  fireEvent.change(screen.getByLabelText('Dirección de Entrega / Faena *'), { target: { value: 'Dirección ficticia 123' } });
+  const address = screen.queryByLabelText('Dirección de Entrega / Faena *');
+  if (address) fireEvent.change(address, { target: { value: 'Dirección ficticia 123' } });
 }
 
 describe('Checkout completo', () => {
+  it('orienta al cliente fuera de cobertura y permite comprar con retiro sin dirección de despacho', async () => {
+    await setup({ region: 'Región Metropolitana de Santiago', comuna: 'Santiago' });
+    expect(screen.getByRole('status')).toHaveTextContent('fuera de la cobertura');
+    expect(screen.getByRole('radio', { name: /Retiro/i })).toBeChecked();
+    fireEvent.submit(screen.getByTestId('checkout-form'));
+    await waitFor(() => expect(orderService.createOrder).toHaveBeenCalledWith(expect.objectContaining({ deliveryType: 'RETIRO_TIENDA' })));
+  });
+  it('ofrece una salida directa cuando se cambia a una comuna sin despacho', async () => {
+    await setup();
+    fireEvent.change(screen.getByLabelText('Comuna *'), { target: { value: 'Ovalle' } });
+    expect(screen.getByRole('button', { name: /confirmar|pagar/i })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar con retiro en tienda' }));
+    expect(screen.getByRole('button', { name: /confirmar|pagar/i })).toBeEnabled();
+    expect(screen.getByRole('radio', { name: /Retiro/i })).toBeChecked();
+  });
   it('mantiene la confirmación después de vaciar el carrito y muestra el flete', async () => {
     await setup();
     fireEvent.submit(screen.getByTestId('checkout-form'));

@@ -27,6 +27,17 @@ function renderUsers() {
 }
 
 describe('Mantenedor de usuarios conectado', () => {
+  it('permite abrir y cerrar la navegación con el botón, el fondo y Escape', async () => {
+    renderUsers();
+    const menu = await screen.findByRole('button', { name: 'Abrir menú de administración' });
+    fireEvent.click(menu);
+    expect(menu).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Cerrar navegación' }));
+    expect(menu).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(menu);
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(menu).toHaveAttribute('aria-expanded', 'false');
+  });
   it('conserva el formulario y el listado si el servidor rechaza la creación', async () => {
     vi.spyOn(userApiService, 'createUser').mockRejectedValue(new Error('El RUN ya está registrado.'));
     renderUsers();
