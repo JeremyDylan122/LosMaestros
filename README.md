@@ -6,6 +6,61 @@ Aplicación académica de comercio y gestión para una ferretería de La Serena,
 
 La versión actual está en **Fase 3**: frontend React, dos API REST Spring Boot y persistencia MySQL. El equipo ha desplegado el proyecto en AWS. La configuración reproducible de EC2, Docker Compose y Nginx está incluida en el repositorio.
 
+## Despliegue en AWS
+
+La aplicación se aloja en **una instancia Amazon EC2**. Docker Compose organiza cinco contenedores: el frontend servido por Nginx, dos API Spring Boot y dos servidores MySQL. El navegador accede a una única dirección pública; Nginx entrega React y dirige las peticiones a cada API por la red Docker.
+
+```mermaid
+flowchart TB
+    cliente["Cliente · navegador web"]
+    administrador["Administrador · acceso SSH"]
+
+    subgraph aws["AWS · Ohio / us-east-2"]
+        subgraph ec2["Amazon EC2 · Ubuntu Server 24.04"]
+            acceso["SSH · puerto 22"]
+            subgraph docker["Docker Compose · cinco contenedores"]
+                frontend["frontend · Nginx :80<br/>React compilado con Vite"]
+                usuarios["usuarios · Spring Boot :8081<br/>Registro, sesión y roles"]
+                ventas["ventas · Spring Boot :8082<br/>Catálogo, pedidos y crédito"]
+                mysqlUsuarios[("mysql-usuarios · MySQL 8.4<br/>losmaestros_usuarios")]
+                mysqlVentas[("mysql-ventas · MySQL 8.4<br/>losmaestros_ventas")]
+
+                frontend -->|"/usuarios/api/v1"| usuarios
+                frontend -->|"/ventas/api/v1"| ventas
+                ventas -->|"Consulta interna autenticada"| usuarios
+                usuarios -->|"SQL · red usuarios_db"| mysqlUsuarios
+                ventas -->|"SQL · red ventas_db"| mysqlVentas
+            end
+        end
+        subgraph ebs["Amazon EBS · almacenamiento persistente"]
+            volumenUsuarios[("Volumen usuarios_data")]
+            volumenVentas[("Volumen ventas_data")]
+        end
+    end
+
+    cliente -->|"HTTP · puerto 80"| frontend
+    administrador -->|"SSH · solo desde la IP autorizada"| acceso
+    mysqlUsuarios --- volumenUsuarios
+    mysqlVentas --- volumenVentas
+
+    classDef entrada fill:#142436,color:#fff,stroke:#142436
+    classDef servicio fill:#EFECE6,color:#142436,stroke:#C84B29
+    classDef datos fill:#E8F1FA,color:#142436,stroke:#37658A
+    class frontend entrada
+    class usuarios,ventas servicio
+    class mysqlUsuarios,mysqlVentas,volumenUsuarios,volumenVentas datos
+```
+
+**Cómo se conectan los servicios.** React llama a `/usuarios/api/v1` y `/ventas/api/v1` desde el mismo origen público. Nginx reenvía esas rutas a los puertos internos 8081 y 8082. Usuarios firma los JWT con su clave privada y Ventas los valida con la pública; la consulta interna de Ventas a Usuarios utiliza una credencial compartida y su ruta se bloquea en Nginx.
+
+**Acceso y datos.** El grupo de seguridad permite HTTP para la tienda y restringe SSH a la IP administradora. Las APIs y MySQL no publican puertos en el host. Cada base utiliza una red Docker interna y un volumen propio en el disco EBS; los datos sobreviven a la recreación de contenedores y a la detención de EC2. Los volúmenes no sustituyen un respaldo fuera de la instancia.
+
+**Arranque y operación.** La unidad `losmaestros.service` inicia el conjunto al encender EC2. Su script consulta la IPv4 pública mediante IMDSv2, actualiza el origen permitido y espera los controles de salud de Compose. Así se conserva la configuración cuando AWS asigna otra IP, sin reconstruir React ni regenerar claves.
+
+El despliegue verificado el **7 de noviembre de 2026** utilizó una `m7i-flex.large` (2 vCPU, 8 GiB de RAM) y EBS gp3 cifrado de 30 GiB. El diagrama representa esa variante **HTTP de demostración**. La guía incluye HTTPS opcional con Caddy y un dominio; esa variante agrega un sexto contenedor. Todos los servicios dependen de una sola EC2: al detenerla, la tienda deja de estar disponible.
+
+Consultar la [guía de despliegue y operación](<Fase 3/despliegue/README.md>), la [configuración Docker Compose](<Fase 3/despliegue/compose.yaml>) y la [verificación registrada en EC2](<Fase 3/despliegue/VERIFICACION_EC2.md>). Esta última documenta el ensayo realizado; no indica la disponibilidad actual del servidor.
+
 ## Qué permite hacer
 
 - Consultar catálogo, categorías, ofertas y fichas de productos; preparar el carrito.
