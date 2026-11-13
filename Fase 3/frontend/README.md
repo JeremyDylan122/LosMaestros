@@ -34,6 +34,20 @@ Para acceder al panel, iniciar sesión con el administrador creado al configurar
 | `npm run test:coverage` | Ejecuta pruebas y genera `coverage/index.html` y los contadores JSON. |
 | `npm run lint` | Ejecuta el análisis estático con Oxlint. |
 
+## Suite reducida para la evaluación
+
+Por la solicitud docente de la evaluación 2, la suite vigente del frontend conserva exactamente **3 casos unitarios**, uno por integrante. Se eliminaron los restantes casos de esta entrega; no se ocultan ni se marcan como omitidos. El historial de Git conserva la suite anterior. Las pruebas del backend no cambian.
+
+| Integrante | Archivo en `src/test/services/` | Regla y resultado esperado |
+| --- | --- | --- |
+| Martín | `userService.test.js` | Correo: acepta `duoc.cl`, `profesor.duoc.cl` y `gmail.com`; rechaza `hotmail.com`. |
+| Jeremy | `productService.test.js` | Precio de oferta: $10.000 con 20% de descuento da $8.000. |
+| Sebastián | `shippingService.test.js` | Retiro: disponible y con costo $0 para una dirección de Santiago. |
+
+Ejecutar `npm run test:run` desde esta carpeta: deben aparecer **3 archivos y 3 pruebas**, sin pruebas omitidas. Cada caso sigue preparar datos → ejecutar la función → comprobar el resultado. Son pruebas unitarias de reglas del frontend, sin navegador ni llamadas HTTP; no demuestran login, compra completa ni persistencia.
+
+Las cifras de pruebas y cobertura de los informes enlazados más abajo corresponden a verificaciones históricas anteriores a esta reducción, no a la suite actual.
+
 ## Organización
 
 `src/pages/` contiene las vistas; `src/components/`, los componentes reutilizables; `src/context/`, la sesión y el carrito; `src/services/`, las reglas y la persistencia; `src/data/`, los datos iniciales; `src/styles/`, los estilos; y `src/test/`, las pruebas y su configuración de entorno.
