@@ -1,8 +1,8 @@
 # Especificación de Requisitos de Software
 
-> Documento de entrega y evidencia de la revisión indicada en el informe. Las referencias a AWS pendiente describen ese momento: el equipo confirmó posteriormente el despliegue. Para operación actual, consultar la [guía de despliegue](<../../Fase 3/despliegue/README.md>). Los resultados medidos y los archivos Word/Excel se conservan como registro de entrega.
+> Revisión 3.1 del 13 de noviembre de 2026, con actualización de despliegue del 14/11. Actualiza la interfaz y distingue las comprobaciones recientes de las evidencias del 5 de noviembre. El frontend se actualizó en EC2 el 14/11/2026, incluidas la navegación por perfil y las acciones móviles de usuarios. Consultar la [guía de despliegue](<../../Fase 3/despliegue/README.md>).
 
-Revisión 3.0 del 5 de noviembre de 2026.
+Revisión 3.1 del 13 de noviembre de 2026.
 
 [Documento Word](<ERS_Ferreteria_Los_Maestros_v3.docx>) · [Índice de documentación](../README.md)
 
@@ -11,9 +11,9 @@ Revisión 3.0 del 5 de noviembre de 2026.
 | Dato | Descripción |
 | --- | --- |
 | Proyecto | Ferretería Los Maestros |
-| Documento | Especificación de Requisitos de Software revisión 3.0 |
+| Documento | Especificación de Requisitos de Software revisión 3.1 |
 | Asignatura y entrega | DSY1104 Desarrollo FullStack II Evaluación Parcial 3 |
-| Fecha | 5 de noviembre de 2026 |
+| Fecha | 13 de noviembre de 2026 |
 | Integrantes | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes |
 | Estado | Versión integrada para revisión de la tercera entrega |
 | Código documentado | Implementación local en Fase 3 con React, Usuarios y Ventas sobre MySQL. |
@@ -25,8 +25,9 @@ Revisión 3.0 del 5 de noviembre de 2026.
 | 14/10/2026 | 2.1 | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes | Revisión de reglas, requisitos y consistencia de las operaciones locales. |
 | 16/10/2026 | 2.2 | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes | Consolidación final de navegación, perfiles, cobertura referencial, imágenes y trazabilidad de pruebas. |
 | 05/11/2026 | 3.0 | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes | Integración REST, JWT, MySQL, permisos de vendedor, crédito administrado y continuidad de formularios. |
+| 13/11/2026 | 3.1 | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes | Navegación por perfil, panel móvil, retiro fuera de cobertura, despliegue previo y suite actual de tres reglas. |
 
-V3 identifica la etapa integrada con React, Spring Boot y MySQL. La revisión 3.0 actualiza la especificación de fase 2 y conserva sus identificadores para facilitar la trazabilidad.
+V3 identifica la etapa integrada con React, Spring Boot y MySQL. La revisión 3.1 conserva los identificadores, incorpora las mejoras de navegación y cobertura de despacho y actualiza el estado del despliegue y las pruebas.
 
 ## 1. Introducción
 
@@ -132,13 +133,13 @@ Las direcciones, tarifas y plazos usados en la demostración son referenciales. 
 
 ### 2.6. Requisitos Futuros
 
-Permanecen fuera de la implementación actual los reportes comerciales por período, la geocodificación exacta, el video del negocio, los pagos bancarios reales y el correo saliente. Docker se utiliza para MySQL; el despliegue completo de las aplicaciones en contenedores y AWS no está implementado. Estas diferencias se mantienen visibles en sus fichas.
+Permanecen fuera de la implementación actual los reportes comerciales por período, la geocodificación exacta, el video del negocio, los pagos bancarios reales y el correo saliente. El conjunto se desplegó en EC2 con Docker Compose, frontend, dos microservicios y dos contenedores MySQL. Los cambios de interfaz se publicaron en EC2 el 14/11/2026 y se comprobó la conservación de datos y configuración.
 
 ## 3. Requisitos Específicos
 
 La especificación contiene 59 requisitos: 48 funcionales, ocho no funcionales y tres restricciones técnicas. Conserva los 57 identificadores de la revisión 2.2 y agrega la configuración administrativa de crédito y la continuidad de la sesión. Implementado en V3 identifica funciones disponibles en esta etapa; Parcial y Pendiente delimitan lo que falta.
 
-Cada ficha presenta perfil, estado, descripción, criterio de aceptación, aplicación actual y origen. Los criterios expresan resultados esperados; las pruebas se documentan por separado. La revisión registra 48 requisitos implementados en V3, 10 parciales y 1 pendientes.
+Cada ficha presenta perfil, estado, descripción, criterio de aceptación, aplicación actual y origen. Los criterios expresan resultados esperados; las pruebas se documentan por separado. La revisión registra 49 requisitos implementados en V3, nueve parciales y uno pendiente.
 
 ### 3.1. Requisitos comunes de las interfaces
 
@@ -378,7 +379,7 @@ Las rutas de negocio usan /api/v1. Usuarios y Ventas se ejecutan en puertos sepa
 | --- | --- |
 | Usuario y estado | Usuario — Implementado en V3 |
 | Descripción | El usuario deberá iniciar sesión con correo y contraseña y cerrar la sesión desde la interfaz. |
-| Criterio de aceptación | Acceder con credenciales válidas y cerrar sesión. Una cuenta sin permisos que intente entrar por el acceso administrativo debe ser rechazada sin reemplazar la sesión vigente. |
+| Criterio de aceptación | Acceder con credenciales válidas y cerrar sesión. ADMIN y VENDEDOR ingresan desde el inicio de sesión común y son dirigidos al panel. CLIENTE, CONTRATISTA y visitante no disponen de acceso administrativo en la navegación ni pueden acceder a rutas u operaciones reservadas. |
 | Aplicación actual | Usuarios emite JWT RS256 de 30 minutos. React conserva auth_token y consulta usuarios/me para restaurar la sesión. Un 401 retira el token; salir en otra pestaña sincroniza el cierre. |
 | Origen | ERS de la primera versión y diseño funcional de la V2. |
 
@@ -517,9 +518,9 @@ Las rutas de negocio usan /api/v1. Usuarios y Ventas se ejecutan en puertos sepa
 | RF-044 | Calcular tarifa y cobertura local |
 | --- | --- |
 | Usuario y estado | Usuario — Implementado en V3 |
-| Descripción | La consulta de cobertura y el formulario de compra deberán utilizar la misma tarifa de demostración por comuna. Las comunas sin tarifa automática deberán solicitar cotización. |
-| Criterio de aceptación | Seleccionar comuna o zona actualiza ambas opciones y la tarifa. La Serena y Coquimbo: $4.990 bajo $100.000 y cero desde ese monto; Vicuña: $14.990; otras comunas: cotización. |
-| Aplicación actual | React presenta la tarifa con shippingService y Ventas vuelve a calcularla al confirmar. El retiro es gratuito y el mapa sigue siendo referencial. |
+| Descripción | La consulta de cobertura y el formulario de compra deberán utilizar la misma tarifa de demostración por comuna. Cuando no exista despacho disponible, el formulario deberá permitir continuar con retiro gratuito en tienda. |
+| Criterio de aceptación | Seleccionar comuna o zona actualiza ambas opciones y la tarifa. La Serena y Coquimbo: $4.990 bajo $100.000 y cero desde ese monto; Vicuña: $14.990. Fuera de cobertura, se informa la limitación y se permite elegir retiro gratuito. |
+| Aplicación actual | React presenta la tarifa con shippingService y Ventas vuelve a calcularla al confirmar. Si el domicilio guardado está fuera de cobertura, Checkout selecciona retiro e informa el motivo. Una dirección sin despacho muestra Continuar con retiro en tienda. El retiro es gratuito y el mapa sigue siendo referencial. |
 | Origen | Configuración de despacho de la demostración V2. |
 
 | RF-045 | Demostrar compra fallida |
@@ -623,7 +624,7 @@ Las comprobaciones se realizaron con el catálogo inicial y operaciones de demos
 | Usuario y estado | Usuario — Parcial |
 | Descripción | Las vistas deberán ser utilizables a 360, 768 y 1280 píxeles con menú móvil y contenido accesible. |
 | Criterio de aceptación | Recorrer tienda, formularios y panel a distintos anchos. La marca, las acciones y los iconos deben mantenerse utilizables y el documento no debe desbordarse. |
-| Aplicación actual | Se conserva la adaptación responsiva de fase 2. La fase 3 se verificó en recorridos de escritorio; no se ha repetido una auditoría completa de todos los perfiles y dispositivos. |
+| Aplicación actual | El panel dispone de menú móvil, cierre por fondo o Escape y cierre al navegar. Formularios y grillas se adaptan y las tablas admiten desplazamiento horizontal. Se comprobó el menú y el formulario de productos a 390 x 844 el 13/11. Falta completar la matriz de 360, 768 y 1280 píxeles y todos los perfiles; por ello el requisito sigue parcial. |
 | Origen | ERS de la primera versión y diseño funcional de la V2. |
 
 | RNF-008 | Facilitar formularios |
@@ -656,10 +657,10 @@ Las comprobaciones se realizaron con el catálogo inicial y operaciones de demos
 
 | RT-003 | Desplegar el sistema con AWS y Docker |
 | --- | --- |
-| Usuario y estado | Equipo de desarrollo — Parcial |
+| Usuario y estado | Equipo de desarrollo — Implementado en V3 |
 | Descripción | La solución final deberá utilizar AWS y Docker para su despliegue. |
 | Criterio de aceptación | La aplicación puede iniciarse mediante sus contenedores y accederse en el entorno desplegado. |
-| Aplicación actual | Docker Compose levanta MySQL con volumen persistente. React y los dos servicios se ejecutan en el host. No se ha desplegado el conjunto completo en AWS. |
+| Aplicación actual | El despliegue previo en EC2 ejecuta Nginx con React, Usuarios, Ventas y dos MySQL mediante Docker Compose, con volúmenes persistentes y arranque configurado. El frontend se actualizó el 14/11. Los cinco contenedores quedaron saludables; se comprobaron autenticación, catálogo y conservación de datos. Las acciones móviles se confirmaron en iPhone 15 Pro, Zen y Chrome. |
 | Origen | Tecnologías obligatorias del contexto del proyecto. |
 
 #### 3.4.2. Criterios de las validaciones actuales
@@ -672,7 +673,7 @@ El backend comprueba permisos, duplicados y reglas de compra sin aceptar identid
 
 #### 3.4.3. Funciones observables de la tercera versión
 
-Las pruebas de esta revisión registran 118 casos aprobados de React y 25 del backend. Las pruebas automatizadas Java utilizan H2; las comprobaciones de MySQL y el recorrido manual aportan evidencia adicional de integración. No se atribuyen a V3 los porcentajes de cobertura obtenidos en la fase 2.
+La ejecución del 13/11 registra tres casos unitarios aprobados de React en tres archivos y 2,02 % de cobertura de líneas. La suite se redujo por el ajuste docente documentado en el README del frontend. Los 118 casos de React, 25 de Java y 70,39 % de líneas del 05/11 son evidencia histórica. La ejecución complementaria del 13/11 aprobó seis pruebas de Usuarios y diecinueve de Ventas con H2; el informe de pruebas registra sus casos y resultados. Las comprobaciones manuales y con MySQL se informan por separado.
 
 | Función observable | Requisitos | Comportamiento de la V3 |
 | --- | --- | --- |
@@ -686,4 +687,4 @@ Las pruebas de esta revisión registran 118 casos aprobados de React y 25 del ba
 | Controlar acceso administrativo | RF-027 RNF-002 | JWT y perfil remoto; VENDEDOR consulta y ADMIN modifica. Volver al foco conserva formularios. |
 | Consultar y anular pedidos | RF-034 RF-035 RNF-002 | Historial autorizado por servidor; anulación de ADMIN restituye stock y crédito una sola vez. |
 
-La entrega documenta la integración local disponible y sus límites. El manual explica las tareas de cada perfil y el informe de APIs e integración describe los datos, rutas, seguridad y pruebas. El acceso remoto en AWS y la operación comercial real siguen pendientes.
+La entrega documenta la integración, el despliegue previo y sus límites. El manual explica las tareas de cada perfil y el informe de APIs e integración describe datos, rutas, seguridad y pruebas. AWS incorpora los cambios recientes del frontend desde el 14/11/2026. La operación comercial y los pagos bancarios reales quedan fuera del prototipo.

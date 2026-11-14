@@ -1,0 +1,222 @@
+{
+  "fecha": "2026-11-13",
+  "zona_horaria": "America/Santiago",
+  "java": "21.0.12.1",
+  "spring_boot": "3.5.16",
+  "maven_surefire": "3.5.6",
+  "comando": "mvnw.cmd -B -ntp test",
+  "base_datos": "H2 en memoria; perfil local",
+  "servicios": [
+    {
+      "servicio": "usuarios-service",
+      "clases": [
+        {
+          "name": "cl.losmaestros.usuarios.UsuariosMartinTests",
+          "time": "9.426",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "casos": [
+            {
+              "nombre": "registroPerfilYDuplicado",
+              "segundos": 0.879,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "registroPublicoRechazaRolesDeGestion",
+              "segundos": 0.013,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "consultaInternaExigeCredencialDeServicio",
+              "segundos": 0.099,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "adminGestionaUsuariosYDesactivacionBloqueaLogin",
+              "segundos": 0.223,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "swaggerDistingueJwtYCredencialInterna",
+              "segundos": 0.29,
+              "estado": "aprobado"
+            }
+          ]
+        },
+        {
+          "name": "cl.losmaestros.usuarios.UsuariosServiceApplicationTests",
+          "time": "1.106",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "casos": [
+            {
+              "nombre": "contextLoads",
+              "segundos": 0.007,
+              "estado": "aprobado"
+            }
+          ]
+        }
+      ],
+      "totales": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finalizacion": "2026-11-13T23:58:46-03:00",
+      "maven_segundos": 20.591
+    },
+    {
+      "servicio": "ventas-service",
+      "clases": [
+        {
+          "name": "cl.losmaestros.ventas.CatalogoJeremyTests",
+          "time": "9.628",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "casos": [
+            {
+              "nombre": "contratoCatalogoPedidosAjustarStock",
+              "segundos": 0.443,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "adminPuedeCrearProducto",
+              "segundos": 0.215,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "vendedorRechazadoEnModificaciones",
+              "segundos": 0.019,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "swaggerDeclaraJwtEnOperacionesProtegidas",
+              "segundos": 0.669,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "consultaPublicaCatalogo",
+              "segundos": 0.144,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "adminPuedeAjustarStock",
+              "segundos": 0.026,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "contratoCatalogoPedidosCalculaPrecioEfectivo",
+              "segundos": 0.024,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "clienteOAnonimoRechazadoEnEscritura",
+              "segundos": 0.01,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "stockCriticoIdentificaProductosBajoUmbral",
+              "segundos": 0.02,
+              "estado": "aprobado"
+            }
+          ]
+        },
+        {
+          "name": "cl.losmaestros.ventas.PedidosSebaTests",
+          "time": "1.492",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "casos": [
+            {
+              "nombre": "anularDosVecesDevuelveStockYCreditoUnaVez",
+              "segundos": 0.179,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "pedidosRespetanIdentidadYPermisos",
+              "segundos": 0.077,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "stockInsuficienteNoDejaCambiosParciales",
+              "segundos": 0.023,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "consultaAdministrativaDeCuentaMantieneSaldoYPermisos",
+              "segundos": 0.011,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "creditoInsuficienteIncluyeFleteYRevierteStock",
+              "segundos": 0.025,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "compraUsaPrecioServidorEIdentidadAutenticada",
+              "segundos": 0.023,
+              "estado": "aprobado"
+            }
+          ]
+        },
+        {
+          "name": "cl.losmaestros.ventas.UsuariosContratistasTests",
+          "time": "1.036",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "casos": [
+            {
+              "nombre": "fallaDeUsuariosConservaCuentaPrevia",
+              "segundos": 0.134,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "habilitaContratistaVerificadoPorHttp",
+              "segundos": 0.016,
+              "estado": "aprobado"
+            },
+            {
+              "nombre": "rechazaInexistenteInactivoYOtroRol",
+              "segundos": 0.034,
+              "estado": "aprobado"
+            }
+          ]
+        },
+        {
+          "name": "cl.losmaestros.ventas.VentasServiceApplicationTests",
+          "time": "0.594",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "casos": [
+            {
+              "nombre": "contextLoads",
+              "segundos": 0.003,
+              "estado": "aprobado"
+            }
+          ]
+        }
+      ],
+      "totales": {
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finalizacion": "2026-11-13T23:58:49-03:00",
+      "maven_segundos": 24.113
+    }
+  ]
+}

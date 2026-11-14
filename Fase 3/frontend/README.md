@@ -20,7 +20,7 @@ La dirección de desarrollo aparece en la terminal; por defecto es `http://local
 
 Arrancar Usuarios en el puerto 8081 y Ventas en el 8082 según sus README. Las variables `VITE_API_USUARIOS_URL` y `VITE_API_VENTAS_URL` incluyen `/api/v1`. Si se modifica `.env`, reiniciar Vite. Las URLs predeterminadas coinciden con `.env.example`.
 
-Para acceder al panel, iniciar sesión con el administrador creado al configurar `USUARIOS_ADMIN_PASSWORD` en Usuarios, o con una cuenta creada por ese administrador. El registro público crea clientes y contratistas. Las cuentas de demostración guardadas en el navegador durante fase 2 requieren registrarse o crearse en el servidor.
+Para acceder al panel, iniciar sesión con el administrador creado al configurar `USUARIOS_ADMIN_PASSWORD` en Usuarios, o con una cuenta creada por ese administrador. El registro público crea clientes y contratistas. Las cuentas de demostración guardadas en el navegador durante fase 2 requieren registrarse o crearse en el servidor. Todos los perfiles utilizan Iniciar Sesión; ADMIN y VENDEDOR son dirigidos a /admin. Solo esos perfiles ven el enlace al panel, en escritorio y en el menú móvil; la navegación pública no incluye un login administrativo separado.
 
 ## Comandos disponibles
 
@@ -70,4 +70,4 @@ También se completó el [recorrido de React con Usuarios/MySQL](../documentacio
 
 El Dockerfile compila React y sirve `dist` mediante Nginx. Para usarlo con ambos servicios y MySQL, seguir la [guía de despliegue en EC2](../despliegue/README.md). En esa construcción las URLs de APIs son relativas: `/usuarios/api/v1` y `/ventas/api/v1`. Nginx resuelve los destinos dentro de Docker; el navegador utiliza la dirección pública de la tienda. Las variables de Vite se aplican al compilar, no al iniciar el contenedor final.
 
-El [informe de pruebas v3](<../../docs/Pruebas unitarias (v3)/PRUEBAS_UNITARIAS_V3.md>) incorpora la medición posterior de cobertura React: 70,39 % de líneas.
+El [informe de pruebas v3, revisión 3.1](<../../docs/Pruebas unitarias (v3)/PRUEBAS_UNITARIAS_V3.md>) documenta tres casos aprobados y 2,02 % de cobertura de líneas. La medición corresponde a tres reglas unitarias, sin comprobar recorridos completos de la interfaz. Los contadores anteriores permanecen en sus archivos de evidencia fechados.

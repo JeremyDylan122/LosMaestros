@@ -1212,7 +1212,7 @@ export const AdminDashboard = () => {
                       <td>{u.comuna}</td>
                       <td>{u.activo ? 'Activo' : 'Inactivo'}</td>
                       <td style={{ textAlign: 'center' }}>
-                        <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
+                        <div className="admin-user-actions">
                           {isAdmin && u.activo && u.rol === 'CONTRATISTA' && <button type="button" className="btn-tactile btn-tactile-sm" onClick={() => setAccountUser(u)}>Cuenta corriente</button>}
                           <button 
                             type="button"

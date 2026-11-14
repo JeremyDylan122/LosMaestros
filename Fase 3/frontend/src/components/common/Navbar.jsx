@@ -9,21 +9,13 @@ import {
   Wrench, 
   ShieldCheck, 
   LogOut, 
-  Tag, 
-  Lock,
-  Mail,
-  Key,
-  AlertCircle
+  Tag
 } from 'lucide-react';
 
 export const Navbar = () => {
-  const { user, isAuthenticated, isVendor, isAdmin, loading: authLoading, login, logout } = useAuth();
+  const { user, isAuthenticated, isVendor, isAdmin, logout } = useAuth();
   const { totalCount, notification, clearNotification } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [adminModalOpen, setAdminModalOpen] = useState(false);
-  const [adminEmail, setAdminEmail] = useState('');
-  const [adminPassword, setAdminPassword] = useState('');
-  const [adminLoginError, setAdminLoginError] = useState('');
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -34,40 +26,6 @@ export const Navbar = () => {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
-  };
-
-  const openAdminModal = () => {
-    setAdminLoginError('');
-    setAdminEmail('admin@duoc.cl');
-    setAdminPassword('');
-    setAdminModalOpen(true);
-    setMobileMenuOpen(false);
-  };
-
-  const closeAdminModal = () => {
-    setAdminModalOpen(false);
-    setAdminLoginError('');
-  };
-
-  // Validar el perfil operativo antes de reemplazar la sesión actual.
-  const handleOperationalLogin = async (email, password) => {
-    setAdminLoginError('');
-    const result = await login(email, password, ['ADMIN', 'VENDEDOR']);
-    if (result.success) {
-      setAdminModalOpen(false);
-      navigate('/admin');
-    } else {
-      setAdminLoginError(result.error || 'Credenciales incorrectas.');
-    }
-  };
-
-  const handleAdminLoginSubmit = async (event) => {
-    event.preventDefault();
-    if (!adminEmail.trim() || !adminPassword.trim()) {
-      setAdminLoginError('Por favor ingresa correo y contraseña.');
-      return;
-    }
-    await handleOperationalLogin(adminEmail, adminPassword);
   };
 
   return (
@@ -124,21 +82,6 @@ export const Navbar = () => {
                 <ShieldCheck size={16} /> Panel Admin
               </NavLink>
             )}
-            {/* BOTÓN APARTADO EN EL HEADER PARA ACCEDER A ADMINISTRACIÓN CON LOGIN */}
-            {!isAdmin && !isVendor && (
-              <button 
-                type="button"
-                onClick={openAdminModal}
-                className="header-admin-pill navbar-admin-access"
-                title="Acceso al Panel de Administración"
-                aria-label="Acceder a Administración"
-              >
-                <ShieldCheck size={16} />
-                <span>Administración</span>
-                <span className="header-admin-tag">LOGIN</span>
-              </button>
-            )}
-
             {isAuthenticated && <Link to="/mis-pedidos" className="btn-tactile btn-tactile-sm navbar-orders-link">Mis pedidos</Link>}
             {/* Botón Carrito */}
             <Link 
@@ -224,7 +167,7 @@ export const Navbar = () => {
 
             {isAuthenticated && <NavLink to="/mis-pedidos" onClick={closeMobileMenu} className="nav-link-tactile">Mis pedidos</NavLink>}
             {/* Acceso a Panel Admin en Móvil */}
-            {(isVendor || isAdmin) ? (
+            {(isVendor || isAdmin) && (
               <NavLink 
                 to="/admin" 
                 onClick={closeMobileMenu} 
@@ -234,16 +177,6 @@ export const Navbar = () => {
                 <ShieldCheck size={18} />
                 Panel Administrativo ({user?.rol})
               </NavLink>
-            ) : (
-              <button 
-                type="button" 
-                onClick={openAdminModal} 
-                className="btn-tactile btn-tactile-secondary"
-                style={{ marginTop: '0.5rem', justifyContent: 'center' }}
-              >
-                <ShieldCheck size={18} />
-                Acceso Administración (Login)
-              </button>
             )}
 
             <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: 'var(--border-sm)' }}>
@@ -271,96 +204,6 @@ export const Navbar = () => {
           </nav>
         )}
       </header>
-
-      {/* MODAL TÁCTIL DE ACCESO ADMINISTRATIVO CON LOGIN INTEGRADO */}
-      {adminModalOpen && (
-        <div className="admin-login-modal-overlay" onClick={closeAdminModal}>
-          <div className="admin-login-modal-card" role="dialog" aria-modal="true" aria-labelledby="admin-login-title" onClick={(e) => e.stopPropagation()}>
-            <button 
-              type="button"
-              className="admin-login-modal-close" 
-              onClick={closeAdminModal}
-              aria-label="Cerrar modal"
-            >
-              <X size={22} />
-            </button>
-
-            <div className="admin-login-modal-header">
-              <span className="admin-login-badge">
-                <ShieldCheck size={14} /> Ferretería Los Maestros
-              </span>
-              <h2 id="admin-login-title" className="admin-login-title">Acceso Administración</h2>
-              <p className="admin-login-desc">
-                Ingresa tus credenciales de operador para acceder al panel de control, inventario y órdenes.
-              </p>
-            </div>
-
-            {adminLoginError && (
-              <div className="alert-tactile alert-tactile-danger" style={{ marginBottom: '1rem', fontSize: '0.85rem' }}>
-                <AlertCircle size={16} />
-                <span>{adminLoginError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleAdminLoginSubmit}>
-              <div className="form-group" style={{ marginBottom: '0.85rem' }}>
-                <label htmlFor="admin-login-email" className="label-tactile" style={{ fontSize: '0.85rem' }}>
-                  Correo Operativo
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <input 
-                    id="admin-login-email"
-                    type="email"
-                    className="input-tactile"
-                    placeholder="admin@duoc.cl"
-                    value={adminEmail}
-                    onChange={(e) => setAdminEmail(e.target.value)}
-                    style={{ paddingLeft: '2.4rem', fontSize: '0.9rem' }}
-                    required
-                  />
-                  <Mail 
-                    size={16} 
-                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} 
-                  />
-                </div>
-              </div>
-
-              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                <label htmlFor="admin-login-password" className="label-tactile" style={{ fontSize: '0.85rem' }}>
-                  Contraseña de Seguridad
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <input 
-                    id="admin-login-password"
-                    type="password"
-                    className="input-tactile"
-                    placeholder="••••••••"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    style={{ paddingLeft: '2.4rem', fontSize: '0.9rem' }}
-                    required
-                  />
-                  <Key 
-                    size={16} 
-                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} 
-                  />
-                </div>
-              </div>
-
-              <button 
-                type="submit"
-                disabled={authLoading}
-                className="btn-tactile btn-tactile-secondary btn-tactile-block"
-                style={{ padding: '0.75rem', fontWeight: 900 }}
-              >
-                <Lock size={16} /> {authLoading ? 'Verificando acceso...' : 'Ingresar al Panel de Operaciones'}
-              </button>
-            </form>
-
-
-          </div>
-        </div>
-      )}
 
       {/* NOTIFICACIÓN TÁCTIL FLOTANTE */}
       {notification && (

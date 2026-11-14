@@ -179,4 +179,12 @@ Las pruebas automatizadas del backend usan H2. El recorrido de MySQL y las compr
 
 Usuarios y las operaciones comerciales de React están integrados con MySQL mediante las APIs de Usuarios y Ventas. Catálogo, checkout, pedidos y crédito usan respuestas del servidor; el carrito permanece local. La revalidación de sesión posterior conserva formularios y las imágenes se normalizan antes de mostrar y cachear. Los métodos locales de `userService` se conservan para validaciones y antecedentes de pruebas; las cuentas de la aplicación integrada se autentican por API.
 
-La documentación final de esta revisión está en [docs](../../docs/README.md), con 118 pruebas de React y 25 del backend. Las pruebas Java usan H2 y las verificaciones de MySQL se registran por separado.
+La revisión del 05/11 está en [docs](../../docs/README.md), con 118 pruebas de React y 25 del backend como evidencia histórica. Las pruebas Java usan H2 y las verificaciones de MySQL se registran por separado.
+
+## Actualización documental del 13 de noviembre de 2026
+
+Los resultados anteriores corresponden a su fecha de comprobación. La suite vigente del frontend conserva tres reglas unitarias por el ajuste docente documentado en su README; el informe de pruebas 3.1 registra tres aprobadas y 2,02 % de líneas. El login común redirige ADMIN y VENDEDOR al panel y la barra pública ya no ofrece un acceso administrativo separado. Los contratos y controles del backend se conservan. Consultar el [índice de documentos actualizado](../../docs/README.md) para el manual, ERS y límites de estas verificaciones.
+
+## Verificación del despliegue del 14 de noviembre de 2026
+
+El frontend se actualizó en EC2 con respaldo previo y sin modificar los microservicios ni las bases. Se comprobaron cinco contenedores saludables, login, catálogo UTF-8 y conservación de datos y claves. Las acciones de usuarios contratistas conservan texto e iconos y un mínimo táctil de 44 px en móvil; su visualización se confirmó en iPhone 15 Pro, Zen y Chrome. Esta comprobación visual es independiente de las suites automatizadas.
