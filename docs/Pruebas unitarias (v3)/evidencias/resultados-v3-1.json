@@ -1,0 +1,85 @@
+{
+  "revision": "3.1",
+  "fecha": "2026-11-13",
+  "zona_horaria": "America/Santiago",
+  "base_git": "8f23bf46ede557f546793600047df3d24adb38d5",
+  "cambios_locales": "Navbar.jsx sin acceso administrativo público ni modal duplicado",
+  "frontend": {
+    "archivos": 3,
+    "aprobadas": 3,
+    "fallidas": 0,
+    "omitidas": 0,
+    "casos": [
+      {
+        "archivo": "src/test/services/productService.test.js",
+        "casos": [
+          {
+            "nombre": "calcula el precio final de un producto con 20% de descuento",
+            "estado": "passed"
+          }
+        ]
+      },
+      {
+        "archivo": "src/test/services/shippingService.test.js",
+        "casos": [
+          {
+            "nombre": "permite retiro gratuito aunque la dirección esté fuera de cobertura",
+            "estado": "passed"
+          }
+        ]
+      },
+      {
+        "archivo": "src/test/services/userService.test.js",
+        "casos": [
+          {
+            "nombre": "acepta los dominios de correo permitidos y rechaza uno ajeno",
+            "estado": "passed"
+          }
+        ]
+      }
+    ],
+    "cobertura": {
+      "sentencias": {
+        "cubiertas": 29,
+        "total": 1560,
+        "porcentaje": 1.85
+      },
+      "ramas": {
+        "cubiertas": 19,
+        "total": 1318,
+        "porcentaje": 1.44
+      },
+      "funciones": {
+        "cubiertas": 4,
+        "total": 430,
+        "porcentaje": 0.93
+      },
+      "lineas": {
+        "cubiertas": 27,
+        "total": 1335,
+        "porcentaje": 2.02
+      }
+    },
+    "inclusion": "src/**/*.{js,jsx}",
+    "exclusion": [
+      "src/main.jsx",
+      "src/test/**",
+      "src/data/**"
+    ]
+  },
+  "compilacion": "Vite correcta; verificación posterior al ajuste de Navbar",
+  "lint": "Oxlint del frontend: 0 errores y 9 advertencias en la revisión de main; Navbar.jsx sin diagnósticos después del ajuste",
+  "backend": "Ejecución complementaria del 13/11: Usuarios 6 y Ventas 19 aprobadas con H2, sin fallos, errores ni omitidas. Detalle en resultados-backend-v3-1.json.",
+  "manual": [
+    "Menú administrativo a 390 x 844: abrir, cerrar por fondo, Escape y navegar",
+    "Formulario de producto en una columna y con desplazamiento vertical",
+    "Visitante sin acceso Administración en escritorio y móvil",
+    "Login normal de ADMIN redirige a /admin; enlace operativo conservado",
+    "Catálogo local con tildes corregidas"
+  ],
+  "limites": [
+    "No se repitió una compra completa en esta revisión",
+    "No se hizo auditoría completa de perfiles y dispositivos",
+    "No se verificó ni actualizó EC2 en esta revisión"
+  ]
+}

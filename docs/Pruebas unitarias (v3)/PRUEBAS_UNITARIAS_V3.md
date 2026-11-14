@@ -1,203 +1,153 @@
-# Informe de pruebas y cobertura de fase 3
+# Informe de pruebas y cobertura de Ferretería Los Maestros
 
-> Documento de entrega y evidencia de la revisión indicada en el informe. Las referencias a AWS pendiente describen ese momento: el equipo confirmó posteriormente el despliegue. Para operación actual, consultar la [guía de despliegue](<../../Fase 3/despliegue/README.md>). Los resultados medidos y los archivos Word/Excel se conservan como registro de entrega.
-
-Revisión 3.0 del 5 de noviembre de 2026.
+Revisión 3.1 del 13 de noviembre de 2026.
 
 [Documento Word](Informe_Pruebas_Unitarias_y_Cobertura_v3.docx) · [Índice de documentación](../README.md)
 
 ## Ficha del documento
+
+
 
 | Dato | Descripción |
 | --- | --- |
 | Proyecto | Ferretería Los Maestros |
 | Entrega | DSY1104 Desarrollo FullStack II Evaluación Parcial 3 |
 | Integrantes | Sebastián Diaz, Jeremy Hanglin y Martín Caviedes |
-| Revisión | 3.0 del 5 de noviembre de 2026 |
-| Base examinada | Código local integrado de Fase 3; rama fase3/martin-usuarios con cambios de trabajo. |
-| Evidencia | 118 casos de React y 25 de Java; cobertura V8 exclusiva del frontend. |
+| Revisión | 3.1 del 13 de noviembre de 2026 |
+| Base examinada | React, Usuarios y Ventas de Fase 3; main 8f23bf4 con el ajuste de navegación de Navbar.jsx. |
+| Estado | Informe de resultados de React y los microservicios Spring Boot |
 
 ## 1 Objetivo y alcance
 
-La ejecución del 5 de noviembre de 2026 aprobó las 118 pruebas de React en 19 archivos y las 25 pruebas del backend en seis clases. La cobertura de líneas de React fue 70,39 % (951 de 1351). No hubo casos fallidos ni omitidos en la ejecución final.
+Las suites ejecutaron 28 pruebas: tres del frontend React, seis de Usuarios y diecinueve de Ventas. Todas aprobaron, sin fallos, errores ni casos omitidos. La cobertura de líneas del frontend fue 2,02 % (27 de 1335); no se midió cobertura de Java.
 
-Este informe reúne resultados, métricas, trazabilidad con el ERS v3 y límites de verificación. Conserva el informe de fase 2 como antecedente independiente. La fase 3 usa APIs REST, JWT y datos de negocio centralizados; las pruebas de interfaz simulan respuestas para comprobar comportamientos controlados.
+Este informe presenta el entorno, los casos y resultados, su relación con el ERS y la cobertura del frontend medida mediante V8. Incluye reglas unitarias de React y pruebas automatizadas de Spring Boot con H2, MockMvc y colaboradores de prueba. La persistencia con MySQL y los recorridos desplegados se documentan por separado en APIs e integración.
 
-La suite combina pruebas de funciones, componentes e integración. Los casos de Spring Boot utilizan H2 y MockMvc; algunas dependencias se sustituyen por dobles de prueba. Los recorridos previos con MySQL y navegador complementan esta ejecución, pero no forman parte de los porcentajes de cobertura.
+Los tres casos de React invocan funciones con datos definidos y comparan su respuesta con el resultado esperado, sin navegador ni solicitudes a los microservicios. Las pruebas Java verifican servicios, acceso HTTP simulado, repositorios y transacciones dentro de contextos de Spring. Una clase de Ventas utiliza un servidor HTTP local controlado para representar Usuarios.
 
 ## 2 Entorno y procedimiento
 
-| Elemento | Configuración y alcance |
+
+
+| Elemento | Configuración |
 | --- | --- |
-| Frontend | Vitest 5.0.3 y @vitest/coverage-v8 5.0.3; jsdom 30.1.2 y Testing Library. |
-| Ejecución | Windows, Node.js 24.22.1; cobertura React ejecutada a las 22:12, hora de Santiago. |
-| Backend | Java 21.0.12.1, Spring Boot 3.5.16, Maven Wrapper y Surefire 3.5.6; destino Java 17. |
-| Datos Java | Perfil local, H2 en memoria. No se conectó la suite Maven a MySQL. |
-| Aislamiento | Datos ficticios; restauración de mocks y almacenamiento en frontend; contextos y datos de prueba en Java. |
-| Instrumentación | V8 instrumenta src/**/*.{js,jsx}; excluye src/main.jsx, src/test/** y src/data/**. |
+| Fecha de ejecución | 13 de noviembre de 2026, 23:03, hora de Santiago |
+| Sistema y ejecución | Windows; Node.js 24.22.1 |
+| Aplicación | React y Vite 8.3.4 |
+| Pruebas | Vitest 5.0.3; entorno jsdom 30.1.2 |
+| Cobertura | Proveedor V8 mediante @vitest/coverage-v8 5.0.3 |
+| Preparación | Dependencias fijadas en package-lock.json; setup en src/test/setup.js |
+| Ubicación | Fase 3/frontend; casos en src/test/services/ |
 
-La cobertura incluye archivos elegibles aunque no reciban ejecución; no incluye CSS ni imágenes. Se calculan sentencias, ramas, funciones y líneas del frontend. No se configuró una medición JaCoCo de Java y no se atribuye a Java el porcentaje de React.
-
-### Tipos de comprobación automatizada
-
-| Tipo | Ejemplo y herramienta |
-| --- | --- |
-| Funciones y servicios | Validaciones, contratos HTTP y normalización de imágenes con Vitest. |
-| Componentes e integración React | Formularios, sesión y rutas con jsdom; API o servicios simulados. |
-| Integración Spring | Controladores, servicios, repositorios y permisos con MockMvc y H2. |
-| Adaptador HTTP | Servidor HTTP de prueba para verificar la consulta de contratistas; no un servicio Usuarios desplegado. |
-
-Un primer intento de instrumentación no pudo leer archivos temporales del entorno de ejecución. Se repitió con un directorio temporal accesible, sin modificar la aplicación ni sus pruebas. Los resultados siguientes corresponden a la ejecución final completada.
-
-## 3 Resultados de ejecución
-
-### 3.1 React
-
-| Archivo de prueba | Casos | Resultado |
-| --- | --- | --- |
-| Access.test.jsx | 5 | Aprobadas |
-| AdminUsers.test.jsx | 2 | Aprobadas |
-| AuthSession.test.jsx | 7 | Aprobadas |
-| Cart.test.jsx | 3 | Aprobadas |
-| Checkout.test.jsx | 6 | Aprobadas |
-| Contact.test.jsx | 4 | Aprobadas |
-| Login.test.jsx | 3 | Aprobadas |
-| ProductNavigation.test.jsx | 4 | Aprobadas |
-| Register.test.jsx | 2 | Aprobadas |
-| VentasIntegration.test.jsx | 6 | Aprobadas |
-| catalogoJeremyFase3.test.jsx | 7 | Aprobadas |
-| orderService.test.js | 10 | Aprobadas |
-| productService.test.js | 15 | Aprobadas |
-| regressions.test.js | 9 | Aprobadas |
-| userApiService.test.js | 5 | Aprobadas |
-| userService.test.js | 14 | Aprobadas |
-| Navbar.test.jsx | 4 | Aprobadas |
-| ProductCard.test.jsx | 5 | Aprobadas |
-| ProfileNavigation.test.jsx | 7 | Aprobadas |
-| Total | 118 | 0 fallidas; 0 omitidas |
-
-La suite tardó 10,40 s en esta ejecución; ese tiempo incluye preparación y ejecución de pruebas, no representa latencia de usuario ni rendimiento de producción. Los nombres completos y estados de los casos se conservan en evidencias/resultados-v3.json.
-
-### 3.2 Servicios Spring Boot
-
-| Servicio y clase | Casos | Resultado |
-| --- | --- | --- |
-| usuarios / UsuariosMartinTests | 5 | 0 fallos y errores |
-| usuarios / UsuariosServiceApplicationTests | 1 | 0 fallos y errores |
-| ventas / CatalogoJeremyTests | 9 | 0 fallos y errores |
-| ventas / PedidosSebaTests | 6 | 0 fallos y errores |
-| ventas / UsuariosContratistasTests | 3 | 0 fallos y errores |
-| ventas / VentasServiceApplicationTests | 1 | 0 fallos y errores |
-| Total backend | 25 | 0 omitidas |
-
-Usuarios ejecutó seis casos y Ventas diecinueve; ambos finalizaron con BUILD SUCCESS. Los casos contextLoads verifican el arranque del contexto y se contabilizan por separado de las reglas de negocio.
-
-UsuariosMartinTests comprueba registro, duplicados, rechazo de roles administrativos en registro público, gestión y desactivación, documentación Swagger y credencial de consulta interna. CatalogoJeremyTests verifica catálogo, oferta efectiva, stock y permisos de escritura.
-
-PedidosSebaTests verifica identidad del comprador, importes del servidor, rollback ante stock o crédito insuficiente, consultas autorizadas y restitución única al anular. UsuariosContratistasTests comprueba la habilitación con respuesta HTTP válida y el rechazo o conservación de la cuenta frente a perfiles inválidos o fallos de dependencia.
-
-Las advertencias de instrumentación de Mockito y serialización de PageImpl no impidieron la ejecución. El error de unicidad registrado en H2 corresponde al caso que comprueba un RUN duplicado rechazado; Surefire reporta cero errores de prueba.
-
-## 4 Casos relevantes y trazabilidad
-
-| Comportamiento | Prueba representativa | ERS v3 |
-| --- | --- | --- |
-| Registro y roles públicos | Register.test.jsx; UsuariosMartinTests | RF-022 RF-026 RNF-002 |
-| Acceso administrativo y baja | Access.test.jsx; UsuariosMartinTests | RF-027 RF-029 RNF-002 |
-| Conservar formulario al volver a ventana | AuthSession.test.jsx; Checkout.test.jsx | RF-046 RF-048 |
-| Compra y errores visibles | Checkout.test.jsx; orderService.test.js | RF-017 RF-033 RF-045 |
-| Precio, identidad y rollback en servidor | PedidosSebaTests | RF-013 RF-031 RNF-004 |
-| Pedidos propios y permisos de personal | PedidosSebaTests; catalogoJeremyFase3.test.jsx | RF-034 RNF-002 |
-| Anular devuelve stock y crédito una vez | PedidosSebaTests | RF-035 RF-036 |
-| Cupo administrado y contratista verificado | UsuariosContratistasTests; PedidosSebaTests | RF-047 |
-| Comprobante e imágenes REST coherentes | VentasIntegration.test.jsx; productService.test.js | RF-006 RF-015 RF-033 |
-| Filtros y navegación | ProductNavigation.test.jsx; ProfileNavigation.test.jsx | RF-001 RF-042 |
-
-La tabla relaciona escenarios comprobados con requisitos; no constituye certificación completa de cada requisito. Un caso puede contener varias aserciones y cubrir más de una regla. El archivo de evidencia conserva los nombres para localizar cada escenario en el código.
-
-## 5 Cobertura medida
-
-| Métrica React | Cubierto / total | Porcentaje |
-| --- | --- | --- |
-| Sentencias | 1062 / 1573 | 67,51 % |
-| Ramas | 827 / 1316 | 62,84 % |
-| Funciones | 259 / 432 | 59,95 % |
-| Líneas | 951 / 1351 | 70,39 % |
-
-La cobertura indica código ejecutado durante esta suite. Las aserciones comprueban resultados; el porcentaje no demuestra por sí mismo que todos los escenarios, requisitos o fallos posibles estén cubiertos.
-
-| Archivo | Sentencias | Ramas | Funciones | Líneas |
-| --- | --- | --- | --- | --- |
-| context/AuthContext.jsx | 95,60 % | 79,48 % | 100,00 % | 98,68 % |
-| context/CartContext.jsx | 62,22 % | 55,88 % | 65,21 % | 67,53 % |
-| services/apiService.js | 90,00 % | 96,29 % | 66,66 % | 94,11 % |
-| services/orderService.js | 87,87 % | 70,00 % | 76,92 % | 88,88 % |
-| services/productService.js | 73,91 % | 70,25 % | 82,00 % | 79,64 % |
-| services/userApiService.js | 75,00 % | 66,66 % | 88,88 % | 80,00 % |
-| pages/Register.jsx | 70,42 % | 60,00 % | 75,00 % | 75,80 % |
-| pages/Checkout.jsx | 74,00 % | 59,59 % | 54,54 % | 77,77 % |
-| pages/admin/AdminDashboard.jsx | 52,36 % | 53,52 % | 36,75 % | 52,72 % |
-| App.jsx | 0,00 % | 0,00 % | 0,00 % | 0,00 % |
-
-AuthContext tiene 98,68 % de líneas y AdminDashboard 52,72 %. App.jsx no recibió ejecución en esta suite. MyOrders alcanza 100 % de líneas, pero solo 37,50 % de ramas: ejecutar sus líneas no significa comprobar todas sus alternativas. Los valores por archivo están disponibles en la evidencia JSON.
-
-El informe de fase 2 registró 60,85 % de líneas; el actual registra 70,39 %. Son mediciones sobre bases de código y conjuntos de pruebas diferentes: no se interpreta la diferencia como una comparación controlada de calidad ni se reutilizan los porcentajes anteriores.
-
-## 6 Verificación complementaria y límites
-
-| Comprobación | Resultado y procedencia |
-| --- | --- |
-| MySQL y APIs reales | Evidencias previas: compra, persistencia, rollback, crédito, anulación y concurrencia controlada. No se repitieron al medir cobertura. |
-| Recorrido manual React | Martín confirmó compra, carrito vacío, historial, deuda, anulación y devolución de stock. Capturas en manual e informe de integración. |
-| Regresiones posteriores | Foco de ventana, comprobante administrativo e imágenes confirmados manualmente y con casos automatizados. |
-| Compilación y lint | Verificación previa: Vite y JAR correctos; Oxlint con 0 errores y 9 advertencias. No son métricas de cobertura. |
-
-Los dobles de prueba permiten provocar errores de red y respuestas específicas, pero no validan por sí solos la comunicación entre procesos desplegados. Las pruebas con autenticación simulada verifican autorización en escenarios definidos; no sustituyen los recorridos previos con JWT firmado.
-
-No se realizó una auditoría completa de accesibilidad, una nueva matriz de dispositivos móviles, una prueba de carga, un ensayo de disponibilidad ni una evaluación de seguridad de producción. Tampoco se midió cobertura Java. Los pagos continúan simulados y no se comprobó un despliegue completo en AWS.
-
-La cobertura incluye servicios locales conservados de la etapa anterior además de los adaptadores REST. Su ejecución no demuestra que la persistencia local de fase 2 sea el almacenamiento de negocio actual. La aplicación integrada obtiene usuarios, catálogo, pedidos y crédito de las APIs.
-
-## 7 Cobertura pendiente
-
-| Prioridad | Área | Próxima comprobación útil |
-| --- | --- | --- |
-| Alta | Aplicación completa | Recorridos desde App con rutas reales y servicios desplegados; App.jsx tiene 0 % de líneas. |
-| Alta | Administración y crédito | Más combinaciones de errores, edición y respuesta de cupos; AdminDashboard conserva ramas sin ejecutar. |
-| Alta | Backend | Medir cobertura Java con una herramienta específica antes de afirmar un porcentaje. |
-| Media | Consulta pública | Casos para Home, Offers, Categories y ProductDetail; sus líneas no reciben ejecución en esta suite. |
-| Media | Errores y ramas | Red intermitente, reintentos y alternativas de MyOrders y CartContext. |
-| Media | Accesibilidad y presentación | Teclado, foco de modales y matriz móvil actual; estas verificaciones no aumentan por sí mismas la cobertura V8. |
-
-Las prioridades se basan en rutas sin ejecución y riesgos funcionales. El objetivo de ampliar las pruebas es comprobar decisiones y resultados relevantes; no aumentar porcentajes con pruebas que solo reproduzcan el código.
-
-## 8 Reproducción y evidencias
-
-Desde Fase 3/frontend, instalar las versiones del archivo de bloqueo y ejecutar:
+El procedimiento consiste en instalar las dependencias, ejecutar la suite y generar el informe de cobertura. Los comandos se ejecutan desde Fase 3/frontend:
 
 ```powershell
 npm ci
-npm run test:coverage -- --reporter=default --reporter=json --outputFile=test-results.json
+npm run test:run
+npm run test:coverage
 ```
 
-Vitest genera coverage/index.html, coverage/coverage-final.json y test-results.json. El HTML permite inspección interactiva; el JSON de cobertura conserva contadores y el de pruebas identifica casos y estados. Las rutas se pueden redirigir con --coverage.reportsDirectory y --outputFile sin cambiar la configuración de inclusión.
+Vitest informa el estado de cada archivo y cada caso. La ejecución con cobertura genera coverage/index.html para consulta y coverage/coverage-final.json con los contadores por archivo. La ejecución medida utilizó también el reportero JSON para registrar los nombres y estados de los casos.
 
-Desde Fase 3/backend/usuarios-service y, por separado, desde ventas-service:
+La instrumentación incluye src/**/*.{js,jsx} y excluye src/main.jsx, src/test/** y src/data/**, conforme a vite.config.js. Los archivos incluidos que no reciben ejecución permanecen en el total de cobertura.
+
+## 3 Casos de React y trazabilidad
+
+
+
+| Caso y responsable | Servicio y archivo | Resultado |
+| --- | --- | --- |
+| PU-01 Martín | userService.validateEmail; userService.test.js | Aprobado |
+| PU-02 Jeremy | productService.getUnitPrice; productService.test.js | Aprobado |
+| PU-03 Sebastián | shippingService.quote; shippingService.test.js | Aprobado |
+
+PU-01. Se validaron alumno@duoc.cl, docente@profesor.duoc.cl y cliente@gmail.com, con respuesta esperada true. Para cliente@hotmail.com se esperaba false. Las cuatro comparaciones coincidieron con los resultados esperados.
+
+PU-02. Se utilizó un producto con precio 10000, enOferta true y descuento 20. La función devolvió 8000, coincidente con el precio unitario esperado de $8.000.
+
+PU-03. Se cotizó RETIRO_TIENDA con Región Metropolitana de Santiago, comuna Santiago y subtotal 10000. La respuesta indicó available true y fee 0, coincidente con el retiro disponible y gratuito.
+
+
+
+| Caso | Requisito relacionado | Parte comprobada |
+| --- | --- | --- |
+| PU-01 | RF-023 Validar correos | Dominios admitidos y rechazo de un dominio ajeno. |
+| PU-02 | RF-013 Calcular importes coherentes | Precio unitario con una oferta de 20 %. |
+| PU-03 | RF-044 Calcular tarifa y cobertura local | Retiro gratuito con una dirección fuera de cobertura. |
+
+La relación con el ERS identifica la regla ejercitada por cada caso. No acredita todas las condiciones del requisito: no se prueban aquí las demás estructuras de correo, el total transaccional del pedido ni las tarifas de despacho a domicilio.
+
+## 4 Pruebas de Spring Boot
+
+Las pruebas se ejecutaron el 13/11/2026 con Java 21.0.12.1, Spring Boot 3.5.16, JUnit Jupiter y Maven Surefire 3.5.6. Ambos proyectos declararon BUILD SUCCESS. Usuarios terminó a las 23:58:46 y Ventas a las 23:58:49, hora de Santiago. El perfil local utiliza H2 en memoria con creación y eliminación del esquema.
+
+Desde Fase 3/backend/usuarios-service y, por separado, desde Fase 3/backend/ventas-service, ejecutar el Maven Wrapper:
 
 ```powershell
-.\mvnw.cmd test
+
+.\mvnw.cmd -B -ntp test
+
 ```
 
-Los resultados Java se generan en target/surefire-reports de cada servicio. Utilizar el perfil local predeterminado para reproducir esta suite H2. No activar el perfil mysql para atribuirle estos resultados; la preparación de la integración real está en el README del backend.
 
-Se publica evidencias/resultados-v3.json con resultados por archivo y clase, nombres de casos y contadores de cobertura por archivo. No contiene contraseñas, tokens, rutas personales ni los volcados de propiedades de la JVM. La salida detallada se regenera con los comandos anteriores.
 
-## 9 Referencias
+| Servicio | Clase ejecutada | Casos | Resultado |
+| --- | --- | --- | --- |
+| Usuarios | UsuariosMartinTests | 5 | Aprobados |
+| Usuarios | UsuariosServiceApplicationTests | 1 | Aprobado |
+| Ventas | CatalogoJeremyTests | 9 | Aprobados |
+| Ventas | PedidosSebaTests | 6 | Aprobados |
+| Ventas | UsuariosContratistasTests | 3 | Aprobados |
+| Ventas | VentasServiceApplicationTests | 1 | Aprobado |
 
-ERS Ferretería Los Maestros v3; APIs e Integración v3; informe de pruebas de fase 2; vite.config.js y package-lock.json del frontend; pruebas en src/test; pom.xml y pruebas Java de ambos servicios; pauta DSY1104 Evaluación Parcial 3 Anexo 1. Las referencias corresponden a archivos del repositorio.
+Usuarios comprobó registro, perfil y duplicados; rechazo de roles de gestión en el registro público; credencial del canal interno; gestión administrativa y bloqueo de login tras desactivar una cuenta; esquemas de seguridad de OpenAPI y arranque del contexto. Estas comprobaciones se relacionan con RF-026, RF-027, RF-029 y RNF-002.
+
+Ventas comprobó consulta pública del catálogo, alta y ajuste de stock por ADMIN, rechazo de modificaciones según rol, stock crítico, precio efectivo, adaptación del catálogo a pedidos y seguridad OpenAPI. En pedidos verificó precio e identidad del servidor, permisos, stock o crédito insuficientes sin cambios parciales, consulta administrativa de crédito y restitución única al repetir una anulación. Estos casos se relacionan con RF-013, RF-030, RF-035, RF-036 y RNF-004.
+
+UsuariosContratistasTests comprobó la habilitación de un contratista mediante una respuesta HTTP controlada, el rechazo de perfiles no válidos y la conservación de la cuenta cuando Usuarios falla. Los casos contextLoads verifican el arranque de Spring. MockMvc no levanta un servidor comercial real; Ventas simula JWT y sustituye algunos colaboradores. Estas pruebas utilizan H2 y no acreditan por sí solas la integración con MySQL o AWS.
+
+## 5 Resultados y cobertura
+
+
+
+| Componente | Aprobadas | Fallos | Errores | Omitidas |
+| --- | --- | --- | --- | --- |
+| React | 3 | 0 | 0 | 0 |
+| Usuarios | 6 | 0 | 0 | 0 |
+| Ventas | 19 | 0 | 0 | 0 |
+| Total | 28 | 0 | 0 | 0 |
+
+
+
+| Métrica React V8 | Cubierto y total | Porcentaje |
+| --- | --- | --- |
+| Sentencias | 29 de 1560 | 1,85 % |
+| Ramas | 19 de 1318 | 1,44 % |
+| Funciones | 4 de 430 | 0,93 % |
+| Líneas | 27 de 1335 | 2,02 % |
+
+Las 28 pruebas finalizaron correctamente. Vitest tardó 2,89 segundos; Maven informó 20,591 segundos para Usuarios y 24,113 segundos para Ventas. Son duraciones de ejecución de suites independientes, incluida su preparación, y no representan el tiempo de respuesta de la aplicación para un usuario.
+
+La cobertura expresa la proporción de código instrumentado que se ejecutó durante la suite. El 2,02 % de líneas corresponde al alcance de las tres reglas unitarias seleccionadas y no acredita una cobertura completa del frontend. Los componentes, las páginas y los recorridos que no se invocan desde estos casos no reciben ejecución.
+
+## 6 Conclusiones y límites
+
+Las reglas de React y los escenarios de Usuarios y Ventas devolvieron los resultados esperados. Las pruebas cubren los tres cálculos o validaciones seleccionados del frontend y escenarios de registro, permisos, catálogo, compra, crédito y anulación del backend. No se observaron fallos ni errores en las 28 pruebas ejecutadas.
+
+Los escenarios con H2 y colaboradores de prueba no constituyen un recorrido completo de la interfaz contra MySQL. Tampoco prueban todas las combinaciones de permisos o errores ni la operación del sistema desplegado. La cobertura V8 se aplica exclusivamente al frontend; no se configuró una medición JaCoCo para Java. La evaluación de rendimiento, accesibilidad y seguridad completa queda fuera de estas ejecuciones.
+
+## 7 Evidencias y referencias
+
+El archivo evidencias/resultados-v3-1.json conserva la fecha de ejecución, los tres nombres de caso, sus estados y los contadores globales de cobertura. El archivo evidencias/resultados-backend-v3-1.json registra las seis clases Java, sus 25 nombres de caso y sus contadores. Los reportes Maven se generan en target/surefire-reports de cada microservicio; las evidencias publicadas excluyen propiedades de la JVM, credenciales y la salida de diagnóstico.
+
+Fuentes del repositorio: src/test/services/userService.test.js, productService.test.js y shippingService.test.js; vite.config.js; package-lock.json; ERS actualizado v3 y APIs e integración v3.
+
+Las comprobaciones con MySQL y los recorridos desplegados se consultan en docs/APIs e Integracion/APIS_E_INTEGRACION.md. Esas comprobaciones se mantienen separadas de las 28 pruebas automatizadas de este informe.
 
 ## Archivos de consulta
 
-[Resultados y cobertura por archivo](evidencias/resultados-v3.json)
+[Resultados de React](evidencias/resultados-v3-1.json)
+
+[Resultados de Spring Boot](evidencias/resultados-backend-v3-1.json)
 
 [ERS v3](<../ERS actualizado (v3)/ERS_actualizado_v3.md>) · [APIs e integración](<../APIs e Integracion/APIS_E_INTEGRACION.md>)

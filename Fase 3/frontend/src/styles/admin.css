@@ -408,6 +408,22 @@
   background-color: #f8fafc;
 }
 
+.admin-user-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.admin-user-actions > button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.admin-user-actions svg {
+  flex-shrink: 0;
+}
+
 /* Badges de Estado */
 .badge-admin-critical {
   display: inline-flex;
@@ -804,4 +820,5 @@
   .admin-layout-root .modal-box-tactile { padding: 1rem; max-height: calc(100dvh - 2rem); }
   .admin-layout-root .modal-box-tactile button { min-height: 44px; }
   .admin-title { overflow-wrap: anywhere; }
+  .admin-user-actions > button { min-width: 44px; min-height: 44px; }
 }

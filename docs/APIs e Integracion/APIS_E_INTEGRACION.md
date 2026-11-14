@@ -1,8 +1,8 @@
 # APIs e integración de Ferretería Los Maestros
 
-> Documento de entrega y evidencia de la revisión indicada en el informe. Las referencias a AWS pendiente describen ese momento: el equipo confirmó posteriormente el despliegue. Para operación actual, consultar la [guía de despliegue](<../../Fase 3/despliegue/README.md>). Los resultados medidos y los archivos Word/Excel se conservan como registro de entrega.
+> Revisión 3.1 del 13 de noviembre de 2026, con actualización de despliegue del 14/11. Actualiza la interfaz y distingue las comprobaciones recientes de las evidencias del 5 de noviembre. El frontend se actualizó en EC2 el 14/11/2026, incluidas la navegación por perfil y las acciones móviles de usuarios. Consultar la [guía de despliegue](<../../Fase 3/despliegue/README.md>).
 
-Revisión 3.0 del 5 de noviembre de 2026.
+Revisión 3.1 del 13 de noviembre de 2026.
 
 [Documento Word](<APIs_e_Integracion_Los_Maestros_v3.docx>) · [Índice de documentación](../README.md)
 
@@ -12,15 +12,15 @@ Ferretería Los Maestros
 
 Título: APIs e integración de Ferretería Los Maestros
 
-Versión del Documento: 3.0
+Versión del Documento: 3.1
 
-Fecha de revisión: 05/11/2026
+Fecha de revisión: 13/11/2026
 
 ## 1 Descripción General
 
 La fase 3 integra React con Usuarios y Ventas mediante APIs REST versionadas. Usuarios autentica y mantiene perfiles; Ventas concentra catálogo, inventario, pedidos y cuenta corriente. Este documento está dirigido al equipo y al docente para comprender la integración y reproducir sus pruebas. La operación se verificó localmente con MySQL y datos ficticios.
 
-Integrantes: Sebastián Diaz, Jeremy Hanglin y Martín Caviedes. Revisión: 05/11/2026. Las capturas documentan recorridos realizados en el entorno de desarrollo; no corresponden a un despliegue público.
+Integrantes: Sebastián Diaz, Jeremy Hanglin y Martín Caviedes. Revisión: 13/11/2026. Las capturas y los recorridos comerciales conservados corresponden a comprobaciones locales del 05/11. El despliegue inicial se verificó el 07/11 y el frontend se actualizó el 14/11, conservando datos y claves.
 
 ## 2 Información General
 
@@ -279,6 +279,8 @@ Nota. Los botones menos y más cambian cantidades; la papelera elimina una líne
 
 ## 7 Pruebas y resultados de comunicación
 
+Resultados históricos del 05/11/2026. La actualización del 13/11 se presenta en la sección 7.3 y no constituye una repetición de todas estas pruebas.
+
 | Comprobación | Resultado registrado | Alcance |
 | --- | --- | --- |
 | React Vitest | 118 aprobadas en 19 archivos | Servicios REST, sesión, acceso, formularios, navegación, carrito y regresiones de integración. |
@@ -312,4 +314,12 @@ El conjunto automatizado de backend usa H2 y, en casos concretos, autenticación
 
 Las evidencias se conservan en Fase 3/documentacion/evidencias/martin y en esta carpeta. Los archivos resultados-automaticos-v3.txt y resultados-integracion-v3.txt resumen las ejecuciones verificadas. Las capturas se comparten como parte de la documentación, sin credenciales ni claves privadas.
 
-Siguen pendientes los reportes por período, geocodificación exacta, video, cobros reales y despliegue completo en AWS. La exportación o separación final de frontend/backend, los comprimidos, la publicación de cambios y su entrega al docente no se realizan automáticamente por generar estos documentos.
+Siguen pendientes los reportes por período, geocodificación exacta, video y cobros reales. El despliegue en AWS incluye las mejoras recientes del frontend desde el 14/11/2026. Publicar cambios, preparar comprimidos actualizados y enviarlos al docente son tareas de entrega independientes de esta revisión documental.
+
+## 7.3 Actualización de interfaz y pruebas del 13 de noviembre
+
+La base de esta revisión es main en 8f23bf4 con el ajuste local de Navbar. Los cambios no modifican endpoints, DTO ni reglas de autorización del servidor. El inicio de sesión común dirige ADMIN y VENDEDOR al panel; la tienda solo muestra el enlace administrativo a esos perfiles. Se retiró el modal de login operativo duplicado.
+
+El panel incorpora cierre de navegación móvil por fondo, Escape o selección de sección, formularios en una columna y desplazamiento de tablas. Se comprobó el menú y el formulario de productos a 390 x 844. Checkout selecciona retiro cuando el domicilio guardado carece de cobertura y ofrece Continuar con retiro en tienda ante una dirección sin despacho. Este comportamiento se revisó en código; no se repitió una compra completa en la comprobación del 13/11.
+
+Vitest aprobó tres reglas unitarias y midió 2,02 % de líneas. Los 118 casos React y 25 Java de la sección 7 corresponden al 05/11; la ejecución complementaria del 13/11 aprobó seis casos de Usuarios y diecinueve de Ventas con H2, documentados en el informe de pruebas. Consultar el informe de pruebas 3.1 y sus evidencias para conocer el alcance vigente. La base local se reparó en sus textos UTF-8 con respaldo previo, conservando precios y stock. El 14/11 se actualizó el frontend en EC2 con respaldo previo: cinco contenedores saludables, login, catálogo y datos conservados. Las acciones de contratistas se confirmaron en iPhone 15 Pro, Zen y Chrome.

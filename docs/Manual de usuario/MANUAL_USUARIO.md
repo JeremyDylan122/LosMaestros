@@ -1,6 +1,6 @@
 # Manual de usuario de Ferretería Los Maestros
 
-Revisión 3.0 del 5 de noviembre de 2026.
+Revisión 3.1 del 13 de noviembre de 2026.
 
 [Documento Word](<Manual_Usuario_Los_Maestros_v3.docx>) · [Índice de documentación](../README.md)
 
@@ -8,15 +8,15 @@ Manual de Usuario
 
 Ferretería Los Maestros
 
-Versión del Documento: 3.0
+Versión del Documento: 3.1
 
-Fecha de revisión: 05/11/2026
+Fecha de revisión: 13/11/2026
 
 ## 1 Introducción
 
 Este manual explica cómo consultar la tienda, preparar una compra, revisar pedidos y utilizar el panel según el perfil. Corresponde a la versión integrada de fase 3, con datos persistentes en MySQL. Está dirigido a clientes, contratistas, vendedores y administradores.
 
-Recorra primero Requisitos y Comenzando. Después consulte el procedimiento de su tarea. Las capturas provienen de pruebas del proyecto con cuentas ficticias; los montos y existencias pueden cambiar al realizar nuevas operaciones.
+Recorra primero Requisitos y Comenzando. Después consulte el procedimiento de su tarea. Las figuras 1 a 11 conservan capturas de los recorridos del 05/11 con cuentas ficticias; documentan las operaciones de negocio y pueden mostrar la cabecera anterior. La sección 7 muestra la navegación vigente del 13/11. Los montos y existencias pueden cambiar al realizar nuevas operaciones.
 
 | Perfil | Acceso disponible |
 | --- | --- |
@@ -60,7 +60,7 @@ La cuenta inicial se crea si no existe un administrador. El alta pública de un 
 
 - 2. Usar un correo de duoc.cl, profesor.duoc.cl o gmail.com y una contraseña de 4 a 10 caracteres, conforme a las restricciones académicas actuales. Un RUN o correo existente no puede registrarse otra vez.
 
-- 3. En Iniciar Sesión, ingresar correo y contraseña y pulsar Ingresar al Sistema. Una cuenta desactivada no puede acceder.
+- 3. En Iniciar Sesión, ingresar correo y contraseña y pulsar Ingresar al Sistema. En móvil, abrir el menú y elegir Ingresar. ADMIN y VENDEDOR son dirigidos al panel; clientes y contratistas continúan en la tienda. Una cuenta desactivada no puede acceder.
 
 - 4. Utilizar el botón de salida para cerrar sesión. La sesión caduca a los 30 minutos; si se solicita acceso nuevamente, iniciar sesión antes de continuar.
 
@@ -72,7 +72,7 @@ Nota. Introducir correo y contraseña de una cuenta activa y pulsar Ingresar al 
 
 ## 4.2 Interfaz de usuario inicial
 
-La barra superior contiene Inicio, Catálogo, Categorías, Ofertas y las páginas informativas. A la derecha aparecen el carrito y sus unidades, el acceso a cuenta y las opciones permitidas para el perfil. Mis pedidos muestra compras propias para cliente y contratista; el personal consulta las órdenes de tienda.
+La barra superior contiene Inicio, Catálogo, Categorías, Ofertas y las páginas informativas. A la derecha aparecen el carrito y el acceso a cuenta. Los visitantes y compradores no ven un botón de Administración. Panel Admin aparece únicamente con sesión de ADMIN o VENDEDOR; en móvil figura como Panel Administrativo dentro del menú. Mis pedidos muestra compras propias. Consulte la sección 7 para ver la cabecera vigente.
 
 En Catálogo, usar búsqueda por nombre o código, categoría, ofertas y orden por precio. Abrir el botón del ojo para consultar la ficha. Añadir incorpora una unidad cuando hay stock. En la ficha puede seleccionarse una cantidad. Las ofertas muestran el precio efectivo con descuento.
 
@@ -106,7 +106,7 @@ Nota. Los botones menos y más cambian cantidades; la papelera elimina una líne
 
 - 2. Elegir Retiro en Mesón Central o Despacho a Faena. Para despacho, completar región, comuna y dirección.
 
-- 3. La Serena y Coquimbo: $4.990 bajo $100.000 y gratis desde ese monto. Vicuña: $14.990. Otras comunas requieren cotización; seleccionar retiro si no existe tarifa automática.
+- 3. La Serena y Coquimbo: $4.990 bajo $100.000 y gratis desde ese monto. Vicuña: $14.990. Si el domicilio guardado está fuera de cobertura, Checkout selecciona retiro gratuito e informa el motivo. Puede elegir despacho e ingresar otra dirección cubierta. Si la dirección elegida no tiene cobertura, usar Continuar con retiro en tienda; no se confirma despacho sin tarifa disponible.
 
 - 4. Elegir Webpay simulado, transferencia o cuenta corriente. El crédito exige CONTRATISTA, cuenta habilitada y cupo suficiente incluyendo despacho. Si el cupo no alcanza, reducir cantidades o elegir otro medio.
 
@@ -150,7 +150,7 @@ Nota. El pedido figura ANULADO y el crédito vuelve a $100.000 con deuda cero. L
 
 ## 5.5 Consultar el panel y mantener productos
 
-Administrador y vendedor ingresan al panel con una cuenta autorizada. La navegación lateral permite consultar el resumen, productos y pedidos. El vendedor dispone de consulta; las acciones de alta, edición, ajustes y cambio de estado corresponden al administrador.
+Administrador y vendedor ingresan mediante Iniciar Sesión, igual que los demás perfiles, y son dirigidos al panel. Desde la tienda pueden volver mediante Panel Admin. En teléfono, abrir el menú administrativo; se cierra al elegir una sección, tocar el fondo o pulsar Escape con teclado. Las tablas pueden desplazarse horizontalmente y los formularios verticalmente. El vendedor dispone de consulta; alta, edición, ajustes y cambio de estado corresponden al administrador.
 
 - 1. Como ADMIN, abrir Productos y buscar por código o nombre o filtrar por categoría.
 
@@ -219,3 +219,19 @@ Nota. El detalle conserva cantidades, precio unitario, subtotales, despacho y to
 | Datos diferentes entre pestañas | Las pestañas del mismo navegador comparten sesión. Cerrar sesión o entrar como otra cuenta afecta a las demás. Para probar dos perfiles simultáneos, usar perfiles de navegador separados. |
 
 Al volver a la ventana, la sesión se comprueba en segundo plano. El mismo usuario conserva sus datos de formulario. Un cambio de cuenta o una sesión rechazada puede retirar el acceso. Las imágenes de catálogo, ofertas, ficha y carrito utilizan la misma referencia por producto.
+
+## 7 Navegación vigente de la revisión 3.1
+
+Las figuras siguientes corresponden al 13/11 y sustituyen la referencia de cabecera de las capturas anteriores. Iniciar Sesión es la entrada común para todos los perfiles; el panel se ofrece solo después de autenticar un rol operativo.
+
+Figura 12  Inicio de la tienda sin sesión
+
+![Navegación pública actual](<imagenes/navegacion-publica-v3-1.png>)
+
+Nota. El visitante dispone de carrito, Iniciar Sesión y Registro. No se muestra un acceso adicional de Administración.
+
+Figura 13  Menú de la tienda en teléfono
+
+![Menú público móvil](<imagenes/menu-publico-movil-v3-1.png>)
+
+Nota. Abrir el botón de menú y elegir Ingresar o Registrarse. ADMIN y VENDEDOR acceden al panel desde el mismo inicio de sesión; con su sesión activa aparece Panel Administrativo.
